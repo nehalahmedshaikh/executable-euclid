@@ -1,0 +1,155 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>I.44 — Executable Euclid</title><style>
+:root {
+  --ink: #101010; --faint: #6a6a6a; --rule: #dcdcdc; --page: #ffffff;
+  --panel: #f7f7f7; --line: #101010;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ededed; --faint: #909090; --rule: #2c2c2c; --page: #0c0c0c;
+    --panel: #151515; --line: #ededed;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 17px/1.68 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding: 3.5rem 1.25rem 6rem; }
+.wide { max-width: 66rem; }
+a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px;
+    text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+h1 { font-size: 1.95rem; line-height: 1.22; margin: 0 0 .5rem; font-weight: normal;
+     letter-spacing: -.01em; }
+h2 { font-size: 1.22rem; font-weight: normal; margin: 2.8rem 0 .8rem;
+     border-bottom: 1px solid var(--rule); padding-bottom: .35rem; }
+h3 { font-size: 1rem; margin: 1.9rem 0 .5rem; font-weight: 700; }
+.kicker { font: 700 .68rem/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--faint);
+  margin: 0 0 .8rem; }
+.lede { color: var(--faint); font-size: 1.05rem; margin: .2rem 0 2rem; }
+nav.top { font: .8rem/2 ui-sans-serif, system-ui, sans-serif; margin-bottom: 2.6rem;
+          padding-bottom: .8rem; border-bottom: 1px solid var(--rule); }
+nav.top a { margin-right: 1.1rem; text-decoration: none; color: var(--faint); }
+nav.top a:hover, nav.top a.here { color: var(--ink); text-decoration: underline; }
+code, pre, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+pre { background: var(--panel); border: 1px solid var(--rule);
+      padding: .95rem 1.05rem; overflow-x: auto; font-size: .78rem; line-height: 1.6; }
+code { font-size: .86em; }
+table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+th, td { text-align: left; padding: .4rem .65rem; border-bottom: 1px solid var(--rule);
+         vertical-align: top; }
+th { font: 700 .68rem/1.5 ui-sans-serif, system-ui, sans-serif;
+     letter-spacing: .09em; text-transform: uppercase; color: var(--faint); }
+tbody tr:last-child td { border-bottom: none; }
+.scroll { overflow-x: auto; }
+figure { margin: 1.8rem 0; text-align: center; }
+figcaption { font: .78rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             margin-top: .6rem; }
+svg.figure { max-width: 100%; height: auto; background: var(--panel);
+             border: 1px solid var(--rule); }
+svg.figure .arc { stroke: var(--line); stroke-width: .8; stroke-dasharray: 3 3;
+                  opacity: .45; }
+svg.figure .ray { stroke: var(--line); stroke-width: 1.3; }
+svg.figure .dot { fill: var(--line); }
+svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
+svg.graph { max-width: 100%; height: auto; }
+svg.graph .edge { fill: none; stroke: var(--rule); stroke-width: 1.1; }
+svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
+svg.graph .node { fill: var(--page); stroke: var(--rule); }
+svg.graph .node.lit { fill: var(--ink); }
+svg.graph .node-label { font: 11px ui-monospace, monospace; fill: var(--ink); }
+svg.graph a:hover .node { stroke: var(--ink); stroke-width: 1.6; }
+ul.claims { list-style: none; padding: 0; margin: 1rem 0; }
+ul.claims li { padding: .5rem 0 .5rem 1rem; border-left: 2px solid var(--ink);
+               margin-bottom: .3rem; }
+ul.claims li.hyp { border-left: 2px solid var(--rule); }
+.cite { font: .7rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+        display: block; margin-top: .2rem; letter-spacing: .02em; }
+.grid { display: grid; gap: .25rem .9rem;
+        grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); }
+.grid a { display: block; padding: .18rem 0; font-size: .88rem;
+          font-family: ui-monospace, monospace; text-decoration: none;
+          border-bottom: 1px solid transparent; }
+.grid a:hover { border-bottom-color: var(--ink); }
+.stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        gap: 0; margin: 1.8rem 0; border: 1px solid var(--rule); }
+.stat div { padding: .9rem 1rem; border-right: 1px solid var(--rule); }
+.stat div:last-child { border-right: none; }
+.stat b { display: block; font: 400 1.6rem/1.15 Georgia, serif; }
+.stat span { font: .68rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             letter-spacing: .05em; text-transform: uppercase; }
+blockquote { margin: 0 0 1.2rem; padding: .2rem 0 .2rem 1.1rem;
+             border-left: 3px solid var(--ink); font-size: 1.06rem; }
+blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-serif;
+                  color: var(--faint); margin-top: .55rem; letter-spacing: .04em;
+                  text-transform: uppercase; }
+.note { color: var(--faint); font-size: .92rem; }
+.finding { border-top: 1px solid var(--rule); padding-top: 1.1rem; margin-top: 1.8rem; }
+.finding h3 { margin-top: 0; }
+footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+         font: .78rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--faint); }
+</style></head><body><div class="wrap"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a></nav><p class="kicker">Book I &middot; Proposition 44</p><h1>I.44</h1><blockquote>To a given straight line to apply, in a given rectilineal angle, a parallelogram equal to a given triangle.<span class="src">Heath, 1908</span></blockquote><p class="note">The application of areas -- the engine of Book II and, later, of the Greek solution of quadratic problems.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="I.44" class="figure"><g class="construction"><circle cx="188.31" cy="147.79" r="66.37" fill="none" class="arc"/><circle cx="249.80" cy="172.78" r="66.37" fill="none" class="arc"/><circle cx="240.70" cy="107.04" r="66.37" fill="none" class="arc"/><circle cx="219.06" cy="160.29" r="5.67" fill="none" class="arc"/><circle cx="224.30" cy="162.42" r="5.07" fill="none" class="arc"/><circle cx="236.30" cy="237.76" r="79.37" fill="none" class="arc"/><circle cx="219.06" cy="160.29" r="66.37" fill="none" class="arc"/><circle cx="236.30" cy="237.76" r="33.18" fill="none" class="arc"/><circle cx="249.80" cy="172.78" r="33.18" fill="none" class="arc"/><circle cx="219.06" cy="160.29" r="67.16" fill="none" class="arc"/><circle cx="249.80" cy="172.78" r="81.60" fill="none" class="arc"/><circle cx="264.63" cy="249.09" r="81.60" fill="none" class="arc"/><circle cx="346.23" cy="249.09" r="67.16" fill="none" class="arc"/><circle cx="264.63" cy="249.09" r="33.18" fill="none" class="arc"/><circle cx="241.97" cy="249.09" r="22.66" fill="none" class="arc"/><circle cx="264.63" cy="249.09" r="96.91" fill="none" class="arc"/><circle cx="241.97" cy="249.09" r="81.60" fill="none" class="arc"/><circle cx="226.11" cy="153.50" r="119.50" fill="none" class="arc"/><circle cx="297.81" cy="249.09" r="96.90" fill="none" class="arc"/><circle cx="226.11" cy="153.50" r="55.84" fill="none" class="arc"/><line x1="81.66" y1="230.76" x2="366.69" y2="9.04" class="ray"/><line x1="277.22" y1="370.96" x2="227.14" y2="9.04" class="ray"/><line x1="133.42" y1="370.96" x2="280.54" y2="9.04" class="ray"/><line x1="81.66" y1="104.43" x2="438.34" y2="249.43" class="ray"/><line x1="265.95" y1="370.96" x2="185.39" y2="9.04" class="ray"/><line x1="81.66" y1="236.82" x2="438.34" y2="261.42" class="ray"/><line x1="274.51" y1="370.96" x2="179.24" y2="9.04" class="ray"/><line x1="208.64" y1="370.96" x2="283.80" y2="9.04" class="ray"/><line x1="81.66" y1="174.90" x2="438.34" y2="319.90" class="ray"/><line x1="220.05" y1="370.96" x2="274.37" y2="9.04" class="ray"/><line x1="301.97" y1="370.96" x2="206.69" y2="9.04" class="ray"/><line x1="81.66" y1="249.09" x2="438.34" y2="249.09" class="ray"/><line x1="356.03" y1="370.96" x2="84.59" y2="9.04" class="ray"/><line x1="81.66" y1="314.37" x2="438.34" y2="314.37" class="ray"/><line x1="81.66" y1="102.97" x2="375.67" y2="370.96" class="ray"/><line x1="81.66" y1="35.35" x2="333.37" y2="370.96" class="ray"/><line x1="313.72" y1="370.96" x2="167.91" y2="9.04" class="ray"/><line x1="389.21" y1="370.96" x2="117.77" y2="9.04" class="ray"/><line x1="262.18" y1="370.96" x2="202.16" y2="9.04" class="ray"/><line x1="81.66" y1="153.50" x2="438.34" y2="153.50" class="ray"/></g><g class="points"><circle cx="241.97" cy="249.09" r="3.2" class="dot"/><text x="248.97" y="242.09" class="letter">A</text><circle cx="264.63" cy="249.09" r="3.2" class="dot"/><text x="271.63" y="242.09" class="letter">B</text><circle cx="236.30" cy="237.76" r="3.2" class="dot"/><text x="243.30" y="230.76" class="letter">C</text><circle cx="188.31" cy="147.79" r="3.2" class="dot"/><text x="195.31" y="140.79" class="letter">D</text><circle cx="249.80" cy="172.78" r="3.2" class="dot"/><text x="256.80" y="165.78" class="letter">E</text><circle cx="245.45" cy="248.11" r="3.2" class="dot"/><text x="252.45" y="241.11" class="letter">P</text><circle cx="247.63" cy="253.34" r="3.2" class="dot"/><text x="254.63" y="246.34" class="letter">Q</text><circle cx="250.51" cy="248.46" r="3.2" class="dot"/><text x="257.51" y="241.46" class="letter">R</text><circle cx="240.70" cy="107.04" r="3.2" class="dot"/><text x="247.70" y="100.04" class="letter">C</text><circle cx="197.41" cy="213.53" r="3.2" class="dot"/><text x="204.41" y="206.53" class="letter">F</text><circle cx="219.06" cy="160.29" r="3.2" class="dot"/><text x="226.06" y="153.29" class="letter">D</text><circle cx="224.30" cy="162.42" r="3.2" class="dot"/><text x="231.30" y="155.42" class="letter">F</text><circle cx="220.50" cy="165.76" r="3.2" class="dot"/><text x="227.50" y="158.76" class="letter">G</text><circle cx="205.56" cy="225.27" r="3.2" class="dot"/><text x="212.56" y="218.27" class="letter">G</text><circle cx="239.83" cy="239.20" r="3.2" class="dot"/><text x="246.83" y="232.20" class="letter">F</text><circle cx="229.02" cy="93.87" r="3.2" class="dot"/><text x="236.02" y="86.87" class="letter">G</text><circle cx="270.57" cy="251.69" r="3.2" class="dot"/><text x="277.57" y="244.69" class="letter">G</text><circle cx="287.29" cy="249.09" r="3.2" class="dot"/><text x="294.29" y="242.09" class="letter">B'</text><circle cx="297.81" cy="249.09" r="3.2" class="dot"/><text x="304.81" y="242.09" class="letter">E</text><circle cx="346.23" cy="249.09" r="3.2" class="dot"/><text x="353.23" y="242.09" class="letter">F</text><circle cx="284.54" cy="275.64" r="3.2" class="dot"/><text x="291.54" y="268.64" class="letter">G</text><circle cx="313.59" cy="314.37" r="3.2" class="dot"/><text x="320.59" y="307.37" class="letter">G</text><circle cx="346.77" cy="314.37" r="3.2" class="dot"/><text x="353.77" y="307.37" class="letter">F</text><circle cx="193.01" cy="183.81" r="3.2" class="dot"/><text x="200.01" y="176.81" class="letter">G</text><circle cx="290.93" cy="314.37" r="3.2" class="dot"/><text x="297.93" y="307.37" class="letter">H</text><circle cx="226.11" cy="153.50" r="3.2" class="dot"/><text x="233.11" y="146.50" class="letter">K</text><circle cx="281.96" cy="153.50" r="3.2" class="dot"/><text x="288.96" y="146.50" class="letter">G</text><circle cx="170.27" cy="153.50" r="3.2" class="dot"/><text x="177.27" y="146.50" class="letter">L</text><circle cx="192.93" cy="153.50" r="3.2" class="dot"/><text x="199.93" y="146.50" class="letter">M</text></g></svg><figcaption>68 lines and circles drawn</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">A and B are distinct<span class="cite">given</span></li><li class="hyp">CDE is a genuine triangle<span class="cite">given</span></li><li class="hyp">PQR is a genuine angle<span class="cite">given</span></li><li class="">BEFG equals the given triangle and has the given angle<span class="cite">by <a href="I-3.html">I.3</a>, <a href="I-23.html">I.23</a>, <a href="I-42.html">I.42</a></span></li><li class="">HLKF is a parallelogram and HK its diameter<span class="cite">by <a href="I-31.html">I.31</a></span></li><li class="">the complements about the diameter are equal, so LABM equals BEFG<span class="cite">by <a href="I-43.html">I.43</a></span></li><li class="">therefore the applied parallelogram equals the given triangle<span class="cite">by C.N.1</span></li><li class="">and the angle ABM equals the given angle, being vertical to GBE<span class="cite">by <a href="I-15.html">I.15</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="I-3.html">I.3</a> <a href="I-15.html">I.15</a> <a href="I-23.html">I.23</a> <a href="I-31.html">I.31</a> <a href="I-42.html">I.42</a> <a href="I-43.html">I.43</a></p><p><strong>Used by:</strong> <a href="I-45.html">I.45</a></p><p><strong>Rests on:</strong> C.N.1, C.N.2, C.N.3, C.N.4, C.N.5, Def.10, Def.15, Def.4, Post.5</p><p><strong>Depth:</strong> 15 steps of argument above the first principles. <strong>Parallel postulate:</strong> needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a circle-circle intersection is used, though no postulate asserts that two circles meet (&times;9)<span class="cite">continuity</span></li><li>a line-circle intersection is used, though no postulate asserts that a line meets a circle (&times;8)<span class="cite">continuity</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "I.44",
+    "To a given straight line to apply, in a given rectilinear angle, a parallelogram "
+    "equal to a given triangle.",
+    CONSTRUCTION,
+    sample=_line_triangle_angle,
+    note="The application of areas -- the engine of Book II and, later, of the "
+    "Greek solution of quadratic problems.",
+)
+def prop_I_44(
+    a: Point,
+    b: Point,
+    c: Point,
+    d: Point,
+    e: Point,
+    p: Point,
+    q: Point,
+    r: Point,
+    away_from: "Point | None" = None,
+) -&gt; Out:
+    hypothesis("A and B are distinct", a != b)
+    hypothesis("CDE is a genuine triangle", not collinear(c, d, e))
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+
+    # Carry a parallelogram equal to the triangle, in the given angle, over to B,
+    # with its base along AB produced (I.3 for the lengths, I.23 for the angle).
+    model = prop_I_42(c, d, e, p, q, r)
+    corner_f, corner_e, corner_c, corner_g = model.parallelogram
+    base_length = length(corner_e, corner_c)
+    side_length = length(corner_e, corner_f)
+
+    beyond = posit(Point(b.x + (b.x - a.x), b.y + (b.y - a.y)), "B'")
+    placed_e = posit(_along(b, beyond, base_length), "E")
+    turned = prop_I_23(corner_f, corner_e, corner_c, b, placed_e, apart_from=away_from)
+    placed_g = posit(_along(b, turned.ray_through, side_length), "G")
+    placed_f = posit(_fourth_vertex(b, placed_e, placed_g), "F")
+
+    claim("BEFG equals the given triangle and has the given angle", ["I.3", "I.23", "I.42"],
+          _area(b, placed_e, placed_f, placed_g) == _area(c, d, e)
+          and eq_angle(placed_e, b, placed_g, p, q, r))
+
+    # the gnomon: complete the figure about the diameter HB produced
+    top = line(placed_f, placed_g, "FG produced")
+    h = posit(meet_one(top, _parallel_through(a, b, placed_g)), "H")
+    diameter = line(h, b, "the diameter HB")
+    side = line(placed_f, placed_e, "FE produced")
+    if parallel(diameter, side):
+        raise GeometryError("HB and FE do not meet in this configuration")
+    k = posit(meet_one(diameter, side), "K")
+    through_k = _parallel_through(k, placed_e, a)
+    l = posit(meet_one(through_k, Line.through(h, a)), "L")
+    m = posit(meet_one(through_k, Line.through(placed_g, b)), "M")
+
+    claim("HLKF is a parallelogram and HK its diameter", "I.31",
+          parallel(Line.through(h, l), Line.through(placed_f, k))
+          and parallel(Line.through(h, placed_f), Line.through(l, k)))
+    claim("the complements about the diameter are equal, so LABM equals BEFG", "I.43",
+          _area(l, a, b, m) == _area(b, placed_e, placed_f, placed_g))
+    claim("therefore the applied parallelogram equals the given triangle", "C.N.1",
+          _area(l, a, b, m) == _area(c, d, e))
+    claim("and the angle ABM equals the given angle, being vertical to GBE", "I.15",
+          eq_angle(a, b, m, p, q, r))
+    return Out(parallelogram=(l, a, b, m))
+</pre><footer><p>Every diagram here was drawn from a construction that ran and checked out in exact arithmetic. Every cross-reference was read off the call graph, not typed in by hand.</p><p>Proposition statements are Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Where a statement is missing from that text, a short summary written for this project stands in, and the page says so.</p></footer></div></body></html>

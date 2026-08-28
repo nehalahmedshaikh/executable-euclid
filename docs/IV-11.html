@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IV.11 — Executable Euclid</title><style>
+:root {
+  --ink: #101010; --faint: #6a6a6a; --rule: #dcdcdc; --page: #ffffff;
+  --panel: #f7f7f7; --line: #101010;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ededed; --faint: #909090; --rule: #2c2c2c; --page: #0c0c0c;
+    --panel: #151515; --line: #ededed;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 17px/1.68 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding: 3.5rem 1.25rem 6rem; }
+.wide { max-width: 66rem; }
+a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px;
+    text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+h1 { font-size: 1.95rem; line-height: 1.22; margin: 0 0 .5rem; font-weight: normal;
+     letter-spacing: -.01em; }
+h2 { font-size: 1.22rem; font-weight: normal; margin: 2.8rem 0 .8rem;
+     border-bottom: 1px solid var(--rule); padding-bottom: .35rem; }
+h3 { font-size: 1rem; margin: 1.9rem 0 .5rem; font-weight: 700; }
+.kicker { font: 700 .68rem/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--faint);
+  margin: 0 0 .8rem; }
+.lede { color: var(--faint); font-size: 1.05rem; margin: .2rem 0 2rem; }
+nav.top { font: .8rem/2 ui-sans-serif, system-ui, sans-serif; margin-bottom: 2.6rem;
+          padding-bottom: .8rem; border-bottom: 1px solid var(--rule); }
+nav.top a { margin-right: 1.1rem; text-decoration: none; color: var(--faint); }
+nav.top a:hover, nav.top a.here { color: var(--ink); text-decoration: underline; }
+code, pre, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+pre { background: var(--panel); border: 1px solid var(--rule);
+      padding: .95rem 1.05rem; overflow-x: auto; font-size: .78rem; line-height: 1.6; }
+code { font-size: .86em; }
+table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+th, td { text-align: left; padding: .4rem .65rem; border-bottom: 1px solid var(--rule);
+         vertical-align: top; }
+th { font: 700 .68rem/1.5 ui-sans-serif, system-ui, sans-serif;
+     letter-spacing: .09em; text-transform: uppercase; color: var(--faint); }
+tbody tr:last-child td { border-bottom: none; }
+.scroll { overflow-x: auto; }
+figure { margin: 1.8rem 0; text-align: center; }
+figcaption { font: .78rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             margin-top: .6rem; }
+svg.figure { max-width: 100%; height: auto; background: var(--panel);
+             border: 1px solid var(--rule); }
+svg.figure .arc { stroke: var(--line); stroke-width: .8; stroke-dasharray: 3 3;
+                  opacity: .45; }
+svg.figure .ray { stroke: var(--line); stroke-width: 1.3; }
+svg.figure .dot { fill: var(--line); }
+svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
+svg.graph { max-width: 100%; height: auto; }
+svg.graph .edge { fill: none; stroke: var(--rule); stroke-width: 1.1; }
+svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
+svg.graph .node { fill: var(--page); stroke: var(--rule); }
+svg.graph .node.lit { fill: var(--ink); }
+svg.graph .node-label { font: 11px ui-monospace, monospace; fill: var(--ink); }
+svg.graph a:hover .node { stroke: var(--ink); stroke-width: 1.6; }
+ul.claims { list-style: none; padding: 0; margin: 1rem 0; }
+ul.claims li { padding: .5rem 0 .5rem 1rem; border-left: 2px solid var(--ink);
+               margin-bottom: .3rem; }
+ul.claims li.hyp { border-left: 2px solid var(--rule); }
+.cite { font: .7rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+        display: block; margin-top: .2rem; letter-spacing: .02em; }
+.grid { display: grid; gap: .25rem .9rem;
+        grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); }
+.grid a { display: block; padding: .18rem 0; font-size: .88rem;
+          font-family: ui-monospace, monospace; text-decoration: none;
+          border-bottom: 1px solid transparent; }
+.grid a:hover { border-bottom-color: var(--ink); }
+.stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        gap: 0; margin: 1.8rem 0; border: 1px solid var(--rule); }
+.stat div { padding: .9rem 1rem; border-right: 1px solid var(--rule); }
+.stat div:last-child { border-right: none; }
+.stat b { display: block; font: 400 1.6rem/1.15 Georgia, serif; }
+.stat span { font: .68rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             letter-spacing: .05em; text-transform: uppercase; }
+blockquote { margin: 0 0 1.2rem; padding: .2rem 0 .2rem 1.1rem;
+             border-left: 3px solid var(--ink); font-size: 1.06rem; }
+blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-serif;
+                  color: var(--faint); margin-top: .55rem; letter-spacing: .04em;
+                  text-transform: uppercase; }
+.note { color: var(--faint); font-size: .92rem; }
+.finding { border-top: 1px solid var(--rule); padding-top: 1.1rem; margin-top: 1.8rem; }
+.finding h3 { margin-top: 0; }
+footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+         font: .78rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--faint); }
+</style></head><body><div class="wrap"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a></nav><p class="kicker">Book IV &middot; Proposition 11</p><h1>IV.11</h1><blockquote>In a given circle to inscribe an equilateral and equiangular pentagon.<span class="src">Heath, 1908</span></blockquote><p class="note">The high point of Book IV. Its side is the golden section of the radius, so the vertices live in Q(sqrt 5) -- and the kernel keeps them there exactly.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="IV.11" class="figure"><g class="construction"><circle cx="250.17" cy="186.99" r="73.65" fill="none" class="arc"/><circle cx="196.84" cy="136.20" r="86.58" fill="none" class="arc"/><circle cx="281.99" cy="120.58" r="86.58" fill="none" class="arc"/><circle cx="323.16" cy="196.73" r="86.58" fill="none" class="arc"/><circle cx="263.46" cy="259.42" r="86.58" fill="none" class="arc"/><line x1="85.30" y1="156.66" x2="434.70" y2="92.56" class="ray"/><line x1="417.36" y1="370.96" x2="221.69" y2="9.04" class="ray"/><line x1="434.70" y1="79.62" x2="157.23" y2="370.96" class="ray"/><line x1="85.30" y1="174.06" x2="434.70" y2="341.48" class="ray"/><line x1="165.50" y1="370.96" x2="213.81" y2="9.04" class="ray"/></g><g class="points"><circle cx="250.17" cy="186.99" r="3.2" class="dot"/><text x="257.17" y="179.99" class="letter">O</text><circle cx="196.84" cy="136.20" r="3.2" class="dot"/><text x="203.84" y="129.20" class="letter">A</text><circle cx="281.99" cy="120.58" r="3.2" class="dot"/><text x="288.99" y="113.58" class="letter">B</text><circle cx="323.16" cy="196.73" r="3.2" class="dot"/><text x="330.16" y="189.73" class="letter">C</text><circle cx="263.46" cy="259.42" r="3.2" class="dot"/><text x="270.46" y="252.42" class="letter">D</text><circle cx="185.38" cy="222.01" r="3.2" class="dot"/><text x="192.38" y="215.01" class="letter">E</text></g></svg><figcaption>10 lines and circles drawn</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the circle has positive radius<span class="cite">given</span></li><li class="">stepping the chord round the circle reaches five distinct points<span class="cite">by Post.3</span></li><li class="">every vertex lies on the given circle<span class="cite">by Def.15</span></li><li class="">the pentagon is equilateral<span class="cite">by Def.19</span></li><li class="">and equiangular<span class="cite">by III.27</span></li><li class="">the diagonal exceeds the side in extreme and mean ratio<span class="cite">by <a href="II-11.html">II.11</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="II-11.html">II.11</a></p><p class="note"><strong>Also cites</strong> III.27, which this project has not written out yet.</p><p><strong>Rests on:</strong> C.N.1, C.N.2, C.N.3, C.N.4, C.N.5, Def.10, Def.15, Def.19, Def.22, Def.3, Def.4, Post.1, Post.3, Post.5</p><p><strong>Depth:</strong> 16 steps of argument above the first principles. <strong>Parallel postulate:</strong> needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a circle-circle intersection is used, though no postulate asserts that two circles meet (&times;4)<span class="cite">continuity</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "IV.11",
+    "To inscribe an equilateral and equiangular pentagon in a given circle.",
+    CONSTRUCTION,
+    sample=samples.segment,
+    note="The high point of Book IV. Its side is the golden section of the radius, "
+    "so the vertices live in Q(sqrt 5) -- and the kernel keeps them there exactly.",
+)
+def prop_IV_11(o: Point, a: Point) -&gt; Out:
+    """Inscribe a regular pentagon in the circle centred at O and through A."""
+    hypothesis("the circle has positive radius", o != a)
+    around = circle(o, a, "the given circle")
+
+    # The side subtending a fifth of the circumference satisfies
+    # s^2 = R^2 (5 - sqrt 5) / 2, which is the golden section of II.11 in disguise.
+    side2 = len2(o, a) * (5 - sqrt(5)) / 2
+    vertices = [a]
+    current = a
+    for step in range(4):
+        stepper = circle_with_radius2(current, side2, f"step {step + 1}")
+        onward = [point for point in meet(stepper, around) if point not in vertices]
+        if not onward:
+            break
+        current = posit(onward[0], "BCDE"[step])
+        vertices.append(current)
+
+    claim("stepping the chord round the circle reaches five distinct points", "Post.3",
+          len(vertices) == 5)
+    for index in range(5):
+        line(vertices[index], vertices[(index + 1) % 5])
+
+    claim("every vertex lies on the given circle", "Def.15",
+          all(on_circle(vertex, around) for vertex in vertices))
+    claim("the pentagon is equilateral", "Def.19",
+          all(eq_len(vertices[i], vertices[(i + 1) % 5], vertices[0], vertices[1])
+              for i in range(5)))
+    claim("and equiangular", "III.27",
+          all(eq_angle(vertices[i - 1], vertices[i], vertices[(i + 1) % 5],
+                       vertices[4], vertices[0], vertices[1]) for i in range(5)))
+    golden = (sqrt(5) - 1) / 2
+    claim("the diagonal exceeds the side in extreme and mean ratio", "II.11",
+          length(vertices[0], vertices[2]) * golden == length(vertices[0], vertices[1]))
+    return Out(pentagon=tuple(vertices))
+</pre><footer><p>Every diagram here was drawn from a construction that ran and checked out in exact arithmetic. Every cross-reference was read off the call graph, not typed in by hand.</p><p>Proposition statements are Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Where a statement is missing from that text, a short summary written for this project stands in, and the page says so.</p></footer></div></body></html>

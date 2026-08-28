@@ -1,0 +1,178 @@
+"""Execution traces.
+
+Everything downstream reads traces rather than re-deriving anything: the SVG
+renderer draws them, the assumption ledger audits them, and the site generator
+turns them into pages.  A trace records three kinds of event:
+
+``moves``
+    the primitive straightedge-and-compass operations, in order;
+``predicates``
+    every exact geometric test that was evaluated, with its truth value -- this
+    is what lets the ledger detect facts that are true of *this diagram* rather
+    than of every legal configuration;
+``claims``
+    the proof steps, each citing the proposition, definition, postulate or
+    common notion that Euclid appeals to, and each independently checked
+    against the model.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Optional
+
+__all__ = [
+    "Claim",
+    "IntersectionEvent",
+    "Move",
+    "PredicateEvent",
+    "Trace",
+    "broadcast_intersection",
+    "broadcast_move",
+    "current_trace",
+    "push_trace",
+    "pop_trace",
+    "record_predicate",
+]
+
+
+@dataclass
+class Move:
+    """One primitive operation: a point posited, a line drawn, a circle drawn."""
+
+    kind: str  # "free" | "line" | "circle" | "intersect" | "derived"
+    label: str
+    obj: Any = None
+    inputs: tuple = ()
+    postulate: str = ""
+    note: str = ""
+
+
+@dataclass
+class IntersectionEvent:
+    """A use of intersection, recorded because existence is not a postulate.
+
+    Euclid's five postulates let you draw lines and circles; none of them says
+    that two circles which *look* like they cross actually share a point.  Every
+    record here is therefore a place where the text relies on continuity it
+    never states.
+    """
+
+    kind: str  # "line-line" | "line-circle" | "circle-circle"
+    count: int
+    guaranteed_by_postulates: bool
+    detail: str = ""
+
+
+@dataclass
+class PredicateEvent:
+    name: str
+    value: Any
+    detail: str = ""
+    order_sensitive: bool = False
+
+
+@dataclass
+class Claim:
+    """A proof step: a statement, its Euclidean justification, and its check."""
+
+    text: str
+    by: tuple[str, ...]
+    holds: bool
+    detail: str = ""
+
+
+@dataclass
+class Trace:
+    proposition: str = ""
+    moves: list[Move] = field(default_factory=list)
+    intersections: list[IntersectionEvent] = field(default_factory=list)
+    predicates: list[PredicateEvent] = field(default_factory=list)
+    claims: list[Claim] = field(default_factory=list)
+    children: list["Trace"] = field(default_factory=list)
+    inputs: dict[str, Any] = field(default_factory=dict)
+    outputs: dict[str, Any] = field(default_factory=dict)
+
+    # -- recording ----------------------------------------------------------
+    def add_move(self, move: Move) -> Move:
+        self.moves.append(move)
+        return move
+
+    def add_intersection(self, event: IntersectionEvent) -> None:
+        self.intersections.append(event)
+
+    def add_predicate(self, event: PredicateEvent) -> None:
+        self.predicates.append(event)
+
+    def add_claim(self, claim: Claim) -> None:
+        self.claims.append(claim)
+
+    # -- summaries ----------------------------------------------------------
+    @property
+    def step_count(self) -> int:
+        return sum(1 for move in self.moves if move.kind in ("line", "circle"))
+
+    @property
+    def continuity_assumptions(self) -> list[IntersectionEvent]:
+        return [event for event in self.intersections if not event.guaranteed_by_postulates]
+
+    def descendants(self) -> list["Trace"]:
+        found: list[Trace] = []
+        for child in self.children:
+            found.append(child)
+            found.extend(child.descendants())
+        return found
+
+    def signature(self) -> tuple:
+        """A shape fingerprint: same construction path, same signature.
+
+        Two runs of the same proposition on different inputs should agree here.
+        When they do not, the proof is following a different route through the
+        diagram -- exactly the case-dependence Euclid leaves unremarked.
+        """
+        return (
+            tuple((move.kind, move.label) for move in self.moves),
+            tuple((event.kind, event.count) for event in self.intersections),
+            tuple((event.name, bool(event.value)) for event in self.predicates),
+            tuple(child.signature() for child in self.children),
+        )
+
+
+_STACK: list[Trace] = []
+
+
+def push_trace(trace: Trace) -> Trace:
+    """Begin a nested trace.  Figure-level events fan out to every enclosing
+    trace (a caller's diagram genuinely does contain the callee's lines), while
+    predicates and claims stay with the proposition that made them."""
+    if _STACK:
+        _STACK[-1].children.append(trace)
+    _STACK.append(trace)
+    return trace
+
+
+def pop_trace() -> Optional[Trace]:
+    return _STACK.pop() if _STACK else None
+
+
+def current_trace() -> Optional[Trace]:
+    return _STACK[-1] if _STACK else None
+
+
+def broadcast_move(move: Move) -> Move:
+    for trace in _STACK:
+        trace.moves.append(move)
+    return move
+
+
+def broadcast_intersection(event: IntersectionEvent) -> IntersectionEvent:
+    for trace in _STACK:
+        trace.intersections.append(event)
+    return event
+
+
+def record_predicate(name: str, value: Any, detail: str = "", order_sensitive: bool = False) -> Any:
+    trace = current_trace()
+    if trace is not None:
+        trace.add_predicate(PredicateEvent(name, value, detail, order_sensitive))
+    return value

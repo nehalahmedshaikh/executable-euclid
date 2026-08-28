@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>I.22 — Executable Euclid</title><style>
+:root {
+  --ink: #101010; --faint: #6a6a6a; --rule: #dcdcdc; --page: #ffffff;
+  --panel: #f7f7f7; --line: #101010;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ededed; --faint: #909090; --rule: #2c2c2c; --page: #0c0c0c;
+    --panel: #151515; --line: #ededed;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 17px/1.68 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding: 3.5rem 1.25rem 6rem; }
+.wide { max-width: 66rem; }
+a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px;
+    text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+h1 { font-size: 1.95rem; line-height: 1.22; margin: 0 0 .5rem; font-weight: normal;
+     letter-spacing: -.01em; }
+h2 { font-size: 1.22rem; font-weight: normal; margin: 2.8rem 0 .8rem;
+     border-bottom: 1px solid var(--rule); padding-bottom: .35rem; }
+h3 { font-size: 1rem; margin: 1.9rem 0 .5rem; font-weight: 700; }
+.kicker { font: 700 .68rem/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--faint);
+  margin: 0 0 .8rem; }
+.lede { color: var(--faint); font-size: 1.05rem; margin: .2rem 0 2rem; }
+nav.top { font: .8rem/2 ui-sans-serif, system-ui, sans-serif; margin-bottom: 2.6rem;
+          padding-bottom: .8rem; border-bottom: 1px solid var(--rule); }
+nav.top a { margin-right: 1.1rem; text-decoration: none; color: var(--faint); }
+nav.top a:hover, nav.top a.here { color: var(--ink); text-decoration: underline; }
+code, pre, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+pre { background: var(--panel); border: 1px solid var(--rule);
+      padding: .95rem 1.05rem; overflow-x: auto; font-size: .78rem; line-height: 1.6; }
+code { font-size: .86em; }
+table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+th, td { text-align: left; padding: .4rem .65rem; border-bottom: 1px solid var(--rule);
+         vertical-align: top; }
+th { font: 700 .68rem/1.5 ui-sans-serif, system-ui, sans-serif;
+     letter-spacing: .09em; text-transform: uppercase; color: var(--faint); }
+tbody tr:last-child td { border-bottom: none; }
+.scroll { overflow-x: auto; }
+figure { margin: 1.8rem 0; text-align: center; }
+figcaption { font: .78rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             margin-top: .6rem; }
+svg.figure { max-width: 100%; height: auto; background: var(--panel);
+             border: 1px solid var(--rule); }
+svg.figure .arc { stroke: var(--line); stroke-width: .8; stroke-dasharray: 3 3;
+                  opacity: .45; }
+svg.figure .ray { stroke: var(--line); stroke-width: 1.3; }
+svg.figure .dot { fill: var(--line); }
+svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
+svg.graph { max-width: 100%; height: auto; }
+svg.graph .edge { fill: none; stroke: var(--rule); stroke-width: 1.1; }
+svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
+svg.graph .node { fill: var(--page); stroke: var(--rule); }
+svg.graph .node.lit { fill: var(--ink); }
+svg.graph .node-label { font: 11px ui-monospace, monospace; fill: var(--ink); }
+svg.graph a:hover .node { stroke: var(--ink); stroke-width: 1.6; }
+ul.claims { list-style: none; padding: 0; margin: 1rem 0; }
+ul.claims li { padding: .5rem 0 .5rem 1rem; border-left: 2px solid var(--ink);
+               margin-bottom: .3rem; }
+ul.claims li.hyp { border-left: 2px solid var(--rule); }
+.cite { font: .7rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+        display: block; margin-top: .2rem; letter-spacing: .02em; }
+.grid { display: grid; gap: .25rem .9rem;
+        grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); }
+.grid a { display: block; padding: .18rem 0; font-size: .88rem;
+          font-family: ui-monospace, monospace; text-decoration: none;
+          border-bottom: 1px solid transparent; }
+.grid a:hover { border-bottom-color: var(--ink); }
+.stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+        gap: 0; margin: 1.8rem 0; border: 1px solid var(--rule); }
+.stat div { padding: .9rem 1rem; border-right: 1px solid var(--rule); }
+.stat div:last-child { border-right: none; }
+.stat b { display: block; font: 400 1.6rem/1.15 Georgia, serif; }
+.stat span { font: .68rem ui-sans-serif, system-ui, sans-serif; color: var(--faint);
+             letter-spacing: .05em; text-transform: uppercase; }
+blockquote { margin: 0 0 1.2rem; padding: .2rem 0 .2rem 1.1rem;
+             border-left: 3px solid var(--ink); font-size: 1.06rem; }
+blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-serif;
+                  color: var(--faint); margin-top: .55rem; letter-spacing: .04em;
+                  text-transform: uppercase; }
+.note { color: var(--faint); font-size: .92rem; }
+.finding { border-top: 1px solid var(--rule); padding-top: 1.1rem; margin-top: 1.8rem; }
+.finding h3 { margin-top: 0; }
+footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+         font: .78rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--faint); }
+</style></head><body><div class="wrap"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a></nav><p class="kicker">Book I &middot; Proposition 22</p><h1>I.22</h1><blockquote>Out of three straight lines, which are equal to three given straight lines, to construct a triangle: thus it is necessary that two of the straight lines taken together in any manner should be greater than the remaining one.<span class="src">Heath, 1908</span></blockquote><p class="note">The proviso is I.20, and Euclid states it as a necessary condition without proving it sufficient -- another place where continuity is doing silent work.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="I.22" class="figure"><g class="construction"><circle cx="226.57" cy="158.55" r="86.36" fill="none" class="arc"/><circle cx="312.92" cy="158.55" r="105.06" fill="none" class="arc"/><circle cx="226.57" cy="158.55" r="124.55" fill="none" class="arc"/><line x1="76.74" y1="158.55" x2="443.26" y2="158.55" class="ray"/></g><g class="points"><circle cx="204.98" cy="223.31" r="3.2" class="dot"/><text x="211.98" y="216.31" class="letter">A</text><circle cx="267.51" cy="282.87" r="3.2" class="dot"/><text x="274.51" y="275.87" class="letter">B</text><circle cx="183.54" cy="346.00" r="3.2" class="dot"/><text x="190.54" y="339.00" class="letter">C</text><circle cx="226.57" cy="158.55" r="3.2" class="dot"/><text x="233.57" y="151.55" class="letter">P</text><circle cx="239.52" cy="158.55" r="3.2" class="dot"/><text x="246.52" y="151.55" class="letter">Q</text><circle cx="312.92" cy="158.55" r="3.2" class="dot"/><text x="319.92" y="151.55" class="letter">F</text><circle cx="295.65" cy="262.17" r="3.2" class="dot"/><text x="302.65" y="255.17" class="letter">G</text></g></svg><figcaption>4 lines and circles drawn</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the three given lines satisfy the triangle inequality<span class="cite">given</span></li><li class="hyp">P and Q are distinct<span class="cite">given</span></li><li class="">PG equals the third given line CA<span class="cite">by Def.15</span></li><li class="">FG equals the second given line BC<span class="cite">by Def.15</span></li><li class="">PF equals the first given line AB<span class="cite">by Def.15</span></li><li class="">so the triangle PFG is built from the three given lines<span class="cite">by <a href="I-8.html">I.8</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="I-8.html">I.8</a></p><p><strong>Used by:</strong> <a href="I-23.html">I.23</a></p><p><strong>Rests on:</strong> C.N.1, C.N.3, C.N.4, C.N.5, Def.15, Def.4</p><p><strong>Depth:</strong> 6 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a circle-circle intersection is used, though no postulate asserts that two circles meet<span class="cite">continuity</span></li><li>a line-circle intersection is used, though no postulate asserts that a line meets a circle<span class="cite">continuity</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "I.22",
+    "To construct a triangle out of three straight lines which equal three given straight "
+    "lines; it is necessary that the sum of any two of the given lines be greater than the "
+    "remaining one.",
+    CONSTRUCTION,
+    sample=_three_lengths,
+    note="The proviso is I.20, and Euclid states it as a necessary condition without "
+    "proving it sufficient -- another place where continuity is doing silent work.",
+)
+def prop_I_22(
+    a: Point,
+    b: Point,
+    c: Point,
+    p: Point,
+    q: Point,
+    beside: "Point | None" = None,
+    apart_from: "Point | None" = None,
+) -&gt; Out:
+    """Build a triangle on the ray PQ whose sides equal AB, BC and CA.
+
+    The two circles meet on both sides of PQ, and either intersection answers
+    the problem.  ``beside`` and ``apart_from`` say which one is wanted -- a
+    choice Euclid makes silently by drawing the figure one way round.
+    """
+    first, second, third = len2(a, b), len2(b, c), len2(c, a)
+    hypothesis("the three given lines satisfy the triangle inequality",
+               length(a, b) + length(b, c) &gt; length(c, a)
+               and length(b, c) + length(c, a) &gt; length(a, b)
+               and length(c, a) + length(a, b) &gt; length(b, c))
+    hypothesis("P and Q are distinct", p != q)
+
+    ray = line(p, q, "the ray PQ")
+    around_p = circle_with_radius2(p, first, "circle radius AB about P")
+    foot = posit(meet(ray, around_p)[1], "F")
+    around_f = circle_with_radius2(foot, second, "circle radius BC about F")
+    closing = circle_with_radius2(p, third, "circle radius CA about P")
+    candidates = meet(around_f, closing)
+    apex = posit(_choose_side(candidates, Line.through(p, q), beside, apart_from), "G")
+
+    claim("PG equals the third given line CA", "Def.15", eq_len(p, apex, c, a))
+    claim("FG equals the second given line BC", "Def.15", eq_len(foot, apex, b, c))
+    claim("PF equals the first given line AB", "Def.15", eq_len(p, foot, a, b))
+    claim("so the triangle PFG is built from the three given lines", "I.8",
+          congruent_sss((p, foot, apex), (a, b, c)))
+    return Out(triangle=(p, foot, apex))
+</pre><footer><p>Every diagram here was drawn from a construction that ran and checked out in exact arithmetic. Every cross-reference was read off the call graph, not typed in by hand.</p><p>Proposition statements are Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Where a statement is missing from that text, a short summary written for this project stands in, and the page says so.</p></footer></div></body></html>

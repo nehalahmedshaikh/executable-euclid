@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
+
+# downloaded source texts: a cache for tools/fetch_heath.py, re-fetched on demand.
+# The parsed result (src/euclid/elements/heath.json) is what ships.
+tools/sources/
