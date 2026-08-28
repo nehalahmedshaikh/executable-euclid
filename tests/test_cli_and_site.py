@@ -99,12 +99,26 @@ def test_the_findings_page_reports_the_real_results(tmp_path):
         assert expected in findings
 
 
-def test_the_site_uses_no_colour(tmp_path):
-    """Strictly black and white: every colour must be a shade of grey."""
+def test_the_site_uses_exactly_three_colours(tmp_path):
+    """Black, white, and one grey exactly halfway between. Nothing else."""
     main(["site", "--out", str(tmp_path), "--no-search"])
-    page = (tmp_path / "index.html").read_text(encoding="utf-8")
-    values = set(re.findall(r"#([0-9a-fA-F]{6})", page))
-    assert values, "no colours found at all -- has the stylesheet moved?"
-    for value in values:
-        red, green, blue = value[0:2].lower(), value[2:4].lower(), value[4:6].lower()
-        assert red == green == blue, f"#{value} is not a shade of grey"
+    found = set()
+    for page in tmp_path.glob("*.html"):
+        found |= set(re.findall(r"#([0-9a-fA-F]{6})", page.read_text(encoding="utf-8")))
+    assert {value.lower() for value in found} == {"000000", "808080", "ffffff"}
+
+
+def test_the_site_never_fakes_a_fourth_shade(tmp_path):
+    """Opacity or alpha would manufacture greys outside the palette."""
+    main(["site", "--out", str(tmp_path), "--no-search"])
+    style = (tmp_path / "index.html").read_text(encoding="utf-8")
+    assert "opacity" not in style
+    assert "rgba" not in style
+
+
+def test_theorems_draw_the_figures_they_argue_about(tmp_path):
+    """A proposition handed a triangle should still show you the triangle."""
+    main(["site", "--out", str(tmp_path), "--no-search"])
+    for ref in ("I-41", "I-4", "I-37", "I-20", "VI-4"):
+        page = (tmp_path / f"{ref}.html").read_text(encoding="utf-8")
+        assert page.count("<line ") >= 3, f"{ref} renders as bare dots"

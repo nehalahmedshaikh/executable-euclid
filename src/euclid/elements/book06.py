@@ -5,7 +5,7 @@ from __future__ import annotations
 from fractions import Fraction
 
 from ..plane.angles import length
-from ..plane.construct import circle_with_radius2, line, meet, meet_one, posit
+from ..plane.construct import circle_with_radius2, line, meet, meet_one, outline, posit
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
     collinear,
@@ -83,6 +83,7 @@ def prop_VI_2(a: Point, b: Point, c: Point, d: Point, e: Point) -> Out:
     hypothesis("D lies on AB and E on AC",
                on_line(d, Line.through(a, b)) and on_line(e, Line.through(a, c)))
     hypothesis("DE is parallel to BC", parallel(Line.through(d, e), Line.through(b, c)))
+    outline(a, b, c)
     line(d, e, "DE")
     claim("the triangles BDE and CDE are equal, being on the same base and in the "
           "same parallels", "I.38", _area(b, d, e) == _area(c, d, e))
@@ -107,6 +108,8 @@ def _equiangular_triangles(rng):
 def prop_VI_4(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("the triangles are equiangular",
                eq_angle(a, b, c, d, e, f) and eq_angle(b, c, a, e, f, d))
+    outline(a, b, c)
+    outline(d, e, f)
     claim("the sides about the equal angles are proportional", ["VI.2", "I.32"],
           similar((a, b, c), (d, e, f)))
     claim("in particular AB is to BC as DE is to EF", "VI.2",

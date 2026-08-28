@@ -13,7 +13,15 @@ misattributed step still cannot let a false statement through.
 from __future__ import annotations
 
 from ..plane.angles import STRAIGHT, angle_at, length
-from ..plane.construct import circle, circle_with_radius2, line, meet, meet_one, posit
+from ..plane.construct import (
+    circle,
+    circle_with_radius2,
+    line,
+    meet,
+    meet_one,
+    outline,
+    posit,
+)
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
     angle_cmp,
@@ -132,6 +140,8 @@ def prop_I_4(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("AB = DE", eq_len(a, b, d, e))
     hypothesis("AC = DF", eq_len(a, c, d, f))
     hypothesis("the included angles BAC and EDF are equal", eq_angle(b, a, c, e, d, f))
+    outline(a, b, c)
+    outline(d, e, f)
 
     claim("the base BC equals the base EF", "Def.4", eq_len(b, c, e, f))
     claim("the triangles are equal in area", "C.N.4", eq_area((a, b, c), (d, e, f)))
@@ -182,6 +192,7 @@ def prop_I_5(a: Point, b: Point, c: Point) -> Out:
 )
 def prop_I_6(a: Point, b: Point, c: Point) -> Out:
     hypothesis("angle ABC = angle ACB", eq_angle(a, b, c, a, c, b))
+    outline(a, b, c)
     claim("were AB unequal to AC, the greater could be cut down to the less (I.3) and "
           "I.4 would make a part equal the whole, which is absurd; so AB = AC",
           ["I.3", "I.4", "C.N.5"], eq_len(a, b, a, c))
@@ -224,6 +235,8 @@ def prop_I_7(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("BC = BD", eq_len(b, c, b, d))
     hypothesis("C and D lie on the same side of AB, or on it",
                not (Line.through(a, b).side_of(c) * Line.through(a, b).side_of(d) < 0))
+    outline(a, c, b)
+    outline(a, d, b)
     claim("if C and D were distinct, I.5 would give an angle both greater and less than "
           "another; so C and D coincide", "I.5", c == d)
     return Out()
@@ -245,6 +258,8 @@ def _sss_pair(rng):
 )
 def prop_I_8(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("the three sides are equal respectively", congruent_sss((a, b, c), (d, e, f)))
+    outline(a, b, c)
+    outline(d, e, f)
     claim("applying one triangle to the other, I.7 forbids the apexes to differ, "
           "so angle BAC = angle EDF", "I.7", eq_angle(b, a, c, e, d, f))
     claim("likewise angle ABC = angle DEF", "I.7", eq_angle(a, b, c, d, e, f))
@@ -375,6 +390,8 @@ def prop_I_12(a: Point, b: Point, c: Point) -> Out:
 def prop_I_13(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("B lies between A and C", between(a, b, c))
     hypothesis("D does not lie on AC", not collinear(a, b, d))
+    outline(a, b, c, close=False)
+    line(b, d)
 
     left = angle_at(a, b, d)
     right = angle_at(d, b, c)
@@ -394,6 +411,8 @@ def prop_I_13(a: Point, b: Point, c: Point, d: Point) -> Out:
 def prop_I_14(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("D is off the line and A, C lie on opposite sides of B",
                not collinear(a, b, d) and between(a, b, c))
+    outline(a, b, c, close=False)
+    line(b, d)
     total = angle_at(a, b, d) + angle_at(d, b, c)
     hypothesis("the adjacent angles sum to two right angles", total == STRAIGHT)
     claim("BA and BC are therefore in one straight line", "I.13", collinear(a, b, c))
@@ -467,6 +486,7 @@ def prop_I_16(a: Point, b: Point, c: Point) -> Out:
 )
 def prop_I_17(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    outline(a, b, c)
     alpha, beta, gamma = angle_at(b, a, c), angle_at(a, b, c), angle_at(a, c, b)
     claim("angle A and angle B together fall short of two right angles", "I.16",
           alpha + beta < STRAIGHT)
@@ -494,6 +514,7 @@ def _unequal_sides(rng):
 def prop_I_18(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
     hypothesis("AC is greater than AB", len2(a, c) > len2(a, b))
+    outline(a, b, c)
     claim("cutting AD equal to AB from the greater side and using I.5 and I.16, "
           "the angle ABC exceeds the angle BCA", ["I.3", "I.5", "I.16"],
           angle_cmp(a, b, c, b, c, a) > 0)
@@ -509,6 +530,7 @@ def prop_I_18(a: Point, b: Point, c: Point) -> Out:
 def prop_I_19(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
     hypothesis("the angle ABC is greater than the angle BCA", angle_cmp(a, b, c, b, c, a) > 0)
+    outline(a, b, c)
     claim("were AC not greater than AB, I.5 or I.18 would contradict the hypothesis",
           ["I.5", "I.18"], len2(a, c) > len2(a, b))
     return Out()
@@ -523,6 +545,7 @@ def prop_I_19(a: Point, b: Point, c: Point) -> Out:
 )
 def prop_I_20(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    outline(a, b, c)
     ab, bc, ca = length(a, b), length(b, c), length(c, a)
     claim("BA together with AC is greater than BC", ["I.5", "I.19"], ab + ca > bc)
     claim("AB together with BC is greater than AC", ["I.5", "I.19"], ab + bc > ca)
@@ -712,6 +735,8 @@ def _hinge_pair(rng):
 )
 def prop_I_24(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("AB = DE and AC = DF", eq_len(a, b, d, e) and eq_len(a, c, d, f))
+    outline(a, b, c)
+    outline(d, e, f)
     hypothesis("the angle at A is greater than the angle at D",
                angle_cmp(b, a, c, e, d, f) > 0)
     claim("the base BC is greater than the base EF", ["I.4", "I.19"], len2(b, c) > len2(e, f))
@@ -728,6 +753,8 @@ def prop_I_24(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
 )
 def prop_I_25(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("AB = DE and AC = DF", eq_len(a, b, d, e) and eq_len(a, c, d, f))
+    outline(a, b, c)
+    outline(d, e, f)
     hypothesis("the base BC is greater than the base EF", len2(b, c) > len2(e, f))
     claim("were the angle at A not greater, I.4 or I.24 would contradict the bases",
           ["I.4", "I.24"], angle_cmp(b, a, c, e, d, f) > 0)
@@ -754,6 +781,8 @@ def prop_I_26(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     hypothesis("angle ABC = angle DEF", eq_angle(a, b, c, d, e, f))
     hypothesis("angle BCA = angle EFD", eq_angle(b, c, a, e, f, d))
     hypothesis("the adjoining side BC = EF", eq_len(b, c, e, f))
+    outline(a, b, c)
+    outline(d, e, f)
     claim("were AB unequal to DE, cutting off an equal part and applying I.4 would make "
           "the exterior angle equal to the interior and opposite, contrary to I.16; "
           "so AB = DE", ["I.4", "I.16"], eq_len(a, b, d, e))

@@ -76,28 +76,23 @@ class _Frame:
         )
 
 
-def _clip_line(line: Line, frame: _Frame, left, bottom, right, top) -> Optional[tuple]:
-    """Trim an infinite line to the drawing area."""
-    a, b, c = to_float(line.a), to_float(line.b), to_float(line.c)
-    margin = 0.08 * max(right - left, top - bottom, 1e-9)
-    left, right = left - margin, right + margin
-    bottom, top = bottom - margin, top + margin
-    candidates = []
-    if abs(b) > 1e-12:
-        for x in (left, right):
-            candidates.append((x, (c - a * x) / b))
-    if abs(a) > 1e-12:
-        for y in (bottom, top):
-            candidates.append(((c - b * y) / a, y))
-    inside = [
-        point
-        for point in candidates
-        if left - 1e-6 <= point[0] <= right + 1e-6 and bottom - 1e-6 <= point[1] <= top + 1e-6
-    ]
-    if len(inside) < 2:
+def _draw_line(line: Line, frame: _Frame, reach: float) -> Optional[tuple]:
+    """Draw the segment between the two points that defined the line.
+
+    Euclid's figures are made of segments, not infinite lines: he joins A to B,
+    and produces a line only as far as he needs it, naming the far end. So the
+    faithful rendering of ``line(A, B)`` is the segment AB, nudged out slightly
+    at each end to show it is a line and not merely a join.
+    """
+    first, second = line.p.as_floats(), line.q.as_floats()
+    span = math.dist(first, second)
+    if span < 1e-12:
         return None
-    first, last = inside[0], max(inside, key=lambda p: math.dist(inside[0], p))
-    return frame.place(*first) + frame.place(*last)
+    overhang = 0.05 * reach / span
+    dx, dy = second[0] - first[0], second[1] - first[1]
+    start = (first[0] - dx * overhang, first[1] - dy * overhang)
+    end = (second[0] + dx * overhang, second[1] + dy * overhang)
+    return frame.place(*start) + frame.place(*end)
 
 
 def render_trace(trace: Trace, title: str = "") -> str:
@@ -121,12 +116,13 @@ def render_trace(trace: Trace, title: str = "") -> str:
             f'<circle cx="{centre[0]:.2f}" cy="{centre[1]:.2f}" r="{radius:.2f}" '
             f'fill="none" class="arc"/>'
         )
+    reach = max(right - left, top - bottom, 1e-9)
     for line in lines:
-        clipped = _clip_line(line, frame, left, bottom, right, top)
-        if clipped:
+        segment = _draw_line(line, frame, reach)
+        if segment:
             parts.append(
-                f'<line x1="{clipped[0]:.2f}" y1="{clipped[1]:.2f}" '
-                f'x2="{clipped[2]:.2f}" y2="{clipped[3]:.2f}" class="ray"/>'
+                f'<line x1="{segment[0]:.2f}" y1="{segment[1]:.2f}" '
+                f'x2="{segment[2]:.2f}" y2="{segment[3]:.2f}" class="ray"/>'
             )
     parts.append("</g>")
 

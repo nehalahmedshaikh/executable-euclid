@@ -16,7 +16,7 @@ from fractions import Fraction
 
 from ..kernel.field import sqrt
 from ..plane.angles import RIGHT, STRAIGHT, angle_at, length
-from ..plane.construct import circle, circle_with_radius2, line, meet, posit
+from ..plane.construct import circle, circle_with_radius2, line, meet, outline, posit
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
     collinear,
@@ -55,6 +55,7 @@ def _adjacent_segments(rng):
 )
 def prop_II_4(a: Point, b: Point, c: Point) -> Out:
     hypothesis("B cuts AC", on_line(b, Line.through(a, c)) and b != a and b != c)
+    outline(a, b, c, close=False)
     whole = length(a, c)
     first, second = length(a, b), length(b, c)
     claim("the segments together make the whole", "C.N.2", first + second == whole)
@@ -192,6 +193,10 @@ def prop_III_20(o: Point, a: Point, b: Point, c: Point) -> Out:
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
     hypothesis("the three points are distinct", a != b and b != c and a != c)
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    circle(o, a, "the circle")
+    outline(a, b, c)
+    line(o, a, "a radius")
+    line(o, c, "a radius")
 
     at_centre = angle_at(a, o, c)
     at_circumference = angle_at(a, b, c)

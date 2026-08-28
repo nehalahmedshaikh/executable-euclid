@@ -38,6 +38,7 @@ __all__ = [
     "meet",
     "meet_one",
     "on_side",
+    "outline",
     "posit",
 ]
 
@@ -73,6 +74,25 @@ def circle(centre: Point, through: Point, label: str = "") -> Circle:
     """Postulate 3: to describe a circle with any centre and radius."""
     drawn = Circle.centred(centre, through, label or f"({centre.label}{through.label})")
     _record(Move("circle", drawn.label, obj=drawn, inputs=(centre, through), postulate="Post.3"))
+    return drawn
+
+
+def outline(*points: Point, close: bool = True) -> list[Line]:
+    """Join a run of points, so a theorem draws the figure it argues about.
+
+    Propositions that prove something about a triangle or a parallelogram often
+    construct nothing: the figure is handed to them, and the argument is about
+    what is already there.  Without this they would produce no diagram at all,
+    which is exactly what a reader wants to look at.
+    """
+    drawn: list[Line] = []
+    ordered = list(points)
+    pairs = list(zip(ordered, ordered[1:]))
+    if close and len(ordered) > 2:
+        pairs.append((ordered[-1], ordered[0]))
+    for first, second in pairs:
+        if first != second:
+            drawn.append(line(first, second))
     return drawn
 
 

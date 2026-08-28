@@ -15,7 +15,15 @@ from __future__ import annotations
 from fractions import Fraction
 
 from ..plane.angles import RIGHT, STRAIGHT, angle_at, length
-from ..plane.construct import GeometryError, circle_with_radius2, line, meet, meet_one, posit
+from ..plane.construct import (
+    GeometryError,
+    circle_with_radius2,
+    line,
+    meet,
+    meet_one,
+    outline,
+    posit,
+)
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
     collinear,
@@ -265,6 +273,7 @@ def prop_I_34(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("ABCD is a parallelogram",
                parallel(Line.through(a, b), Line.through(d, c))
                and parallel(Line.through(a, d), Line.through(b, c)))
+    outline(a, b, c, d)
     diameter = line(a, c, "the diameter AC")
 
     claim("the alternate angles ABC and CDA are equal", "I.29", eq_angle(a, b, c, c, d, a))
@@ -295,6 +304,8 @@ def prop_I_35(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
                and parallel(Line.through(a, f), Line.through(b, e)))
     hypothesis("C, D, E, F lie on one parallel to AB",
                collinear(d, c, e) and collinear(d, c, f))
+    outline(a, b, c, d)
+    outline(a, b, e, f)
 
     claim("AD = BC and AF = BE, the opposite sides", "I.34",
           eq_len(a, d, b, c) and eq_len(a, f, b, e))
@@ -333,6 +344,8 @@ def prop_I_36(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point, g: Poi
     hypothesis("the bases AB and EF are equal", eq_len(a, b, e, f))
     hypothesis("the bases lie on one straight line", collinear(a, b, e) and collinear(a, b, f))
     hypothesis("the tops lie on one parallel", collinear(d, c, g) and collinear(d, c, h))
+    outline(a, b, c, d)
+    outline(e, f, g, h)
     claim("joining the ends of the equal and parallel bases gives a parallelogram", "I.33",
           eq_len(a, b, e, f))
     claim("both parallelograms equal that one, hence one another", "I.35",
@@ -349,6 +362,9 @@ def prop_I_36(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point, g: Poi
 def prop_I_37(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("C and D lie on one parallel to AB",
                parallel(Line.through(a, b), Line.through(c, d)))
+    outline(a, b, c)
+    outline(a, b, d)
+    line(c, d, "the parallel through the apexes")
     claim("completing the parallelograms on AB, they are equal", "I.35",
           eq_polygon_area(
               [a, b, c, _fourth_vertex(b, a, c)], [a, b, d, _fourth_vertex(b, a, d)]))
@@ -368,6 +384,9 @@ def prop_I_38(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     hypothesis("the bases lie on one straight line", collinear(a, b, d) and collinear(a, b, e))
     hypothesis("the apexes lie on one parallel to the bases",
                parallel(Line.through(a, b), Line.through(c, f)))
+    outline(a, b, c)
+    outline(d, e, f)
+    line(c, f, "the parallel through the apexes")
     claim("the completed parallelograms on equal bases are equal", "I.36",
           eq_polygon_area(
               [a, b, c, _fourth_vertex(b, a, c)], [d, e, f, _fourth_vertex(e, d, f)]))
@@ -391,6 +410,9 @@ def prop_I_39(a: Point, b: Point, c: Point, d: Point) -> Out:
     base = Line.through(a, b)
     hypothesis("C and D are on the same side of AB", same_side(c, d, base))
     hypothesis("the triangles ABC and ABD are equal", eq_area((a, b, c), (a, b, d)))
+    outline(a, b, c)
+    outline(a, b, d)
+    line(c, d)
     claim("were CD not parallel to AB, a parallel through C would cut BD and I.37 would "
           "make a part equal the whole", "I.37", parallel(Line.through(c, d), base))
     return Out()
@@ -412,6 +434,9 @@ def prop_I_40(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
                eq_len(a, b, d, e) and collinear(a, b, d) and collinear(a, b, e))
     hypothesis("C and F are on the same side", same_side(c, f, Line.through(a, b)))
     hypothesis("the triangles are equal", eq_area((a, b, c), (d, e, f)))
+    outline(a, b, c)
+    outline(d, e, f)
+    line(c, f)
     claim("were CF not parallel to the bases, I.38 would make a part equal the whole", "I.38",
           parallel(Line.through(c, f), Line.through(a, b)))
     return Out()
@@ -443,6 +468,8 @@ def prop_I_41(a: Point, b: Point, c: Point, d: Point, e: Point) -> Out:
                parallel(Line.through(a, b), Line.through(d, c))
                and parallel(Line.through(a, d), Line.through(b, c)))
     hypothesis("E lies on the parallel DC", collinear(d, c, e))
+    outline(a, b, c, d)
+    outline(a, b, e)
     claim("the triangle ABE equals the triangle ABC", "I.37", eq_area((a, b, e), (a, b, c)))
     claim("the diameter halves the parallelogram, so it is double the triangle", "I.34",
           _area(a, b, c, d) == 2 * _area(a, b, e))
@@ -714,6 +741,7 @@ def prop_I_48(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
     hypothesis("the square on AC equals those on AB and BC",
                len2(a, c) == len2(a, b) + len2(b, c))
+    outline(a, b, c)
     claim("erecting a perpendicular at B equal to BA gives, by I.47, a triangle with the "
           "same three sides; so by I.8 the angle ABC is right", ["I.11", "I.47", "I.8"],
           right_angle(a, b, c))
