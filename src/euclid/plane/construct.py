@@ -26,7 +26,13 @@ from typing import Union
 
 from ..kernel.field import Constructible, is_zero, sign, sqrt
 from .objects import Circle, Line, Point
-from .trace import IntersectionEvent, Move, broadcast_intersection, broadcast_move
+from .trace import (
+    IntersectionEvent,
+    Move,
+    broadcast_intersection,
+    broadcast_move,
+    record_result,
+)
 
 __all__ = [
     "Figure",
@@ -39,7 +45,9 @@ __all__ = [
     "meet_one",
     "on_side",
     "outline",
+    "outline_result",
     "posit",
+    "result",
 ]
 
 Shape = Union[Line, Circle]
@@ -93,6 +101,29 @@ def outline(*points: Point, close: bool = True) -> list[Line]:
     for first, second in pairs:
         if first != second:
             drawn.append(line(first, second))
+    return drawn
+
+
+def result(*objects: Union[Point, Line, Circle]) -> None:
+    """Mark what the proposition set out to produce.
+
+    A construction that stands on three levels of helper propositions inherits
+    every line those helpers drew -- I.45 ends up with two hundred lettered
+    points, which is a record of the work but not a figure anyone can read.
+    Naming the answer lets the renderer draw it firmly and hold the rest back.
+    The scaffolding is still drawn, because it was really constructed; it is
+    just no longer competing with the conclusion.
+
+    Optional.  A proposition that marks nothing is drawn wholly firm, which is
+    right for the great majority, whose figures are their own subject.
+    """
+    record_result(*objects)
+
+
+def outline_result(*points: Point, close: bool = True) -> list[Line]:
+    """``outline`` over points that are themselves the answer."""
+    drawn = outline(*points, close=close)
+    result(*points, *drawn)
     return drawn
 
 

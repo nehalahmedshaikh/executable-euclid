@@ -7,7 +7,9 @@ nicer web edition, coloured diagrams, interactive applets. This one runs it.
 
 Each proposition is a small program. It draws its own figure with a straightedge
 and compass, checks its own conclusion, and reports what it needed to get there.
-Nothing is measured, rounded, or approximated.
+Nothing is measured, rounded, or approximated. The books that argue about
+numbers and magnitudes rather than figures — V, VII to IX, and most of X — draw
+nothing, as Euclid draws nothing there; what they check is exact all the same.
 
 ```console
 $ euclid run I.47
@@ -57,10 +59,10 @@ True
 
 There is a [findings page](docs/findings.html) with all of these written up.
 
-**The first proposition holds up the whole book.** Of the 48 propositions in
-Book I, **41 depend on I.1**, the equilateral triangle. Nothing else comes close.
-That ranking was not assigned by anyone — it is what the call graph looks like
-after every proposition has run.
+**The first proposition holds up the whole book.** Of the 390 propositions written
+out here, **136 depend on I.1**, the equilateral triangle. Nothing else comes
+close. That ranking was not assigned by anyone — it is what the call graph looks
+like after every proposition has run.
 
 **The parallel postulate announces itself.** Euclid holds his fifth and most
 argued-over rule back until I.29. Nobody told the machine that. It reads the
@@ -68,13 +70,13 @@ references each proof cites, and the line lands exactly where historians say it
 does: I.27 and I.28 manage without it, everything from I.29 on needs it.
 
 **Pythagoras needs a quarter of the book.** Follow I.47 back through everything
-it uses and **25 propositions** remain out of 73. Delete the rest and it still
+it uses and **25 propositions** remain out of 390. Delete the rest and it still
 stands.
 
 **Euclid uses something his own rules do not give him.** His postulates let you
 draw a circle. None of them says two circles ever cross. He needs them to cross
 in I.1, on the first page, and simply takes it. Counting every such step gives
-**154 places** where a point is used that no rule promises exists.
+**355 places** where a point is used that no rule promises exists.
 
 **Nothing in the book quietly changes its mind.** Each proposition is run on many
 different figures and the runs compared, looking for a step that holds in one
@@ -130,6 +132,12 @@ $ euclid classify "(1+sqrt(5))/2"      # the golden ratio: a fifth binomial
 $ euclid classify "sqrt(18)+sqrt(2)"   # not a binomial — it is really 4·sqrt(2)
 ```
 
+All thirteen names are implemented. The last six — *major*, *minor*, and the
+four whose names are whole sentences — are the awkward ones: their two terms are
+the roots of a single quadratic, so neither can be written without the other and
+the sum has no seam to split it at. Squaring puts the seam back, and the pair
+that comes out is checked by adding it up again.
+
 ## Impossible things
 
 ```console
@@ -146,18 +154,26 @@ rather than taking it on faith.
 
 ## What is covered
 
-| Book | | |
+| Book | Encoded | |
 |---|---|---|
-| **I** | **all 48** | congruence, parallels, area, Pythagoras |
-| II | 4 propositions | geometric algebra, the golden section |
-| III | 3 | circles, Thales |
-| IV | 1 | the regular pentagon |
-| V | 4 | Eudoxus on proportion |
-| VI | 5 | similar figures |
-| VII–IX | 4 | the arithmetic books, as algorithms |
-| X | 4 + the classifier | irrational lengths |
+| **I** | **48 / 48** | congruence, parallels, area, Pythagoras |
+| **II** | **14 / 14** | geometric algebra, the golden section |
+| **III** | **37 / 37** | circles, tangents, the power of a point |
+| **IV** | **16 / 16** | inscribed and circumscribed figures |
+| **V** | **25 / 25** | Eudoxus on proportion |
+| **VI** | **33 / 33** | similar figures, application of areas |
+| **VII** | **39 / 39** | the Euclidean algorithm, primes, proportion |
+| **VIII** | **27 / 27** | continued proportions, squares and cubes |
+| **IX** | **36 / 36** | primes, parity, perfect numbers |
+| **X** | **115 / 115** | incommensurables, the thirteen irrationals |
+| XI | 0 / 39 | solid geometry |
+| XII | 0 / 18 | the method of exhaustion |
+| XIII | 0 / 18 | the regular solids |
 
-73 propositions, 1244 checked steps.
+**390 propositions**, 6207 checked steps. **Books I to X are complete** — every
+proposition of plane geometry, the theory of proportion, the arithmetical books,
+and the whole of Book X. Books XI–XIII are solid geometry and the kernel is
+planar by design, so they wait on a decision about that.
 
 **Book V is worth a note.** Its famous Definition 5 asks about *all* pairs of
 multiples at once, so it cannot be tested by trying them. But it can be settled
@@ -168,13 +184,31 @@ definition into a procedure.
 ## Where the words come from
 
 Proposition statements are Thomas L. Heath's 1908 translation, which is out of
-copyright. They are downloaded and parsed by [`tools/fetch_heath.py`](tools/fetch_heath.py),
+copyright. They are parsed by [`tools/fetch_heath.py`](tools/fetch_heath.py),
 not retyped or reworded — so what ships here is the published text.
 
-Books I–IV are covered (115 statements). For Books V–X no clean copy was
-available to parse, so a short summary written for this project stands in.
-**Every place a statement appears says which of the two it is**, on the site and
-at the command line.
+One source, all thirteen books, **465 enunciations** — every proposition of the
+*Elements*. The script reads a local epub and touches no network. Only the
+enunciations are taken; a modern edition's introductions and notes are a
+copyrighted compilation and are neither extracted nor committed.
+
+**Nothing is paraphrased, anywhere.** There is no second kind of statement to
+fall back to: a proposition has no parameter for its own wording, and looking up
+one that is missing raises rather than inventing a stand-in. A summary cannot
+reach a page by accident because there is no code path that would put one there.
+
+Where the scan misprints Heath, the correction is published rather than hidden.
+Three so far — `acutc` for `acute`, `cach` for `each`, and one lost full stop —
+each listed on the site with what the scan says, what it was corrected to, and
+why. The parser refuses to run if a correction stops applying, so a stale one
+cannot sit there doing nothing.
+
+Two of those three substitute a single letter and still spell a real word, so no
+spell check would find them. What finds them is that Euclid's vocabulary is tiny
+and endlessly repetitive — about four hundred distinct words across all 465
+enunciations — so the script lists every word used *exactly once*. A misprint
+has nowhere to hide in a list that short, and everything else in it is a genuine
+term of art (`polyhedral`, `eventimes`, `anthyphairesis`).
 
 ## What "checked" means
 
@@ -188,7 +222,15 @@ But this tests the constructions, not Euclid's reasoning. It confirms the
 conclusions are true of the figures; it does not confirm they follow by his rules
 of inference. The references each step cites are recorded but not relied on — so
 a step with the wrong reference attached still cannot slip a false statement past,
-though the machine will not tell you the reference is wrong.
+though the machine will not tell you the reference is wrong. It will tell you if
+the reference names a proposition that does not exist, which is a different and
+much smaller guarantee.
+
+A second thing worth being straight about: *certified* and *actually tested* are
+not the same. A claim that cannot come out false, or a hypothesis no sampled
+figure can satisfy, passes every run while checking nothing. Both have happened
+here, and both are now caught — [`tests/test_corpus.py`](tests/test_corpus.py)
+reads every claim in the corpus looking for the shapes that cannot fail.
 
 For the shortest-construction searches: where the result says *fewest possible*,
 every construction of that length was examined, so it really is shortest and a

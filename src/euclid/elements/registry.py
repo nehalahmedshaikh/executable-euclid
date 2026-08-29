@@ -47,7 +47,6 @@ __all__ = [
     "Run",
     "THEOREM",
     "all_propositions",
-    "book_of",
     "claim",
     "get",
     "hypothesis",
@@ -64,21 +63,25 @@ THEOREM = "theorem"
 # Heath's text
 # ---------------------------------------------------------------------------
 # Statements are Thomas L. Heath's 1908 translation, which is public domain.
-# They are downloaded and parsed by tools/fetch_heath.py rather than retyped,
-# so the words are his. Where a proposition is not in the file, the code's own
-# one-line summary stands in, and everything that shows a statement says which
-# of the two it is showing.
+# They are parsed by tools/fetch_heath.py rather than retyped, so the words are
+# his and nothing else. All 465 propositions of all thirteen books are in the
+# file, and a proposition whose ref is missing from it raises rather than
+# falling back to anything: there is no second kind of statement to fall back
+# to, and no way to smuggle a paraphrase in by omission.
+#
+# Where the source misprints Heath the correction is recorded in ERRATA in the
+# fetch script and shipped in the file, so every departure from the scan can be
+# read and checked.
 
 _HEATH_PATH = Path(__file__).with_name("heath.json")
 
 
-def _load_heath() -> dict[str, str]:
-    if not _HEATH_PATH.exists():  # pragma: no cover - the file is committed
-        return {}
-    return json.loads(_HEATH_PATH.read_text(encoding="utf-8")).get("statements", {})
+def _load_heath() -> tuple[dict[str, str], list[dict]]:
+    payload = json.loads(_HEATH_PATH.read_text(encoding="utf-8"))
+    return payload["statements"], payload.get("errata", [])
 
 
-HEATH: dict[str, str] = _load_heath()
+HEATH, ERRATA = _load_heath()
 
 HEATH_CREDIT = (
     "Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> "
@@ -120,7 +123,6 @@ class Proposition:
     ref: str
     book: str
     number: int
-    title: str
     kind: str
     raw: Callable
     wrapped: Callable = field(default=None, repr=False)
@@ -131,16 +133,15 @@ class Proposition:
 
     @property
     def statement(self) -> str:
-        """The enunciation: Heath's words where we have them."""
-        return HEATH.get(self.ref, self.title)
-
-    @property
-    def statement_is_heath(self) -> bool:
-        return self.ref in HEATH
-
-    @property
-    def statement_source(self) -> str:
-        return "Heath, 1908" if self.statement_is_heath else "editorial summary"
+        """The enunciation, in Heath's words. There is no other kind."""
+        try:
+            return HEATH[self.ref]
+        except KeyError:  # pragma: no cover - every ref of every book is present
+            raise KeyError(
+                f"{self.ref} has no enunciation in heath.json. Statements are parsed, "
+                f"never written: add the proposition to the source text rather than "
+                f"describing it here."
+            ) from None
 
     @property
     def depends_on(self) -> set[str]:
@@ -215,10 +216,6 @@ def reference_kind(ref: str) -> str:
     return "other"
 
 
-def book_of(ref: str) -> str:
-    return ref.split(".")[0]
-
-
 def _register_given(name: str, value: Any) -> Any:
     """Label a proposition's inputs and record them as the figure's givens.
 
@@ -239,20 +236,27 @@ def _register_given(name: str, value: Any) -> Any:
 
 def proposition(
     ref: str,
-    title: str,
     kind: str = THEOREM,
     sample: Optional[Callable] = None,
     note: str = "",
 ) -> Callable:
-    """Register a proposition and wrap it so that running it records itself."""
+    """Register a proposition and wrap it so that running it records itself.
+
+    There is deliberately no way to give a proposition its own wording.  The
+    enunciation is looked up from Heath by ``ref``, so the only thing this
+    decorator can say about what a proposition *states* is which one it is.
+    ``note`` is commentary, shown as commentary, and never stands in for the
+    statement.
+    """
 
     def decorate(function: Callable) -> Callable:
         book, number = ref.split(".")
+        if ref not in HEATH:
+            raise KeyError(f"{ref} is not a proposition of the Elements")
         entry = Proposition(
             ref=ref,
             book=book,
             number=int(number),
-            title=title,
             kind=kind,
             raw=function,
             sample=sample,

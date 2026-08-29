@@ -14,6 +14,13 @@ turns them into pages.  A trace records three kinds of event:
     the proof steps, each citing the proposition, definition, postulate or
     common notion that Euclid appeals to, and each independently checked
     against the model.
+
+A trace may also carry ``results``: the objects the proposition was carried out
+to produce.  A construction that leans on three levels of helper propositions
+inherits all their scaffolding, and the figure becomes unreadable; naming the
+answer lets the renderer draw it firmly and hold the scaffolding back.  Marking
+is optional, and a proposition that marks nothing is drawn entirely firm, as
+before.
 """
 
 from __future__ import annotations
@@ -33,6 +40,7 @@ __all__ = [
     "push_trace",
     "pop_trace",
     "record_predicate",
+    "record_result",
 ]
 
 
@@ -89,6 +97,7 @@ class Trace:
     intersections: list[IntersectionEvent] = field(default_factory=list)
     predicates: list[PredicateEvent] = field(default_factory=list)
     claims: list[Claim] = field(default_factory=list)
+    results: list[Any] = field(default_factory=list)
     children: list["Trace"] = field(default_factory=list)
     inputs: dict[str, Any] = field(default_factory=dict)
     outputs: dict[str, Any] = field(default_factory=dict)
@@ -169,6 +178,20 @@ def broadcast_intersection(event: IntersectionEvent) -> IntersectionEvent:
     for trace in _STACK:
         trace.intersections.append(event)
     return event
+
+
+def record_result(*objects: Any) -> None:
+    """Name the objects this proposition was carried out to produce.
+
+    Kept on the proposition's own trace rather than broadcast: a helper's
+    answer is scaffolding to its caller, which has an answer of its own.
+    """
+    trace = current_trace()
+    if trace is None:
+        return
+    for item in objects:
+        if item not in trace.results:
+            trace.results.append(item)
 
 
 def record_predicate(name: str, value: Any, detail: str = "", order_sensitive: bool = False) -> Any:

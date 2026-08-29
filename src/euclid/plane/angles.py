@@ -26,7 +26,7 @@ from fractions import Fraction
 from ..kernel.field import Constructible, is_zero, sign, sqrt
 from .objects import Point, vector_between
 
-__all__ = ["Angle", "RIGHT", "STRAIGHT", "ZERO_ANGLE", "angle_at", "length", "turn_at"]
+__all__ = ["Angle", "RIGHT", "STRAIGHT", "angle_at", "length"]
 
 
 def length(a: Point, b: Point) -> Constructible:
@@ -129,7 +129,6 @@ class Angle:
         return f"Angle({self.degrees():.4f} deg)"
 
 
-ZERO_ANGLE = Angle(Fraction(1), Fraction(0))
 RIGHT = Angle(Fraction(0), Fraction(1))
 STRAIGHT = Angle(Fraction(-1), Fraction(0))
 
@@ -139,9 +138,3 @@ def angle_at(first: Point, vertex: Point, second: Point) -> Angle:
     return Angle.between_rays(vertex, first, second)
 
 
-def turn_at(first: Point, vertex: Point, second: Point) -> Angle:
-    """The *oriented* turn from ray ``vertex->first`` to ray ``vertex->second``."""
-    ux, uy = vector_between(vertex, first)
-    vx, vy = vector_between(vertex, second)
-    scale = sqrt(ux * ux + uy * uy) * sqrt(vx * vx + vy * vy)
-    return Angle((ux * vx + uy * vy) / scale, (ux * vy - uy * vx) / scale)

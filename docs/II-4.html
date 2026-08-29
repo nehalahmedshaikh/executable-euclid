@@ -46,6 +46,9 @@ svg.figure .arc { stroke: var(--grey); stroke-width: 1; stroke-dasharray: 3 3; }
 svg.figure .ray { stroke: var(--ink); stroke-width: 1.4; }
 svg.figure .dot { fill: var(--ink); }
 svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
+svg.figure .ray.aside { stroke: var(--grey); stroke-width: .7; }
+svg.figure .arc.aside { stroke: var(--grey); stroke-width: .6; stroke-dasharray: 2 4; }
+svg.figure .dot.aside { fill: var(--grey); }
 svg.graph { max-width: 100%; height: auto; }
 svg.graph .edge { fill: none; stroke: var(--grey); stroke-width: 1.1; }
 svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
@@ -83,22 +86,55 @@ blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-ser
 .finding h3 { margin-top: 0; }
 footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--grey);
          font: .78rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--grey); }
-</style></head><body><div class="wrap"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a></nav><p class="kicker">Book II &middot; Proposition 4</p><h1>II.4</h1><blockquote>If a straight line be cut at random, the square on the whole is equal to the squares on the segments and twice the rectangle contained by the segments.<span class="src">Heath, 1908</span></blockquote><p class="note">(a+b)^2 = a^2 + 2ab + b^2, four centuries before algebraic notation.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="II.4" class="figure"><g class="construction"><line x1="260.00" y1="18.40" x2="260.00" y2="309.60" class="ray"/></g><g class="points"><circle cx="260.00" cy="34.00" r="3.2" class="dot"/><text x="267.00" y="27.00" class="letter">A</text><circle cx="260.00" cy="294.00" r="3.2" class="dot"/><text x="267.00" y="287.00" class="letter">B</text><circle cx="260.00" cy="346.00" r="3.2" class="dot"/><text x="267.00" y="339.00" class="letter">C</text></g></svg><figcaption>2 lines and circles drawn</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">B cuts AC<span class="cite">given</span></li><li class="">the segments together make the whole<span class="cite">by C.N.2</span></li><li class="">the square on the whole equals the squares on the parts together with twice the rectangle they contain<span class="cite">by <a href="I-43.html">I.43</a>, <a href="I-46.html">I.46</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="I-43.html">I.43</a> <a href="I-46.html">I.46</a></p><p><strong>Rests on:</strong> C.N.1, C.N.2, C.N.3, C.N.4, C.N.5, Def.10, Def.15, Def.22, Def.4, Post.5</p><p><strong>Depth:</strong> 12 steps of argument above the first principles. <strong>Parallel postulate:</strong> needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
+</style></head><body><div class="wrap"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav><p class="kicker">Book II &middot; Proposition 4</p><h1>II.4</h1><blockquote>If a straight line be cut at random, the square on the whole is equal to the squares on the segments and twice the rectangle contained by the segments.<span class="src">Heath, 1908</span></blockquote><p class="note">(a+b)^2 = a^2 + 2ab + b^2, four centuries before algebraic notation.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="II.4" class="figure"><g class="construction"><line x1="104.00" y1="21.52" x2="104.00" y2="358.48" class="ray"/><line x1="91.52" y1="346.00" x2="428.48" y2="346.00" class="ray"/><line x1="416.00" y1="358.48" x2="416.00" y2="21.52" class="ray"/><line x1="428.48" y1="34.00" x2="91.52" y2="34.00" class="ray"/><line x1="91.52" y1="294.00" x2="428.48" y2="294.00" class="ray"/><line x1="364.00" y1="21.52" x2="364.00" y2="358.48" class="ray"/><line x1="95.18" y1="25.18" x2="424.82" y2="354.82" class="ray"/></g><g class="points"><circle cx="104.00" cy="34.00" r="3.2" class="dot"/><text x="111.00" y="27.00" class="letter">A</text><circle cx="104.00" cy="294.00" r="3.2" class="dot"/><text x="111.00" y="287.00" class="letter">B</text><circle cx="104.00" cy="346.00" r="3.2" class="dot"/><text x="111.00" y="339.00" class="letter">C</text><circle cx="416.00" cy="34.00" r="3.2" class="dot"/><text x="423.00" y="27.00" class="letter">D</text><circle cx="416.00" cy="346.00" r="3.2" class="dot"/><text x="423.00" y="339.00" class="letter">E</text><circle cx="416.00" cy="294.00" r="3.2" class="dot"/><text x="423.00" y="287.00" class="letter">F</text><circle cx="364.00" cy="34.00" r="3.2" class="dot"/><text x="371.00" y="27.00" class="letter">G</text><circle cx="364.00" cy="294.00" r="3.2" class="dot"/><text x="371.00" y="287.00" class="letter">H</text><circle cx="364.00" cy="346.00" r="3.2" class="dot"/><text x="371.00" y="339.00" class="letter">K</text></g></svg><figcaption>7 lines and circles drawn</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">B cuts AC<span class="cite">given</span></li><li class="">the segments together make the whole<span class="cite">by C.N.2</span></li><li class="">the two cuts leave four figures that fill the square<span class="cite">by C.N.2</span></li><li class="">the squares on the segments stand about the diameter<span class="cite">by <a href="I-43.html">I.43</a></span></li><li class="">two of them are the squares on the segments<span class="cite">by <a href="I-46.html">I.46</a></span></li><li class="">and the other two, being the complements about the diameter, are each the rectangle contained by the segments<span class="cite">by <a href="I-43.html">I.43</a></span></li><li class="">so the square on the whole equals the squares on the parts together with twice the rectangle they contain<span class="cite">by <a href="I-43.html">I.43</a>, <a href="I-46.html">I.46</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="I-43.html">I.43</a> <a href="I-46.html">I.46</a></p><p><strong>Used by:</strong> <a href="II-7.html">II.7</a> <a href="II-8.html">II.8</a> <a href="II-9.html">II.9</a> <a href="II-10.html">II.10</a> <a href="II-12.html">II.12</a></p><p><strong>Rests on:</strong> C.N.1, C.N.2, C.N.3, C.N.4, C.N.5, Def.10, Def.15, Def.22, Def.4, Post.5</p><p><strong>Depth:</strong> 12 steps of argument above the first principles. <strong>Parallel postulate:</strong> needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>the argument reads a 'between' fact off the figure<span class="cite">order</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
     "II.4",
-    "If a straight line is cut at random, then the square on the whole equals the squares "
-    "on the segments plus twice the rectangle contained by the segments.",
     THEOREM,
     sample=_adjacent_segments,
     note="(a+b)^2 = a^2 + 2ab + b^2, four centuries before algebraic notation.",
 )
 def prop_II_4(a: Point, b: Point, c: Point) -&gt; Out:
-    hypothesis("B cuts AC", on_line(b, Line.through(a, c)) and b != a and b != c)
-    outline(a, b, c, close=False)
+    """AC is cut at B, and the square on AC is cut both ways through B."""
+    hypothesis("B cuts AC", between(a, b, c))
+
+    # The square on the whole, divided as Euclid divides it: the two cuts
+    # through B leave the squares on the two segments at opposite corners, and
+    # the rectangle they contain twice over between them.
+    low, high = _across(a, b), _across(b, c)
+    lift = (low[0] + high[0], low[1] + high[1])
+    d = posit(Point(a.x + lift[0], a.y + lift[1]), "D")
+    e = posit(Point(c.x + lift[0], c.y + lift[1]), "E")
+    outline(a, c, e, d)
+    f = posit(Point(b.x + lift[0], b.y + lift[1]), "F")
+    g = posit(Point(a.x + low[0], a.y + low[1]), "G")
+    h = posit(Point(b.x + low[0], b.y + low[1]), "H")
+    k = posit(Point(c.x + low[0], c.y + low[1]), "K")
+    line(b, f, "BF")
+    line(g, k, "GK")
+    # Euclid draws the diameter, because his reason for the two rectangles being
+    # equal is I.43: they are the complements of the figures about it. Drawing
+    # it is what makes the cited step visible in the figure.
+    line(a, e, "the diameter AE")
+
+    on_first, on_second = (a, b, h, g), (h, k, e, f)
+    between_them = ((b, c, k, h), (g, h, f, d))
     whole = length(a, c)
     first, second = length(a, b), length(b, c)
+
     claim("the segments together make the whole", "C.N.2", first + second == whole)
-    claim("the square on the whole equals the squares on the parts together with "
+    claim("the two cuts leave four figures that fill the square", "C.N.2",
+          _area(a, c, e, d)
+          == _area(*on_first) + _area(*on_second)
+          + _area(*between_them[0]) + _area(*between_them[1]))
+    claim("the squares on the segments stand about the diameter", "I.43",
+          on_line(h, Line.through(a, e)))
+    claim("two of them are the squares on the segments", "I.46",
+          _area(*on_first) == first * first and _area(*on_second) == second * second)
+    claim("and the other two, being the complements about the diameter, are each the "
+          "rectangle contained by the segments", "I.43",
+          _area(*between_them[0]) == first * second
+          and _area(*between_them[1]) == first * second)
+    claim("so the square on the whole equals the squares on the parts together with "
           "twice the rectangle they contain", ["I.43", "I.46"],
           whole * whole == first * first + second * second + 2 * first * second)
-    return Out()
-</pre><footer><p>Every diagram here was drawn from a construction that ran and checked out in exact arithmetic. Every cross-reference was read off the call graph, not typed in by hand.</p><p>Proposition statements are Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Where a statement is missing from that text, a short summary written for this project stands in, and the page says so.</p></footer></div></body></html>
+    return Out(square=(a, c, e, d), pieces=(on_first, on_second) + between_them)
+</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not, and do not try to be. Every cross-reference was read off the call graph, not typed in by hand.</p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

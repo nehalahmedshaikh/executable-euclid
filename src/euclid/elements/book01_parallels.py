@@ -22,7 +22,9 @@ from ..plane.construct import (
     meet,
     meet_one,
     outline,
+    outline_result,
     posit,
+    result,
 )
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
@@ -105,8 +107,6 @@ def _three_parallels(rng):
 
 @proposition(
     "I.27",
-    "If a straight line falling on two straight lines makes the alternate angles equal to "
-    "one another, then the straight lines are parallel to one another.",
     THEOREM,
     sample=_transversal,
     note="Neutral geometry: no appeal to Postulate 5.",
@@ -125,9 +125,6 @@ def prop_I_27(a: Point, b: Point, c: Point, d: Point, g: Point, h: Point) -> Out
 
 @proposition(
     "I.28",
-    "If a straight line falling on two straight lines makes the exterior angle equal to "
-    "the interior and opposite angle on the same side, or the sum of the interior angles "
-    "on the same side equal to two right angles, then the straight lines are parallel.",
     THEOREM,
     sample=_transversal,
 )
@@ -149,9 +146,6 @@ def prop_I_28(a: Point, b: Point, c: Point, d: Point, g: Point, h: Point) -> Out
 
 @proposition(
     "I.29",
-    "A straight line falling on parallel straight lines makes the alternate angles equal "
-    "to one another, the exterior angle equal to the interior and opposite angle, and the "
-    "sum of the interior angles on the same side equal to two right angles.",
     THEOREM,
     sample=_transversal,
     note="The first proposition in the Elements that needs the parallel postulate.",
@@ -174,7 +168,6 @@ def prop_I_29(a: Point, b: Point, c: Point, d: Point, g: Point, h: Point) -> Out
 
 @proposition(
     "I.30",
-    "Straight lines parallel to the same straight line are also parallel to one another.",
     THEOREM,
     sample=_three_parallels,
 )
@@ -189,7 +182,6 @@ def prop_I_30(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
 
 @proposition(
     "I.31",
-    "To draw a straight line through a given point parallel to a given straight line.",
     CONSTRUCTION,
     sample=samples.line_and_external_point,
 )
@@ -222,9 +214,6 @@ def _parallel_through(point: Point, first: Point, second: Point) -> Line:
 
 @proposition(
     "I.32",
-    "In any triangle, if one of the sides is produced, then the exterior angle equals the "
-    "sum of the two interior and opposite angles, and the sum of the three interior angles "
-    "of the triangle equals two right angles.",
     THEOREM,
     sample=samples.triangle,
 )
@@ -244,8 +233,6 @@ def prop_I_32(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.33",
-    "Straight lines which join the ends of equal and parallel straight lines in the same "
-    "directions are themselves equal and parallel.",
     THEOREM,
     sample=samples.parallelogram,
 )
@@ -264,8 +251,6 @@ def prop_I_33(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.34",
-    "In parallelogrammic areas the opposite sides and angles equal one another, and the "
-    "diameter bisects the areas.",
     THEOREM,
     sample=samples.parallelogram,
 )
@@ -291,7 +276,6 @@ def prop_I_34(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.35",
-    "Parallelograms which are on the same base and in the same parallels equal one another.",
     THEOREM,
     sample=samples.two_parallelograms_same_base,
 )
@@ -336,7 +320,6 @@ def _parallelograms_equal_bases(rng):
 
 @proposition(
     "I.36",
-    "Parallelograms which are on equal bases and in the same parallels equal one another.",
     THEOREM,
     sample=_parallelograms_equal_bases,
 )
@@ -355,7 +338,6 @@ def prop_I_36(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point, g: Poi
 
 @proposition(
     "I.37",
-    "Triangles which are on the same base and in the same parallels equal one another.",
     THEOREM,
     sample=samples.triangles_same_base,
 )
@@ -375,7 +357,6 @@ def prop_I_37(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.38",
-    "Triangles which are on equal bases and in the same parallels equal one another.",
     THEOREM,
     sample=samples.triangles_equal_bases,
 )
@@ -401,8 +382,6 @@ def _equal_triangles_same_base(rng):
 
 @proposition(
     "I.39",
-    "Equal triangles which are on the same base and on the same side are also in the same "
-    "parallels.",
     THEOREM,
     sample=_equal_triangles_same_base,
 )
@@ -424,8 +403,6 @@ def _equal_triangles_equal_bases(rng):
 
 @proposition(
     "I.40",
-    "Equal triangles which are on equal bases and on the same side are also in the same "
-    "parallels.",
     THEOREM,
     sample=_equal_triangles_equal_bases,
 )
@@ -458,8 +435,6 @@ def _parallelogram_and_triangle(rng):
 
 @proposition(
     "I.41",
-    "If a parallelogram has the same base with a triangle and is in the same parallels, "
-    "then the parallelogram is double the triangle.",
     THEOREM,
     sample=_parallelogram_and_triangle,
 )
@@ -489,13 +464,13 @@ def _triangle_and_angle(rng):
 
 @proposition(
     "I.42",
-    "To construct a parallelogram equal to a given triangle in a given rectilinear angle.",
     CONSTRUCTION,
     sample=_triangle_and_angle,
 )
 def prop_I_42(a: Point, b: Point, c: Point, p: Point, q: Point, r: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
     hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    outline(p, q, r, close=False)  # the arms of the given angle
 
     middle = posit(prop_I_10(b, c).midpoint, "E")
     line(a, middle, "join AE")
@@ -528,8 +503,6 @@ def _line_triangle_angle(rng):
 
 @proposition(
     "I.44",
-    "To a given straight line to apply, in a given rectilinear angle, a parallelogram "
-    "equal to a given triangle.",
     CONSTRUCTION,
     sample=_line_triangle_angle,
     note="The application of areas -- the engine of Book II and, later, of the "
@@ -549,6 +522,7 @@ def prop_I_44(
     hypothesis("A and B are distinct", a != b)
     hypothesis("CDE is a genuine triangle", not collinear(c, d, e))
     hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    outline(p, q, r, close=False)  # the arms of the given angle
 
     # Carry a parallelogram equal to the triangle, in the given angle, over to B,
     # with its base along AB produced (I.3 for the lengths, I.23 for the angle).
@@ -588,6 +562,12 @@ def prop_I_44(
           _area(l, a, b, m) == _area(c, d, e))
     claim("and the angle ABM equals the given angle, being vertical to GBE", "I.15",
           eq_angle(a, b, m, p, q, r))
+
+    # What the enunciation is about: the parallelogram applied to AB, and the
+    # triangle it is equal to. Three levels of helper construction stand behind
+    # them, and stay in the figure, drawn back.
+    outline_result(l, a, b, m)
+    outline_result(c, d, e)
     return Out(parallelogram=(l, a, b, m))
 
 
@@ -600,8 +580,6 @@ def _parallelogram_with_diameter_point(rng):
 
 @proposition(
     "I.43",
-    "In any parallelogram the complements of the parallelograms about the diameter equal "
-    "one another.",
     THEOREM,
     sample=_parallelogram_with_diameter_point,
 )
@@ -637,8 +615,6 @@ def _figure_and_angle(rng):
 
 @proposition(
     "I.45",
-    "To construct a parallelogram equal to a given rectilinear figure in a given "
-    "rectilinear angle.",
     CONSTRUCTION,
     sample=_figure_and_angle,
 )
@@ -646,9 +622,10 @@ def prop_I_45(a: Point, b: Point, c: Point, d: Point, p: Point, q: Point, r: Poi
     """The quadrilateral is cut into two triangles; the first gets a
     parallelogram by I.42, the second is applied to its side by I.44."""
     hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    outline(p, q, r, close=False)  # the arms of the given angle
     hypothesis("ABCD is a genuine quadrilateral",
                not collinear(a, b, c) and not collinear(a, c, d))
-    line(a, c, "the diameter AC dividing the figure")
+    diameter = line(a, c, "the diameter AC dividing the figure")
 
     first = prop_I_42(a, b, c, p, q, r)
     corner_f, corner_e, corner_c, corner_g = first.parallelogram
@@ -663,6 +640,14 @@ def prop_I_45(a: Point, b: Point, c: Point, d: Point, p: Point, q: Point, r: Poi
     claim("together they equal the whole figure", "C.N.2",
           total == _area(a, b, c) + _area(a, c, d))
     claim("and each is in the given angle", "I.44", eq_angle(applied_a, applied_b, m, p, q, r))
+
+    # The given figure, the diameter that halves it, and the two parallelograms
+    # that together equal it -- everything the enunciation names, and nothing
+    # of the three levels of helper construction underneath.
+    outline_result(a, b, c, d)
+    result(diameter)
+    outline_result(corner_f, corner_e, corner_c, corner_g)
+    outline_result(l, applied_a, applied_b, m)
     return Out(pieces=((corner_f, corner_e, corner_c, corner_g), (l, applied_a, applied_b, m)))
 
 
@@ -673,7 +658,6 @@ def prop_I_45(a: Point, b: Point, c: Point, d: Point, p: Point, q: Point, r: Poi
 
 @proposition(
     "I.46",
-    "To describe a square on a given straight line.",
     CONSTRUCTION,
     sample=samples.segment,
 )
@@ -700,8 +684,6 @@ def prop_I_46(a: Point, b: Point) -> Out:
 
 @proposition(
     "I.47",
-    "In right-angled triangles the square on the side subtending the right angle equals "
-    "the sum of the squares on the sides containing the right angle.",
     THEOREM,
     sample=samples.right_triangle,
     note="Pythagoras. Euclid proves it by cutting the large square into two rectangles, "
@@ -731,9 +713,6 @@ def prop_I_47(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.48",
-    "If in a triangle the square on one of the sides equals the sum of the squares on the "
-    "remaining two sides of the triangle, then the angle contained by the remaining two "
-    "sides of the triangle is right.",
     THEOREM,
     sample=samples.right_triangle,
 )

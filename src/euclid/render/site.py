@@ -10,12 +10,16 @@ hand.
 from __future__ import annotations
 
 import html
+import math
 import random
+from fractions import Fraction
 from pathlib import Path
 from typing import Optional
 
 from ..elements.registry import (
     BOOK_TITLES,
+    ERRATA,
+    HEATH,
     HEATH_CREDIT,
     BadConfiguration,
     ProofFailure,
@@ -30,7 +34,7 @@ from ..plane.trace import Trace
 from ..verify.fuzz import certify
 from ..verify.ledger import audit
 from .layout import graph_svg
-from .svg import render_trace
+from .svg import _bounds, _collect, render_trace
 
 __all__ = ["build"]
 
@@ -85,6 +89,9 @@ svg.figure .arc { stroke: var(--grey); stroke-width: 1; stroke-dasharray: 3 3; }
 svg.figure .ray { stroke: var(--ink); stroke-width: 1.4; }
 svg.figure .dot { fill: var(--ink); }
 svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
+svg.figure .ray.aside { stroke: var(--grey); stroke-width: .7; }
+svg.figure .arc.aside { stroke: var(--grey); stroke-width: .6; stroke-dasharray: 2 4; }
+svg.figure .dot.aside { fill: var(--grey); }
 svg.graph { max-width: 100%; height: auto; }
 svg.graph .edge { fill: none; stroke: var(--grey); stroke-width: 1.1; }
 svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
@@ -132,6 +139,7 @@ NAV = [
     ("ledger.html", "What Euclid assumes"),
     ("optimizer.html", "Shortest constructions"),
     ("book-x.html", "Book X"),
+    ("text.html", "Text and figures"),
 ]
 
 
@@ -154,26 +162,77 @@ def _page(title: str, body: str, here: str = "", wide: bool = False) -> str:
         f"<title>{_esc(title)}</title><style>{STYLE}</style></head><body>"
         f'<div class="wrap{" wide" if wide else ""}">'
         f'<nav class="top">{links}</nav>{body}'
-        "<footer><p>Every diagram here was drawn from a construction that ran and "
-        "checked out in exact arithmetic. Every cross-reference was read off the call "
-        "graph, not typed in by hand.</p>"
-        f"<p>Proposition statements are {HEATH_CREDIT} Where a statement is missing "
-        "from that text, a short summary written for this project stands in, and the "
-        "page says so.</p></footer>"
+        "<footer><p>Every diagram here is the record of a construction that ran and "
+        "checked out in exact arithmetic &mdash; not an illustration of one. It shows "
+        "what the machine drew, on the coordinates it was given, with the apparatus of "
+        "its helper constructions held back but still there. Euclid's own figures are "
+        "composed; these are not, and do not try to be. Every cross-reference was read "
+        "off the call graph, not typed in by hand.</p>"
+        f"<p>Every proposition statement here is {HEATH_CREDIT} Nothing is "
+        'paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer>'
         "</div></body></html>"
     )
 
 
-def _sample_trace(entry: Proposition, seed: int = 3) -> Optional[Trace]:
+def _legibility(trace: Trace) -> float:
+    """How well a sampled figure reads, from 0 (unreadable) to 1.
+
+    Presentation only, and deliberately kept away from anything that is
+    checked: verification samples widely on purpose, and a near-degenerate
+    triangle is a *better* test than a comfortable one. It is only a worse
+    picture. So the wide sampling stays, and the one configuration put on the
+    page is chosen from among many for being the one a reader can see.
+
+    Two things decide it. A figure squeezed into a sliver wastes the frame, so
+    the shape of the bounding box counts; and labels that collide are unreadable
+    whatever the shape, so the closest pair of points counts too.
+    """
+    points, _, _ = _collect(trace)
+    if len(points) < 2:
+        return 0.0
+    left, bottom, right, top = _bounds(points, [])
+    width, height = right - left, top - bottom
+    diagonal = math.hypot(width, height)
+    if diagonal <= 0:
+        return 0.0
+    shape = min(width, height) / max(width, height)
+
+    placed = [point.as_floats() for point in points]
+    closest = min(
+        math.dist(placed[i], placed[j])
+        for i in range(len(placed))
+        for j in range(i + 1, len(placed))
+    )
+    # A gap of a twentieth of the diagonal is enough to letter two points apart.
+    separation = min(1.0, (closest / diagonal) / 0.05)
+    return shape * separation
+
+
+def _sample_trace(entry: Proposition, seed: int = 3, tries: int = 40) -> Optional[Trace]:
+    """The clearest figure among many valid ones."""
     if entry.sample is None:
         return None
     rng = random.Random(f"site:{entry.ref}:{seed}")
-    for _ in range(12):
+    best: Optional[Trace] = None
+    best_score = -1.0
+    for _ in range(tries):
         try:
-            return run_sampled(entry.ref, rng).trace
+            trace = run_sampled(entry.ref, rng).trace
         except (BadConfiguration, GeometryError, ProofFailure):
             continue
-    return None
+        # Books V and VII to X argue about magnitudes and draw nothing, so
+        # there is no figure to choose between: searching forty configurations
+        # for the clearest of them is forty runs spent on a picture that does
+        # not exist. Two hundred and forty of the three hundred and ninety
+        # propositions are in that case.
+        if not _collect(trace)[1] and not _collect(trace)[2]:
+            return trace
+        score = _legibility(trace)
+        if score > best_score:
+            best, best_score = trace, score
+        if best_score > 0.75:  # good enough; stop paying for the search
+            break
+    return best
 
 
 # ---------------------------------------------------------------------------
@@ -186,17 +245,32 @@ def _proposition_page(entry: Proposition, graph, trace: Optional[Trace]) -> str:
         f'<p class="kicker">Book {entry.book} &middot; Proposition {entry.number}</p>',
         f"<h1>{entry.ref}</h1>",
         f"<blockquote>{_esc(entry.statement)}"
-        f'<span class="src">{_esc(entry.statement_source)}</span></blockquote>',
+        f'<span class="src">Heath, 1908</span></blockquote>',
     ]
+    corrected = [item for item in ERRATA if item["ref"] == entry.ref]
+    for item in corrected:
+        body.append(
+            f'<p class="note">The source used here misprints this enunciation &mdash; '
+            f'it reads &ldquo;{_esc(item["source_reads"])}&rdquo; where Heath has '
+            f'&ldquo;{_esc(item["corrected_to"])}&rdquo; ({_esc(item["note"])}). '
+            f'<a href="text.html">The full errata &rarr;</a></p>'
+        )
     if entry.note:
         body.append(f'<p class="note">{_esc(entry.note)}</p>')
 
     if trace is not None:
         figure = render_trace(trace, entry.ref)
         if figure:
+            helpers = len(trace.descendants())
+            aside = (
+                f", of which {helpers} helper construction{'s' if helpers > 1 else ''} "
+                "drew the fainter ones"
+                if helpers
+                else ""
+            )
             body.append(
                 f"<figure>{figure}<figcaption>"
-                f"{trace.step_count} lines and circles drawn"
+                f"{trace.step_count} lines and circles drawn{aside}"
                 "</figcaption></figure>"
             )
 
@@ -340,7 +414,8 @@ def _findings_page(graph, stats, search_rows) -> str:
 
     findings.append((
         "The first proposition holds up the whole book",
-        f"<p>Of the 48 propositions in Book I, <strong>{top[0][1]} depend on I.1</strong>, "
+        f"<p>Of the {len(graph.nodes)} propositions written out here, "
+        f"<strong>{top[0][1]} depend on I.1</strong>, "
         "the equilateral triangle. Nothing else comes close to carrying that much. The "
         "ranking below was not assigned; it is what the call graph looks like once every "
         "proposition has run.</p>"
@@ -469,10 +544,10 @@ def _findings_page(graph, stats, search_rows) -> str:
         body.append(f'<div class="finding"><h3>{heading}</h3>{text}</div>')
     body.append(
         '<div class="finding"><h3>Still open</h3>'
-        "<p>Books V to X are represented by a handful of propositions each, not written "
-        "out in full. Their statements are short summaries rather than Heath's words, "
-        "because no clean copy of that part of his translation was available to parse. "
-        "Both are marked wherever they appear.</p></div>"
+        f"<p>All {len(HEATH)} propositions of the thirteen books are here as text; "
+        f"{len(all_propositions())} of them have been written out as programs. The rest "
+        "is the work in hand, book by book. Books XI to XIII are solid geometry, and "
+        "the kernel is planar by design, so they wait on a decision about that.</p></div>"
     )
     return _page("Findings — Executable Euclid", "".join(body), here="findings.html")
 
@@ -625,6 +700,73 @@ def _optimizer_page(rows) -> str:
                  here="optimizer.html", wide=True)
 
 
+def _text_page() -> str:
+    """Where the words come from, and every place they depart from the scan."""
+    encoded = {entry.ref for entry in all_propositions()}
+    rows = "".join(
+        f'<tr><td>{_esc(item["ref"])}</td>'
+        f'<td class="mono">{_esc(item["source_reads"])}</td>'
+        f'<td class="mono">{_esc(item["corrected_to"])}</td>'
+        f'<td>{_esc(item["note"])}</td></tr>'
+        for item in ERRATA
+    )
+    body = [
+        '<p class="kicker">Nothing here is paraphrased</p>',
+        "<h1>Text and figures</h1>",
+        f'<p class="lede">Every proposition statement on this site is '
+        f"{HEATH_CREDIT}</p>",
+        f"<p>All <strong>{len(HEATH)} propositions</strong> of all thirteen books are "
+        "parsed from one source and shipped as data. There is no second kind of "
+        "statement: a proposition whose enunciation is missing raises rather than "
+        "falling back to a summary, so a paraphrase cannot reach a page by accident. "
+        f"Of the {len(HEATH)}, <strong>{len(encoded)}</strong> have been written out as "
+        "programs so far; the rest are text waiting for code.</p>",
+        "<h2>Errata</h2>",
+        "<p>The source is a scan, and scans misread. Every correction made to it is "
+        "listed here in full &mdash; what the scan says, what it was corrected to, and "
+        "why. Each is a demonstrable misprint, never a reading of what Euclid meant, "
+        "and the parser refuses to run if a correction stops applying.</p>",
+        '<div class="scroll"><table><tr><th>Proposition</th><th>The scan reads</th>'
+        f"<th>Corrected to</th><th>Why</th></tr>{rows}</table></div>",
+        "<h2>The figures are not Euclid's</h2>",
+        "<p>The words are his exactly. <strong>The diagrams are not, and are not "
+        "meant to be.</strong> If you hold a printed Euclid next to these pages, most "
+        "figures will not match, and that is the design rather than a fault.</p>",
+        "<p>A figure in a book is <em>composed</em>. The author picks a configuration "
+        "that shows the case well, draws the construction lines the argument needs and "
+        "no others, and letters the points to suit the proof. Every figure here is a "
+        "<em>trace</em>: the record of a construction that actually ran, on coordinates "
+        "chosen by a sampler, containing whatever objects the code made, lettered after "
+        "the parameters in the code. Three differences follow, and they are permanent:</p>",
+        "<ul>"
+        "<li>The shapes and the lettering differ, because ours are sampled rather than "
+        "chosen.</li>"
+        "<li>Ours often carry fewer points. Euclid needs a construction to <em>argue</em> "
+        "steps that exact arithmetic settles outright, so his figure holds scaffolding "
+        "ours has no use for.</li>"
+        "<li>Ours never show an impossible configuration. Where Euclid argues by "
+        "contradiction his figure draws the case being refuted &mdash; I.7 shows two "
+        "distinct apexes over one base. That configuration does not exist, so it cannot "
+        "be constructed here; ours shows the two coincident, which is what the "
+        "proposition proves.</li>"
+        "</ul>",
+        "<p>What the figures do promise: every line and every point in them was really "
+        "constructed by the program that verified the proposition, in exact arithmetic. "
+        "A proposition's own work is drawn firm; the apparatus it inherited from helper "
+        "constructions is drawn back in grey, still present, no longer competing.</p>",
+        "<h2>How a misprint gets found</h2>",
+        "<p>Two of the three above substitute a single letter and still spell a real "
+        "word &mdash; <span class=\"mono\">acutc</span>, <span class=\"mono\">cach</span> "
+        "&mdash; so no spell check or length check would catch them. What catches them "
+        "is that Euclid's vocabulary is tiny and endlessly repetitive: about four "
+        "hundred distinct words across all four hundred and sixty-five enunciations. "
+        "The parser lists every word used <em>exactly once</em>, and a misprint has "
+        "nowhere to hide in a list that short. Everything else in it is a genuine term "
+        "of art.</p>",
+    ]
+    return _page("Text and figures — Executable Euclid", "".join(body), here="text.html")
+
+
 def _book_x_page() -> str:
     from ..elements.book10 import classify
 
@@ -644,9 +786,22 @@ def _book_x_page() -> str:
             sqrt(3) - sqrt(2),
             fourth_root + sqrt(2) * fourth_root,
             sqrt(2) * fourth_root - fourth_root,
+            sqrt(3) * fourth_root + fourth_root,
+            sqrt(3) * fourth_root - fourth_root,
             sqrt(18) + sqrt(2),
             sqrt(4 + sqrt(7)),
         ]
+        # The last six species are the ones whose two terms are the roots of a
+        # single quadratic, so a sum like this is the only way to write them
+        # down: give the sum of the squares and the rectangle, and the pair
+        # follows. X.39-41 and their duals in X.76-78.
+        for squares, rectangle in ((Fraction(1), sqrt(2) / 4),
+                                   (sqrt(5), Fraction(1, 2)),
+                                   (sqrt(5), sqrt(3) / 2)):
+            root = sqrt(squares * squares - 4 * rectangle * rectangle)
+            greater, lesser = sqrt((squares + root) / 2), sqrt((squares - root) / 2)
+            specimens.append(greater + lesser)
+            specimens.append(greater - lesser)
         for value in specimens:
             named = classify(value)
             rows.append(
@@ -668,11 +823,19 @@ def _book_x_page() -> str:
         "whole classification becomes a single function.</p>",
         '<div class="scroll"><table><tr><th>Length</th><th>Value</th>'
         f"<th>Euclid's name for it</th><th>Degree</th></tr>{''.join(rows)}</table></div>",
-        '<p class="note">Two rows repay a look. '
+        "<p>All thirteen names are above. The last six are the awkward ones: their two "
+        "terms are the roots of a single quadratic, so neither can be written without "
+        "the other and the sum shows no seam to split it at. Squaring puts the seam "
+        "back &mdash; the square is the sum of the squares plus twice the rectangle, and "
+        "<em>those</em> come apart &mdash; after which the recovered pair is checked by "
+        "adding it up again.</p>",
+        '<p class="note">Three rows repay a look. '
         '<span class="mono">sqrt(18) + sqrt(2)</span> is not a binomial: the two parts are '
         'multiples of each other, so it collapses to <span class="mono">4&middot;sqrt(2)</span>, '
-        'and the classifier says so. And <span class="mono">sqrt(4 + sqrt 7)</span> untangles '
-        "itself before being named.</p>",
+        'and the classifier says so. <span class="mono">sqrt(4 + sqrt 7)</span> untangles '
+        "itself before being named. And the second bimedial turns on its rectangle being "
+        "a medial <em>area</em> rather than a medial <em>line</em> &mdash; one square "
+        "shallower, and a distinction easy to lose.</p>",
         "<h2>Try it</h2>",
         '<pre>euclid classify "sqrt(3) + sqrt(5)"\n'
         'euclid classify "(1+sqrt(5))/2"</pre>',
@@ -731,4 +894,5 @@ def build(destination: Path, run_search: bool = True) -> list[Path]:
     write("ledger.html", _ledger_page())
     write("optimizer.html", _optimizer_page(search_rows))
     write("book-x.html", _book_x_page())
+    write("text.html", _text_page())
     return written

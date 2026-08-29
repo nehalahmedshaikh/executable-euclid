@@ -46,7 +46,7 @@ def cmd_run(args) -> int:
     rng = random.Random(args.seed)
     result = run_sampled(args.ref, rng)
     print(f"{entry.ref}  {entry.statement}")
-    print(f"        ({entry.statement_source})\n")
+    print("        (Heath, 1908)\n")
     if entry.note:
         print(f"  {entry.note}\n")
     for claim in result.trace.claims:

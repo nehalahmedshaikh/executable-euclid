@@ -21,11 +21,13 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import Callable, Iterable
 
+from ..plane.angles import Angle
 from ..plane.objects import Point
 
 __all__ = [
     "frame",
     "nonzero",
+    "points_round_a_circle",
     "rational_rotation",
     "scalar",
 ]
@@ -110,11 +112,94 @@ def triangle(rng) -> tuple[Point, Point, Point]:
 
 
 def acute_triangle(rng) -> tuple[Point, Point, Point]:
+    """All three angles acute, which is what dropping a perpendicular *inside*
+    the opposite side depends on.
+
+    The two base angles are acute whenever the apex stands over the base. The
+    apex angle is the one at risk, and it is the *flat* triangles that fail it:
+    the angle at the apex is acute exactly when ``y^2 > x(base-x)``, so a low
+    apex spans too wide. Keeping the apex within the middle quarter of the base
+    bounds ``x(base-x)`` above by ``b^2/4``, and a height of at least
+    ``5b/8`` puts ``y^2`` at no less than ``25b^2/64`` -- acute by construction
+    rather than by luck.
+    """
     move = frame(rng)
     base = nonzero(rng, 4, 7)
-    apex_x = Fraction(base, 2) + Fraction(rng.randint(-2, 2), 4)
-    apex_y = nonzero(rng, 3, 7)
+    apex_x = base / 2 + Fraction(rng.randint(-1, 1), 8) * base
+    apex_y = base / 2 + Fraction(rng.randint(1, 3), 8) * base
     return move(Point(0, 0)), move(Point(base, 0)), move(Point(apex_x, apex_y))
+
+
+def points_round_a_circle(rng, count: int, radius=None) -> tuple:
+    """A centre and ``count`` distinct points on one circle, in order round it.
+
+    Book III needs this constantly, and needs it exact.  A rational rotation
+    applied to ``(radius, 0)`` lands on the circle without any square root, so
+    the points are as exact as the centre is.  They come back sorted by the
+    angle they stand at, which is what lets a proposition about a quadrilateral
+    inscribed *in order* be handed one.
+
+    The sort is exact too: dividing each step by the radius puts it on the unit
+    circle, where it is already the cosine and sine of its own angle, and
+    :class:`Angle` compares those without a square root or a float.
+    """
+    move = frame(rng, scaled=False)
+    radius = radius if radius is not None else nonzero(rng, 2, 5)
+    seen: list[Point] = []
+    guard = 0
+    while len(seen) < count:
+        guard += 1
+        if guard > 400:  # pragma: no cover - the rotations would have to collide
+            raise ValueError(f"could not find {count} distinct points on the circle")
+        cosine, sine = rational_rotation(rng)
+        candidate = Point(radius * cosine, radius * sine)
+        if candidate not in seen:
+            seen.append(candidate)
+    seen.sort(key=lambda p: Angle(p.x / radius, p.y / radius))
+    return (move(Point(0, 0)),) + tuple(move(point) for point in seen)
+
+
+def circle_and_chord(rng) -> tuple[Point, Point, Point, Point]:
+    """A circle (centre O through A) and a line CD no longer than its diameter.
+
+    IV.1's proviso is a real one -- a chord cannot exceed the diameter -- so the
+    given line is drawn short enough for the proposition to be answerable.
+    """
+    move = frame(rng)
+    radius = nonzero(rng, 2, 5)
+    wanted = radius * Fraction(rng.randint(2, 7), 4)  # at most 7/4 of the radius
+    return (
+        move(Point(0, 0)),
+        move(Point(radius, 0)),
+        move(Point(-radius - 2, -radius - 2)),
+        move(Point(-radius - 2 + wanted, -radius - 2)),
+    )
+
+
+def square(rng) -> tuple[Point, Point, Point, Point]:
+    """A square ABCD, lettered round."""
+    move = frame(rng)
+    side = nonzero(rng, 2, 6)
+    return (
+        move(Point(0, 0)),
+        move(Point(side, 0)),
+        move(Point(side, side)),
+        move(Point(0, side)),
+    )
+
+
+def obtuse_triangle(rng) -> tuple[Point, Point, Point]:
+    """Obtuse at B, so the foot of the perpendicular from A falls outside CB.
+
+    That is the configuration II.12 is about: the apex is set back beyond B, so
+    dropping a perpendicular from it onto CB misses the segment and lands on CB
+    produced.
+    """
+    move = frame(rng)
+    base = nonzero(rng, 2, 5)
+    apex_x = -nonzero(rng, 1, 4)
+    apex_y = nonzero(rng, 1, 4)
+    return move(Point(apex_x, apex_y)), move(Point(0, 0)), move(Point(base, 0))
 
 
 def isosceles(rng) -> tuple[Point, Point, Point]:

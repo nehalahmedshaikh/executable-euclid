@@ -47,13 +47,13 @@ from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
 
 @proposition(
     "I.1",
-    "On a given finite straight line to construct an equilateral triangle.",
     CONSTRUCTION,
     sample=samples.segment,
 )
 def prop_I_1(a: Point, b: Point) -> Out:
     """The first construction in the *Elements*, and the first thing it takes
     on faith: that the two circles meet at all."""
+    line(a, b, "the given line AB")
     around_a = circle(a, b, "circle centre A through B")
     around_b = circle(b, a, "circle centre B through A")
     apex = posit(meet(around_a, around_b)[0], "C")
@@ -68,7 +68,6 @@ def prop_I_1(a: Point, b: Point) -> Out:
 
 @proposition(
     "I.2",
-    "To place at a given point (as an extremity) a straight line equal to a given straight line.",
     CONSTRUCTION,
     sample=samples.point_and_segment,
 )
@@ -77,8 +76,9 @@ def prop_I_2(a: Point, b: Point, c: Point) -> Out:
     collapses -- so he transports it through an equilateral triangle."""
     hypothesis("A and B are distinct", a != b)
     hypothesis("BC is a genuine magnitude", b != c)
+    line(b, c, "the given line BC")
 
-    apex = prop_I_1(a, b).apex.named("D")
+    apex = posit(prop_I_1(a, b).apex, "D")
     through_b = line(apex, b, "DB produced")
     through_a = line(apex, a, "DA produced")
 
@@ -98,12 +98,12 @@ def prop_I_2(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.3",
-    "Given two unequal straight lines, to cut off from the greater a straight line equal to the less.",
     CONSTRUCTION,
     sample=samples.unequal_segments,
 )
 def prop_I_3(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("AB is greater than CD", len2(a, b) > len2(c, d))
+    line(c, d, "the given lesser line CD")
 
     placed = prop_I_2(a, c, d).placed
     reach = circle_with_radius2(a, len2(a, placed), "circle centre A with radius CD")
@@ -128,9 +128,6 @@ def _sas_pair(rng):
 
 @proposition(
     "I.4",
-    "If two triangles have two sides equal to two sides respectively, and have the angles "
-    "contained by the equal straight lines equal, then they also have the base equal to the "
-    "base, the triangle equals the triangle, and the remaining angles equal the remaining angles.",
     THEOREM,
     sample=_sas_pair,
     note="Side-angle-side. Euclid argues by superposition; the machine checks the "
@@ -152,8 +149,6 @@ def prop_I_4(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
 
 @proposition(
     "I.5",
-    "In isosceles triangles the angles at the base equal one another, and if the equal "
-    "straight lines are produced further, then the angles under the base equal one another.",
     THEOREM,
     sample=samples.isosceles,
     note="The pons asinorum. Euclid's proof produces the equal sides and applies I.4 twice.",
@@ -184,8 +179,6 @@ def prop_I_5(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.6",
-    "If in a triangle two angles equal one another, then the sides opposite the equal "
-    "angles also equal one another.",
     THEOREM,
     sample=samples.isosceles,
     note="Converse of I.5, proved by Euclid's first reductio.",
@@ -221,10 +214,6 @@ def _apex_pair(rng):
 
 @proposition(
     "I.7",
-    "Given two straight lines constructed on a straight line from its extremities and "
-    "meeting in a point, there cannot be constructed on the same straight line from its "
-    "extremities, and on the same side of it, two other straight lines meeting in another "
-    "point and equal to the former two respectively.",
     THEOREM,
     sample=_apex_pair,
     note="The uniqueness of the apex. Stated here as: equal legs on the same side force "
@@ -250,9 +239,6 @@ def _sss_pair(rng):
 
 @proposition(
     "I.8",
-    "If two triangles have the two sides equal to two sides respectively, and also have "
-    "the base equal to the base, then they also have the angles equal which are contained "
-    "by the equal straight lines.",
     THEOREM,
     sample=_sss_pair,
 )
@@ -274,7 +260,6 @@ def prop_I_8(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
 
 @proposition(
     "I.9",
-    "To bisect a given rectilinear angle.",
     CONSTRUCTION,
     sample=samples.angle_config,
 )
@@ -303,12 +288,11 @@ def prop_I_9(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.10",
-    "To bisect a given finite straight line.",
     CONSTRUCTION,
     sample=samples.segment,
 )
 def prop_I_10(a: Point, b: Point) -> Out:
-    apex = prop_I_1(a, b).apex.named("C")
+    apex = posit(prop_I_1(a, b).apex, "C")
     bisected = prop_I_9(a, apex, b)
     middle = posit(meet_one(bisected.bisector, line(a, b)), "D")
 
@@ -320,7 +304,6 @@ def prop_I_10(a: Point, b: Point) -> Out:
 
 @proposition(
     "I.11",
-    "To draw a straight line at right angles to a given straight line from a given point on it.",
     CONSTRUCTION,
     sample=samples.point_on_segment,
 )
@@ -347,8 +330,6 @@ def prop_I_11(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.12",
-    "To draw a straight line perpendicular to a given infinite straight line from a given "
-    "point not on it.",
     CONSTRUCTION,
     sample=samples.line_and_external_point,
 )
@@ -382,8 +363,6 @@ def prop_I_12(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.13",
-    "If a straight line stands on a straight line, then it makes either two right angles "
-    "or angles whose sum equals two right angles.",
     THEOREM,
     sample=samples.straight_line_with_ray,
 )
@@ -402,9 +381,6 @@ def prop_I_13(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.14",
-    "If with any straight line, and at a point on it, two straight lines not lying on the "
-    "same side make the sum of the adjacent angles equal to two right angles, then the two "
-    "straight lines are in a straight line with one another.",
     THEOREM,
     sample=samples.straight_line_with_ray,
 )
@@ -421,7 +397,6 @@ def prop_I_14(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.15",
-    "If two straight lines cut one another, then they make the vertical angles equal to one another.",
     THEOREM,
     sample=samples.crossing_lines,
 )
@@ -447,8 +422,6 @@ def prop_I_15(a: Point, b: Point, c: Point, d: Point) -> Out:
 
 @proposition(
     "I.16",
-    "In any triangle, if one of the sides is produced, then the exterior angle is greater "
-    "than either of the interior and opposite angles.",
     THEOREM,
     sample=samples.triangle,
     note="Euclid's proof needs the produced line to fall where the diagram shows it -- "
@@ -480,7 +453,6 @@ def prop_I_16(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.17",
-    "In any triangle the sum of any two angles is less than two right angles.",
     THEOREM,
     sample=samples.triangle,
 )
@@ -507,7 +479,6 @@ def _unequal_sides(rng):
 
 @proposition(
     "I.18",
-    "In any triangle the greater side subtends the greater angle.",
     THEOREM,
     sample=_unequal_sides,
 )
@@ -523,7 +494,6 @@ def prop_I_18(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.19",
-    "In any triangle the greater angle is subtended by the greater side.",
     THEOREM,
     sample=_unequal_sides,
 )
@@ -538,7 +508,6 @@ def prop_I_19(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.20",
-    "In any triangle the sum of any two sides is greater than the remaining one.",
     THEOREM,
     sample=samples.triangle,
     note="The triangle inequality -- which the Epicureans mocked as evident even to an ass.",
@@ -555,10 +524,6 @@ def prop_I_20(a: Point, b: Point, c: Point) -> Out:
 
 @proposition(
     "I.21",
-    "If from the ends of one of the sides of a triangle two straight lines are constructed "
-    "meeting within the triangle, then the sum of the straight lines so constructed is less "
-    "than the sum of the remaining two sides of the triangle, but the constructed lines "
-    "contain a greater angle.",
     THEOREM,
     sample=samples.triangle_with_interior_point,
 )
@@ -568,6 +533,7 @@ def prop_I_21(a: Point, b: Point, c: Point, d: Point) -> Out:
                same_side(d, c, base)
                and same_side(d, a, Line.through(b, c))
                and same_side(d, b, Line.through(a, c)))
+    outline(a, b, c)
     line(a, d)
     line(b, d)
     claim("BD together with DA is less than BC together with CA", "I.20",
@@ -606,9 +572,6 @@ def _three_lengths(rng):
 
 @proposition(
     "I.22",
-    "To construct a triangle out of three straight lines which equal three given straight "
-    "lines; it is necessary that the sum of any two of the given lines be greater than the "
-    "remaining one.",
     CONSTRUCTION,
     sample=_three_lengths,
     note="The proviso is I.20, and Euclid states it as a necessary condition without "
@@ -635,6 +598,7 @@ def prop_I_22(
                and length(b, c) + length(c, a) > length(a, b)
                and length(c, a) + length(a, b) > length(b, c))
     hypothesis("P and Q are distinct", p != q)
+    outline(a, b, c)  # the three given lines
 
     ray = line(p, q, "the ray PQ")
     around_p = circle_with_radius2(p, first, "circle radius AB about P")
@@ -661,8 +625,6 @@ def _angle_and_ray(rng):
 
 @proposition(
     "I.23",
-    "To construct a rectilinear angle equal to a given rectilinear angle on a given "
-    "straight line and at a point on it.",
     CONSTRUCTION,
     sample=_angle_and_ray,
 )
@@ -678,6 +640,7 @@ def prop_I_23(
     hypothesis("ABC is a genuine angle", not collinear(a, b, c))
     hypothesis("P and Q are distinct", p != q)
 
+    outline(a, b, c, close=False)  # the arms of the given angle
     line(a, c, "join AC")
     built = prop_I_22(b, a, c, p, q, beside=beside, apart_from=apart_from)
     _, foot, apex = built.triangle
@@ -726,9 +689,6 @@ def _hinge_pair(rng):
 
 @proposition(
     "I.24",
-    "If two triangles have two sides equal to two sides respectively, but have one of the "
-    "angles contained by the equal straight lines greater than the other, then they also "
-    "have the base greater than the base.",
     THEOREM,
     sample=_hinge_pair,
     note="The hinge theorem.",
@@ -745,9 +705,6 @@ def prop_I_24(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
 
 @proposition(
     "I.25",
-    "If two triangles have two sides equal to two sides respectively, but have the base "
-    "greater than the base, then they also have the one of the angles contained by the "
-    "equal straight lines greater than the other.",
     THEOREM,
     sample=_hinge_pair,
 )
@@ -769,10 +726,6 @@ def _asa_pair(rng):
 
 @proposition(
     "I.26",
-    "If two triangles have two angles equal to two angles respectively, and one side equal "
-    "to one side, namely either the side adjoining the equal angles or that subtending one "
-    "of the equal angles, then the remaining sides equal the remaining sides and the "
-    "remaining angle equals the remaining angle.",
     THEOREM,
     sample=_asa_pair,
     note="Angle-side-angle, and angle-angle-side.",

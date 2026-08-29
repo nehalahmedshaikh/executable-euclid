@@ -105,7 +105,7 @@ def _collect_traces(ref: str, trials: int, seed: int) -> list[Trace]:
 def audit(ref: str, trials: int = 12, seed: int = 0) -> Ledger:
     """Build the ledger for one proposition."""
     entry = get(ref)
-    ledger = Ledger(ref=ref, title=entry.title)
+    ledger = Ledger(ref=ref, title=entry.statement)
     if entry.sample is None:
         return ledger
     traces = _collect_traces(ref, trials, seed)
