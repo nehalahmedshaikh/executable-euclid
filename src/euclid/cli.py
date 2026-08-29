@@ -209,6 +209,68 @@ def cmd_classify(args) -> int:
     return 0
 
 
+def cmd_measure(args) -> int:
+    """Questions the corpus can be asked, now that all of it runs."""
+    from .elements.registry import BOOK_ORDER
+    from .measure import ceilings, depth_profile, first_appearances, necessity_report
+
+    if args.write:
+        from .measure import FINDINGS_PATH, write_findings
+
+        print("running the corpus; this takes a few minutes")
+        payload = write_findings(trials=args.trials)
+        print(f"wrote {FINDINGS_PATH.name}: {payload['corpus']} propositions measured")
+        return 0
+
+    if not (args.depth or args.needless):
+        print("choose --depth, --needless or --write", file=sys.stderr)
+        return 1
+
+    if args.depth:
+        profile = depth_profile()
+        print("The algebraic degree each book reaches\n")
+        for book, top in sorted(ceilings(profile).items(),
+                                key=lambda item: BOOK_ORDER.index(item[0])):
+            print(f"  {book:<5} {top}")
+        print("\nWhere each degree is first needed\n")
+        for order, ref in first_appearances(profile).items():
+            print(f"  degree {order:<3} {ref:<8} {profile[ref].where}")
+
+    if args.needless:
+        report = necessity_report(trials=args.trials)
+        print("\nHypotheses, broken one at a time\n")
+        print(report.summary())
+        print("\n  Candidates are configurations where the hypothesis was broken and")
+        print("  every claim still held. That is evidence, not proof: the likeliest")
+        print("  reading of a candidate is that the claims are too weak to notice.\n")
+        for item in sorted(report.candidates, key=lambda x: -x.broken)[:20]:
+            print(f"    {item.ref:<8} x{item.broken:<3} {item.text}")
+    return 0
+
+
+def cmd_gap(args) -> int:
+    """Constructible numbers Book X's thirteen species do not name."""
+    from .measure import simplest_gap, taxonomy_gaps
+
+    if args.all:
+        found = taxonomy_gaps(limit=10)
+        if not found:
+            print("every candidate tried falls inside the thirteen species")
+            return 0
+        print(f"{len(found)} constructible numbers Book X has no name for:\n")
+        for gap in found:
+            print(f"  {gap.expression:<26} degree {gap.degree:<3} ~ {gap.value_float:.8f}")
+        return 0
+
+    gap = simplest_gap()
+    if gap is None:
+        print("every candidate tried falls inside the thirteen species")
+        return 0
+    print("The simplest constructible number Book X cannot name\n")
+    print(gap)
+    return 0
+
+
 def cmd_site(args) -> int:
     from .render.site import build as build_site
 
@@ -277,6 +339,20 @@ def main(argv: list[str] | None = None) -> int:
     p = subs.add_parser("classify", help="name a magnitude in Book X's vocabulary")
     p.add_argument("magnitude", help='e.g. "sqrt(3)+sqrt(5)" or "(1+sqrt(5))/2"')
     p.set_defaults(func=cmd_classify)
+
+    p = subs.add_parser("measure", help="ask the corpus about itself")
+    p.add_argument("--depth", action="store_true",
+                   help="the algebraic degree each proposition reaches")
+    p.add_argument("--needless", action="store_true",
+                   help="hypotheses the conclusions turn out not to need")
+    p.add_argument("--write", action="store_true",
+                   help="recompute and record findings.json, which the site reads")
+    p.add_argument("--trials", type=int, default=16)
+    p.set_defaults(func=cmd_measure)
+
+    p = subs.add_parser("gap", help="constructible numbers Book X cannot name")
+    p.add_argument("--all", action="store_true", help="list more than the simplest")
+    p.set_defaults(func=cmd_gap)
 
     p = subs.add_parser("site", help="generate the static site")
     p.add_argument("--out", default="docs")

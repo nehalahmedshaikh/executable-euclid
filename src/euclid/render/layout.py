@@ -50,9 +50,17 @@ def graph_svg(graph, refs: Optional[Iterable[str]] = None, highlight: Optional[s
             x1, y1 = position[required]
             midpoint = (y1 + y2) / 2
             emphasis = " lit" if highlight and ref == highlight else ""
+            # Solid where the call was recorded as it happened; dashed where the
+            # reference was written beside the step by hand. Most are dashed, and
+            # the picture should say so rather than leaving it to the caption.
+            if required in graph.executed.get(ref, ()):
+                kind = ""
+            else:
+                kind = " cited"
             parts.append(
                 f'<path d="M {x1:.1f} {y1:.1f} C {x1:.1f} {midpoint:.1f}, '
-                f'{x2:.1f} {midpoint:.1f}, {x2:.1f} {y2:.1f}" class="edge{emphasis}"/>'
+                f'{x2:.1f} {midpoint:.1f}, {x2:.1f} {y2:.1f}" '
+                f'class="edge{kind}{emphasis}"/>'
             )
     parts.append("</g><g class=\"nodes\">")
     for ref in chosen:

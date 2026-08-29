@@ -10,9 +10,13 @@ Running it does four things at once:
    *and* a predicate that the kernel checks exactly.  A wrong citation cannot
    smuggle a false statement through, because the check is independent of the
    citation.
-3. **Reports its dependencies.**  Both the calls it makes and the propositions
-   it cites are captured at run time.  Nothing in this project hand-maintains a
-   cross-reference table; the graph is a by-product of execution.
+3. **Reports its dependencies.**  Two kinds, and they are not equally strong.
+   The *calls* it makes are recorded as they happen and cannot be wrong.  The
+   *citations* it gives are written by hand beside each step, following Heath's
+   marginal references; the check on the step never consults them, so a wrong
+   one cannot let a false statement through, but the edge is authored rather
+   than observed.  About one edge in eight is executed.  See ``graph/dag.py``,
+   which says so on every page that reads the graph.
 4. **Records a trace**, which the renderer and the assumption ledger consume.
 
 What the machine verifies is precisely this: *the conclusion holds, exactly, of
@@ -26,6 +30,7 @@ from __future__ import annotations
 import inspect
 import textwrap
 import json
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
@@ -52,6 +57,7 @@ __all__ = [
     "hypothesis",
     "proposition",
     "reference_kind",
+    "relaxed_hypotheses",
     "run",
     "run_sampled",
 ]
@@ -324,12 +330,42 @@ def hypothesis(text: str, holds: bool) -> bool:
     """
     holds = bool(holds)
     trace = current_trace()
+    owner = _CALL_STACK[-1].ref if _CALL_STACK else "?"
     if trace is not None:
         trace.add_claim(Claim(text, ("hypothesis",), holds))
     if not holds:
-        owner = _CALL_STACK[-1].ref if _CALL_STACK else "?"
+        if _RELAXED:
+            # Someone is asking what happens *without* this hypothesis, so note
+            # the violation and let the proposition carry on. See measure.necessity.
+            _RELAXED[-1].append((owner, text))
+            return False
         raise BadConfiguration(f"{owner}: hypothesis violated -- {text}")
     return holds
+
+
+# When non-empty, a violated hypothesis is recorded rather than raised. Only
+# measure.necessity pushes onto this, and only to ask whether a conclusion
+# survives its hypothesis being broken.
+_RELAXED: list[list[tuple[str, str]]] = []
+
+
+@contextmanager
+def relaxed_hypotheses():
+    """Run without enforcing hypotheses, collecting the ones that fail.
+
+    Ordinarily a violated hypothesis means bad input and the run is abandoned:
+    the proposition says nothing about configurations it excludes. To find out
+    whether an excluded configuration would have satisfied the conclusion
+    anyway, the exclusion has to be lifted. What comes back is the list of
+    ``(ref, text)`` violations, so the caller can tell which hypothesis it
+    actually broke.
+    """
+    collected: list[tuple[str, str]] = []
+    _RELAXED.append(collected)
+    try:
+        yield collected
+    finally:
+        _RELAXED.pop()
 
 
 class BadConfiguration(ValueError):

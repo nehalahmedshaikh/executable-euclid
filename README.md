@@ -57,35 +57,100 @@ True
 
 ## What came out of it
 
-There is a [findings page](docs/findings.html) with all of these written up.
+The [findings page](docs/findings.html) has these written up, each with the
+command that reproduces it. Three kinds of claim appear, and they are not equally
+strong: **exhaustive** means every possibility was enumerated, so a negative is a
+theorem; **measured** means computed exactly from the constructions as they run;
+**empirical** means sampled over configurations, so it is evidence, and it says
+how much.
 
-**The first proposition holds up the whole book.** Of the 390 propositions written
-out here, **136 depend on I.1**, the equilateral triangle. Nothing else comes
-close. That ranking was not assigned by anyone — it is what the call graph looks
-like after every proposition has run.
+Nothing here is read off the `cites` annotations. Those are written by hand
+beside each step, following Heath's marginal references, so a finding drawn from
+them would be a finding about our own typing. See [what is *not*
+here](#what-this-is-not) below.
 
-**The parallel postulate announces itself.** Euclid holds his fifth and most
-argued-over rule back until I.29. Nobody told the machine that. It reads the
-references each proof cites, and the line lands exactly where historians say it
-does: I.27 and I.28 manage without it, everything from I.29 on needs it.
+**Measured — the *Elements* leaves the rationals on its first page.** Every
+magnitude these constructions produce is an exact element of a tower of quadratic
+extensions of the rationals, so it has a degree, and the kernel can state it.
+Running all 390 propositions gives a map of the work by algebraic depth:
 
-**Pythagoras needs a quarter of the book.** Follow I.47 back through everything
-it uses and **25 propositions** remain out of 390. Delete the rest and it still
-stands.
+| Book | I | II | III | IV | V | VI | VII | VIII | IX | X |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Highest degree** | 4 | 4 | 2 | 8 | 4 | 2 | 1 | 1 | 1 | 32 |
 
-**Euclid uses something his own rules do not give him.** His postulates let you
-draw a circle. None of them says two circles ever cross. He needs them to cross
-in I.1, on the first page, and simply takes it. Counting every such step gives
-**355 places** where a point is used that no rule promises exists.
+I.1 already needs √3, and I.2 already needs a second square root standing on the
+first. Yet Books III and VI — all those circles, all that similarity — never
+exceed degree 2, and Books VII to IX never leave the rationals at all, which is
+what arithmetic ought to look like. The deepest point in the work is **X.115, at
+degree 32**. The text cannot tell you this; it is a property of what the
+constructions *do*.
 
-**Nothing in the book quietly changes its mind.** Each proposition is run on many
-different figures and the runs compared, looking for a step that holds in one
-picture but not another. There are none. That is a negative result, but a real
-one, and the detector that produced it is tested directly.
+```console
+$ euclid measure --depth
+```
 
-**Euclid's first construction cannot be beaten.** Trying every construction of
-two moves or fewer confirms the two circles of I.1 are the shortest way to build
-an equilateral triangle.
+**Exhaustive — Book X cannot name every constructible number.** Book X sorts the
+irrationals into thirteen named species and is often described as though that
+were all of them. Searching constructible numbers by increasing complexity, the
+first one Euclid has no word for is
+
+```console
+$ euclid gap
+1 + sqrt2 + sqrt3   ~ 4.1462643699
+  Book X calls this : an irrational outside Euclid's thirteen species
+  because           : it resolves into 3 terms, where Book X's definitions
+                      treat two
+  degree over Q     : 4
+  minimal polynomial: x^4 - 4*x^3 - 4*x^2 + 16*x - 8 = 0
+```
+
+It is constructible with straightedge and compass. Euclid classifies what comes
+out of applying areas — sums and differences of *two* terms — so a number needing
+three falls outside however constructible it is.
+
+**Empirical — II.9 and II.10 are one proposition, written twice.** Both say the
+squares on the two segments of a divided line are double the square on the half
+together with the square on the piece between the points of section. II.9 states
+it for a point taken *between* the ends; II.10 for a point taken beyond them.
+Break that hypothesis and run anyway: the conclusion holds either way, in every
+configuration tried. The identity does not care where the point falls. Euclid
+needs two propositions because he has no negative length to let one cover both;
+in exact arithmetic the distinction disappears.
+
+**Empirical — breaking Euclid's hypotheses on purpose.** A proposition says
+nothing about the configurations its hypotheses exclude, so those are normally
+thrown away and one question goes unasked: *would the conclusion have held
+anyway?* Move one given until a hypothesis breaks, then run without enforcing it.
+
+Across the corpus 729 hypotheses are stated; **260 could be broken cleanly enough
+to judge (36% coverage)** — a run that breaks two at once says nothing about
+either and is discarded. Of those, **162 proved necessary** and 21 turned out to
+be holding the construction together rather than the conclusion up. **77 survived
+being broken.** Those are *candidates*, not results, and the honest first reading
+of one is that our claims are too weak to notice the difference — which is
+exactly what happened the first time this ran: seven propositions of Book III
+were checking things true of any four points, circle or no circle. They were
+strengthened, and their hypotheses became necessary.
+
+```console
+$ euclid measure --needless
+```
+
+**Measured — Euclid uses something his own rules do not give him.** His
+postulates let you draw a circle. None of them says two circles ever cross. He
+needs them to cross in I.1, on the first page, and simply takes it. Every step
+using an intersection the postulates do not license is counted as it happens:
+**355 places** across Books I to X.
+
+**Empirical — nothing in the book quietly changes its mind.** Each proposition is
+run on many configurations and the runs compared, looking for a step that holds
+in one figure and fails in another. There are none. Caveat worth stating: as the
+corpus grew, more samplers came to be *built* to satisfy their hypotheses rather
+than stumbling into them, which makes the configurations less adversarial than
+they were in Book I. The detector itself is tested directly, on cases contrived
+to trip it.
+
+**Exhaustive — I.1 cannot be beaten, and the compass alone costs seven circles.**
 
 | Problem | Euclid | His moves | Fewest possible |
 |---|---|---|---|
@@ -96,17 +161,27 @@ an equilateral triangle.
 | square on a segment | I.46 | 10 | **5** |
 | midpoint, *compass alone* | — | — | **7** |
 
-That last row is the interesting one. Mohr (1672) and Mascheroni (1797) proved
-the compass alone can find anything a straightedge and compass can. Searching
-every possibility confirms it and puts a price on it: with no straight line
-permitted, finding the middle of a segment takes **exactly seven circles**. Six
-is not enough, and every six-circle construction was checked.
+Every construction up to the stated length was enumerated, so *fewest possible*
+is a theorem and not a search that gave up. That last row is the interesting one:
+Mohr (1672) and Mascheroni (1797) proved the compass alone can find anything a
+straightedge and compass can, and enumeration puts a price on it. Six circles are
+not enough, and all of them were tried. Some of Euclid's own constructions are
+far longer than they need to be, because he builds them out of results already
+proved rather than reaching for the quickest route.
 
-**A bug the mathematics caught.** Partway through Book II a length came out
-negative. Every square root has two answers, and the routine that looks for one
-inside the existing numbers had returned the wrong one. A version working in
-decimals would never have noticed — an ordinary square root function always
-hands back the positive answer.
+### What this is not
+
+The dependency graph has two kinds of edge and the difference matters. **53 are
+executed** — one proposition calls another as a function and the call is recorded
+as it happens. **383 are cited** — a reference written by hand beside a step,
+following Heath's margins. Citations are checked (every one must name a
+proposition that exists, and no proposition may cite a later one) but they are
+transcription, not discovery, and **only 12% of the graph is executed**.
+
+So statements like *"136 propositions depend on I.1"* or *"the parallel postulate
+first appears at I.29"* are true, and are Euclid's own cross-references read back
+in a tidy order. They used to be listed above as findings. They are not findings,
+and they have been removed.
 
 ---
 
@@ -223,8 +298,18 @@ conclusions are true of the figures; it does not confirm they follow by his rule
 of inference. The references each step cites are recorded but not relied on — so
 a step with the wrong reference attached still cannot slip a false statement past,
 though the machine will not tell you the reference is wrong. It will tell you if
-the reference names a proposition that does not exist, which is a different and
-much smaller guarantee.
+the reference names a proposition that does not exist, or one that comes *later*
+in the book, which are different and much smaller guarantees. This is why nothing
+in [What came out of it](#what-came-out-of-it) is derived from citations.
+
+The **necessity analysis is empirical and partial**, and both words matter. A
+hypothesis that survives being broken is a candidate, not a theorem: it means no
+counterexample turned up among the configurations tried. Coverage is 36%, and the
+missing 64% is mostly propositions like I.4, where moving any one point breaks
+two hypotheses at once so no outcome can be attributed to either. Those are
+reported as untested, never as unneeded — the difference is the whole credibility
+of the analysis, and [`tests/test_measure.py`](tests/test_measure.py) pins it
+down.
 
 A second thing worth being straight about: *certified* and *actually tested* are
 not the same. A claim that cannot come out false, or a hypothesis no sampled

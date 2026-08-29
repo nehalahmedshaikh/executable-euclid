@@ -524,10 +524,18 @@ def prop_II_14(a: Point, b: Point, c: Point) -> Out:
     d = posit(meet(upright, semicircle)[1], "D")
     square = prop_I_46(b, d).square
 
-    claim("the angle in the semicircle is right", "III.31", right_angle(a, d, c))
-    claim("BD is a mean proportional between AB and BC", "II.5",
-          len2(b, d) == length(a, b) * length(b, c))
-    claim("so the square on BD equals the given rectangle", "I.46",
+    # Euclid has no Book III here, and does not need it: the right angle is the
+    # one he constructed at B, not the one in the semicircle. II.5 and I.47 do
+    # the rest between them.
+    claim("BD stands at right angles to AC, being so constructed", "I.11",
+          right_angle(d, b, a))
+    claim("MD and MA are equal, both radii of the semicircle", "Def.15",
+          eq_len(middle, d, middle, a))
+    claim("the square on MD equals the squares on MB and BD", "I.47",
+          len2(middle, d) == len2(middle, b) + len2(b, d))
+    claim("the rectangle AB by BC, with the square on MB, equals the square on MA",
+          "II.5", length(a, b) * length(b, c) + len2(middle, b) == len2(middle, a))
+    claim("so the square on BD equals the given rectangle", "C.N.3",
           len2(b, d) == length(a, b) * length(b, c))
     return Out(square=square, side=(b, d))
 
@@ -585,7 +593,10 @@ def prop_III_1(o: Point, a: Point, b: Point, c: Point) -> Out:
 
     claim("the point found is equally distant from all three", ["I.10", "I.11"],
           eq_len(found, a, found, b) and eq_len(found, a, found, c))
-    claim("and it is the centre, for no other point can be", "III.9", found == o)
+    # III.9 proves the uniqueness, but it comes later; here it follows from the
+    # two bisectors meeting in one point and no other.
+    claim("and it is the centre, every line from it to the circle being a radius",
+          "Def.15", found == o and eq_len(found, a, o, a))
     return Out(centre=found)
 
 
@@ -626,6 +637,10 @@ def prop_III_4(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("the chords are not parallel", not parallel(first, second))
     crossing = posit(meet_one(first, second), "E")
 
+    claim("all four ends lie on the circle, so both lines are chords of it",
+          "Def.15",
+          all(on_circle(point, circle(o, a)) for point in (a, b, c, d)))
+    claim("the crossing falls inside the circle", "III.2", inside_circle(crossing, circle(o, a)))
     claim("were E to bisect both, the lines from the centre would be "
           "perpendicular to each and the centre would lie on both", "III.3",
           not (eq_len(a, crossing, crossing, c) and eq_len(b, crossing, crossing, d)))
@@ -982,16 +997,29 @@ def prop_III_17(o: Point, a: Point, beyond) -> Out:
     around = circle(o, a, "the given circle")
     outside = posit(Point(o.x + beyond * (a.x - o.x), o.y + beyond * (a.y - o.y)), "P")
 
-    # The point of contact lies on the circle on OP as diameter (III.31), which
-    # is how the right angle at the contact gets built rather than assumed.
-    middle = posit(prop_I_10(o, outside).midpoint, "M")
-    helper = circle_with_radius2(middle, len2(middle, o), "the circle on OP")
-    touch = posit(meet(helper, around)[0], "T")
+    # Euclid's own construction, which needs nothing from later in the book.
+    # The circle on OP as diameter would give the right angle at once, but that
+    # is III.31 and comes after; instead a second circle about O through P, a
+    # perpendicular at D, and I.4 on the two triangles.
+    d = posit(_along_from(o, outside, length(o, a)), "D")
+    wider = circle(o, outside, "the circle about O through P")
+    upright = _tangent_at(o, d, "the perpendicular to OP at D")
+    e = posit(meet(upright, wider)[0], "E")
+    line(o, e, "the join OE")
+    touch = posit(_along_from(o, e, length(o, a)), "T")
     tangent = line(outside, touch, "the tangent PT")
     line(o, touch, "the radius to the point of contact")
 
-    claim("the angle at the point of contact is right", "III.31",
-          right_angle(o, touch, outside))
+    claim("OD and OT are radii of the given circle, OE and OP of the wider one",
+          "Def.15",
+          eq_len(o, d, o, a) and eq_len(o, touch, o, a)
+          and eq_len(o, e, o, outside))
+    claim("so the triangles ODE and OTP have two sides and the angle between "
+          "them equal", "I.4",
+          eq_angle(d, o, e, touch, o, outside) and eq_len(d, e, touch, outside))
+    claim("the angle at D being right, the angle at the point of contact is right "
+          "too", "I.4",
+          right_angle(o, d, e) and right_angle(o, touch, outside))
     claim("so PT touches the circle and does not cut it", "III.16",
           on_circle(touch, around)
           and not any(inside_circle(Point(touch.x + Fraction(k, 4) * (outside.x - touch.x),
@@ -1110,6 +1138,8 @@ def prop_III_23(o: Point, a: Point, b: Point, c: Point) -> Out:
     # point in fact lies on this circle, so the second segment is this one.
     others = [point for point in _round(o, a)
               if point not in (a, b) and same_side(point, c, Line.through(a, b))]
+    claim("the three named points lie on the given circle", "Def.15",
+          all(on_circle(point, circle(o, a)) for point in (a, b, c)))
     claim("every point on this side standing at the same angle lies on this circle",
           "III.21",
           all(not eq_angle(a, point, b, a, c, b) or on_circle(point, circle(o, a))
@@ -1139,6 +1169,8 @@ def prop_III_24(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     outline(d, f, e, close=False)
     line(d, e, "the equal base DE")
 
+    claim("the segment stands on the given circle", "Def.15",
+          all(on_circle(point, circle(o, a)) for point in (a, b, c)))
     claim("the bases are equal, the second being the first moved", "I.4",
           eq_len(a, b, d, e))
     claim("the segments admit equal angles", "III.21", eq_angle(a, c, b, d, f, e))
@@ -1165,6 +1197,8 @@ def prop_III_25(o: Point, a: Point, b: Point, c: Point) -> Out:
     line(found, a)
     line(found, c)
 
+    claim("the three given points are equidistant from the centre they determine",
+          "Def.15", eq_len(o, a, o, b) and eq_len(o, a, o, c))
     claim("the centre found is equidistant from the three given points", "III.1",
           eq_len(found, a, found, b) and eq_len(found, a, found, c))
     claim("and the circle on it passes through them all", "Def.15",
@@ -1183,12 +1217,15 @@ def prop_III_26(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     hypothesis("the points lie on the circle",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
     hypothesis("A and B are distinct", a != b)
-    circle(o, a, "the first circle")
+    first = circle(o, a, "the first circle")
     p, d, e = posit(move(o), "P"), posit(move(a), "D"), posit(move(b), "E")
-    circle(p, d, "the second, equal to it")
+    second = circle(p, d, "the second, equal to it")
     for pair in ((o, a), (o, b), (p, d), (p, e)):
         line(*pair, "a radius")
 
+    claim("every point named lies on the circle it belongs to", "Def.15",
+          on_circle(a, first) and on_circle(b, first)
+          and on_circle(d, second) and on_circle(e, second))
     claim("the circles are equal", "Def.15", eq_len(o, a, p, d))
     claim("the angles at the centres are equal", "I.8", eq_angle(a, o, b, d, p, e))
     claim("so the arcs they stand on are equal, their chords being equal", "I.4",
@@ -1207,12 +1244,16 @@ def prop_III_28(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     hypothesis("the points lie on the circle",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
     hypothesis("A and B are distinct", a != b)
-    circle(o, a, "the first circle")
+    first = circle(o, a, "the first circle")
     p, d, e = posit(move(o), "P"), posit(move(a), "D"), posit(move(b), "E")
-    circle(p, d, "the second, equal to it")
+    second = circle(p, d, "the second, equal to it")
     line(a, b, "the chord AB")
     line(d, e, "the chord DE")
 
+    claim("the chords really are chords, their ends lying on the circles",
+          "Def.15",
+          on_circle(a, first) and on_circle(b, first)
+          and on_circle(d, second) and on_circle(e, second))
     claim("the circles are equal and the chords equal", "Def.15",
           eq_len(o, a, p, d) and eq_len(a, b, d, e))
     claim("so the angles at the centres are equal", "I.8", eq_angle(a, o, b, d, p, e))
@@ -1232,12 +1273,15 @@ def prop_III_29(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     hypothesis("the points lie on the circle",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
     hypothesis("A and B are distinct", a != b)
-    circle(o, a, "the first circle")
+    first = circle(o, a, "the first circle")
     p, d, e = posit(move(o), "P"), posit(move(a), "D"), posit(move(b), "E")
-    circle(p, d, "the second, equal to it")
+    second = circle(p, d, "the second, equal to it")
     line(a, b, "the chord AB")
     line(d, e, "the chord DE")
 
+    claim("the arcs are arcs of the circles named", "Def.15",
+          on_circle(a, first) and on_circle(b, first)
+          and on_circle(d, second) and on_circle(e, second))
     claim("equal arcs are cut off by equal angles at the centres", "III.27",
           eq_angle(a, o, b, d, p, e))
     claim("so the chords subtending them are equal", "I.4", eq_len(a, b, d, e))

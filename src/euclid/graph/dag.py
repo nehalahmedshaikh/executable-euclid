@@ -1,11 +1,32 @@
-"""The dependency graph, extracted by execution.
+"""The dependency graph, and where each edge really comes from.
 
-Nothing in this project maintains a cross-reference table.  The edges below are
-whatever the propositions actually did when they ran: the calls they made and
-the results they cited.  That has a pleasant consequence -- the graph cannot
-drift out of step with the proofs, because it *is* the proofs.
+An edge arrives here by one of two routes, and they are not equally strong:
 
-What it buys us:
+**Executed.**  One proposition calls another, and the call is recorded as it
+happens.  I.44 genuinely runs I.42; nothing was declared, and the edge cannot be
+wrong.
+
+**Cited.**  A step names the result it appeals to -- ``claim(..., "I.4", ...)``
+-- and that name is written by hand alongside the step, following Heath's
+marginal references.  The *check* on the step is independent of the citation, so
+a wrong name cannot smuggle a false statement through; but the edge itself is an
+authored claim about the proof, not an observation of it.
+
+The split is lopsided and should be stated rather than glossed: roughly one edge
+in eight is executed and the rest are cited, and every postulate, definition and
+common-notion edge is cited, because those are not callable objects.  So results
+read off this graph -- what rests on I.1, where Postulate 5 first appears, the
+minimal set behind I.47 -- report *Euclid's own cross-references, faithfully
+transcribed*.  That is worth having.  It is not a discovery, and this module
+used to claim it was.
+
+:attr:`Graph.executed` holds only what actually ran; :attr:`Graph.cited` holds
+the rest; :meth:`Graph.provenance` counts both.  :meth:`Graph.needs` and
+everything built on it mix the two, which is usually what you want for
+navigation and never what you want for a finding.
+
+What it buys us -- all of it over the mixed edges, so read it as a tidy view of
+Euclid's cross-references:
 
 * **Tree-shaking.**  The minimal set of propositions needed for a given result,
   in dependency order -- a self-contained little book ending at, say, I.47.
@@ -14,8 +35,13 @@ What it buys us:
 * **Load-bearing rank.**  How many propositions would fall if this one did.
   (I.4 has an alarming answer.)
 * **First principles.**  Which postulates, definitions and common notions a
-  result depends on -- which is how you see, mechanically, that I.27 is neutral
-  geometry and I.29 is not.
+  result depends on.  That I.27 is neutral geometry and I.29 is not falls out of
+  this -- but it falls out of the citations, which is to say out of Heath's
+  margins, and calling it mechanical would be a lie.
+
+Two checks keep the cited edges honest, in :mod:`tests.test_corpus`: every
+citation must name something that exists, and no proposition may cite a later
+one.  Neither makes a citation into an observation.
 """
 
 from __future__ import annotations
@@ -32,6 +58,13 @@ __all__ = ["Graph", "build"]
 class Graph:
     nodes: dict[str, Proposition] = field(default_factory=dict)
     edges: dict[str, set[str]] = field(default_factory=dict)  # ref -> what it needs
+    executed: dict[str, set[str]] = field(default_factory=dict)  # ...by calling it
+    cited: dict[str, set[str]] = field(default_factory=dict)     # ...by naming it
+
+    def provenance(self) -> tuple[int, int]:
+        """How many edges were executed, and how many only cited."""
+        return (sum(len(refs) for refs in self.executed.values()),
+                sum(len(refs) for refs in self.cited.values()))
 
     # -- basic queries ------------------------------------------------------
     def needs(self, ref: str) -> set[str]:
@@ -183,9 +216,12 @@ def build(propositions: Optional[Iterable[Proposition]] = None, warm: bool = Tru
     for entry in entries:
         graph.nodes[entry.ref] = entry
     for entry in entries:
-        graph.edges[entry.ref] = {
-            ref
-            for ref in entry.depends_on
-            if reference_kind(ref) == "proposition" and ref in graph.nodes
-        }
+        def keep(refs):
+            return {ref for ref in refs
+                    if reference_kind(ref) == "proposition"
+                    and ref in graph.nodes and ref != entry.ref}
+
+        graph.edges[entry.ref] = keep(entry.depends_on)
+        graph.executed[entry.ref] = keep(entry.calls)
+        graph.cited[entry.ref] = keep(entry.cites) - keep(entry.calls)
     return graph

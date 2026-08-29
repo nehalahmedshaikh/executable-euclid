@@ -1,0 +1,140 @@
+"""How algebraically deep each proposition goes.
+
+Every magnitude a construction produces is an exact element of a tower of
+quadratic extensions of Q, so it has a degree, and :func:`minpoly.degree`
+returns it.  Running the whole corpus and recording the highest degree each
+proposition reaches gives a map of the *Elements* by algebraic complexity --
+where the second square root first becomes necessary, where the fourth, and
+which books never leave the rationals at all.
+
+Nothing about this is available from the text.  It is a property of what the
+constructions *do*, and it can only be read off a corpus that runs exactly.
+
+One trap, which caught the first version: walking point coordinates alone
+reports Books V and VII to X as degree 1, because those propositions argue
+about magnitudes and construct no points.  The magnitudes are in what the
+proposition returns, so the walk has to go through ``Out`` as well.
+"""
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass, field
+from fractions import Fraction
+from typing import Iterator, Optional
+
+from ..elements.registry import Out, Proposition, all_propositions, run_sampled
+from ..kernel.field import Surd
+from ..kernel.minpoly import degree
+from ..plane.objects import Circle, Line, Point
+
+__all__ = ["Depth", "algebraic_depth", "depth_profile", "first_appearances"]
+
+
+def _magnitudes(value, seen: Optional[set] = None) -> Iterator:
+    """Every exact magnitude reachable from a value, however it is wrapped."""
+    seen = set() if seen is None else seen
+    if id(value) in seen:
+        return
+    seen.add(id(value))
+    if isinstance(value, (Fraction, Surd)):
+        yield value
+    elif isinstance(value, Point):
+        yield value.x
+        yield value.y
+    elif isinstance(value, Line):
+        yield value.a
+        yield value.b
+        yield value.c
+    elif isinstance(value, Circle):
+        yield from _magnitudes(value.centre, seen)
+        yield value.r2
+    elif isinstance(value, (list, tuple, set, frozenset)):
+        for item in value:
+            yield from _magnitudes(item, seen)
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _magnitudes(item, seen)
+    elif isinstance(value, Out):
+        for name, item in vars(value).items():
+            if name not in ("trace", "proposition"):
+                yield from _magnitudes(item, seen)
+
+
+@dataclass
+class Depth:
+    ref: str
+    degree: int = 1
+    where: str = ""          # the labelled point or result that reaches it
+    tower_height: int = 0    # how many square roots deep the context went
+
+    def __str__(self) -> str:
+        return f"{self.ref:<8} degree {self.degree:>3}   {self.where}"
+
+
+def algebraic_depth(entry: Proposition, seed: int = 0, tries: int = 8) -> Optional[Depth]:
+    """The highest degree over Q that one proposition's construction reaches."""
+    if entry.sample is None:
+        return None
+    rng = random.Random(f"depth:{entry.ref}:{seed}")
+    for _ in range(tries):
+        try:
+            run = run_sampled(entry.ref, rng)
+        except Exception:
+            continue
+        found = Depth(entry.ref, tower_height=run.context.tower.depth)
+        for move in run.trace.moves:
+            for magnitude in _magnitudes(move.obj):
+                try:
+                    order = degree(magnitude)
+                except Exception:  # pragma: no cover - a magnitude with no minimal polynomial
+                    continue
+                if order > found.degree:
+                    found.degree = order
+                    found.where = move.label or move.kind
+        for magnitude in _magnitudes(run.value):
+            try:
+                order = degree(magnitude)
+            except Exception:  # pragma: no cover
+                continue
+            if order > found.degree:
+                found.degree = order
+                found.where = "the magnitude it produces"
+        return found
+    return None
+
+
+def depth_profile(entries=None) -> dict:
+    """Every proposition's depth, keyed by ref."""
+    chosen = list(entries) if entries is not None else all_propositions()
+    found = {}
+    for entry in chosen:
+        depth = algebraic_depth(entry)
+        if depth is not None:
+            found[entry.ref] = depth
+    return found
+
+
+def first_appearances(profile: dict) -> dict:
+    """Where in the Elements each degree is first reached.
+
+    Propositions are visited in Euclid's own order, so the answer is the
+    earliest place the book demands that much algebra.
+    """
+    order = [entry.ref for entry in all_propositions()]
+    first: dict[int, str] = {}
+    for ref in order:
+        depth = profile.get(ref)
+        if depth is None:
+            continue
+        first.setdefault(depth.degree, ref)
+    return dict(sorted(first.items()))
+
+
+def ceilings(profile: dict) -> dict:
+    """The highest degree each book reaches."""
+    highest: dict[str, int] = {}
+    for ref, depth in profile.items():
+        book = ref.split(".")[0]
+        highest[book] = max(highest.get(book, 1), depth.degree)
+    return highest

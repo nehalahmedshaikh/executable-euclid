@@ -298,9 +298,32 @@ def test_the_errata_are_published_in_full(site):
 
 
 def test_the_findings_page_reports_the_real_results(site):
+    """Every finding is measured, labelled by strength, and reproducible.
+
+    This used to require the words "parallel postulate", which was the page's
+    worst overclaim: that finding is somebody typing ``"Post.5"`` beside I.29 and
+    not beside I.27, and only 12% of the graph's edges are executed at all. The
+    requirement is now the opposite one.
+    """
     findings = (site / "findings.html").read_text(encoding="utf-8")
-    for expected in ("I.1", "parallel postulate", "seven circles", "Book X"):
-        assert expected in findings
+
+    for banished in ("parallel postulate", "Postulate 5", "depend on I.1",
+                     "holds up the whole book", "a quarter of what has been written"):
+        assert banished not in findings, f"{banished!r} is derived from citations"
+
+    # What is left, and the kind of claim each one is.
+    for expected in ("Exhaustive", "Measured", "Empirical",
+                     "II.9 and II.10", "Book X", "coverage"):
+        assert expected in findings, expected
+
+    # This site is built with --no-search, so the shortest-construction results
+    # were never computed for it -- and the page must therefore not state them.
+    # The old page carried "exactly seven circles" as prose no matter what the
+    # build had actually run, which is the failing the rewrite is about.
+    assert "seven circles" not in findings
+
+    # Nothing may sit here without the command that reproduces it.
+    assert findings.count("<pre>euclid ") >= findings.count('<div class="finding">') - 1
 
 
 def test_the_site_uses_exactly_three_colours(site):

@@ -150,6 +150,34 @@ def test_every_citation_names_something_real(corpus):
     )
 
 
+# Genuine forward references in the text would go here, with a reason. There
+# are none: every one found so far was an anachronism in the encoding.
+ALLOWED_FORWARD_CITATIONS: dict[str, str] = {}
+
+
+def test_no_proposition_cites_a_later_one(corpus):
+    """Euclid may only lean on what he has already proved.
+
+    A step citing a proposition that comes later is an anachronism in the
+    encoding, not a discovery about the text. Six were found this way: II.14
+    reached into Book III for the angle in a semicircle, which Euclid does not
+    have yet and does not need -- II.5 and I.47 do the work between them.
+    """
+    def position(ref: str) -> tuple:
+        book, number = ref.split(".")
+        return BOOK_ORDER.index(book), int(number)
+
+    forward = []
+    for entry, _ in corpus.values():
+        for ref in entry.cites:
+            if reference_kind(ref) != "proposition" or ref == entry.ref:
+                continue
+            if position(ref) > position(entry.ref) \
+                    and ALLOWED_FORWARD_CITATIONS.get(f"{entry.ref}->{ref}") is None:
+                forward.append(f"{entry.ref} cites {ref}")
+    assert not forward, "propositions reaching forward:\n  " + "\n  ".join(sorted(forward))
+
+
 def test_every_statement_is_the_parsed_text():
     """Nothing displayed anywhere is written by this project."""
     for entry in all_propositions():

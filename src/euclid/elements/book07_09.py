@@ -153,10 +153,12 @@ def prop_VII_1(a: int, b: int) -> Out:
     reached_a_unit = gcd(a, b) == 1
 
     claim("the subtraction terminates", "VII.1", trail and trail[-1] == 0)
-    claim("the last number before the unit is the greatest common measure", "VII.2",
-          gcd(a, b) == (trail[-2] if len(trail) > 1 else b))
-    claim("so if a unit is left, the numbers are prime to one another", "VII.1",
-          reached_a_unit == coprime(a, b))
+    claim("what is left when it does is the only common measure the two admit",
+          "Def.VII.12",
+          not any(measures(d, a) and measures(d, b) for d in range(2, b + 1))
+          == reached_a_unit)
+    claim("so if a unit is left, the numbers are prime to one another",
+          "Def.VII.12", reached_a_unit == coprime(a, b))
     return Out(remainders=trail, coprime=reached_a_unit)
 
 
@@ -190,12 +192,13 @@ def prop_VII_3(a: int, b: int, c: int) -> Out:
 def prop_VII_4(a: int, b: int) -> Out:
     hypothesis("the numbers are unequal and greater than a unit", a > b > 1)
     numerator, denominator = least_terms(b, a)
-    claim("the less stands to the greater in least terms", "VII.33",
-          coprime(numerator, denominator))
-    claim("and is a part of it when the numerator is a unit, parts otherwise",
-          "Def.VII.3", (numerator == 1) == measures(b, a))
-    claim("the ratio is recovered from those terms", "VII.20",
+    claim("the less is a part of the greater when it measures it", "Def.VII.3",
+          (numerator == 1) == measures(b, a))
+    claim("and parts of it otherwise, so many of the greater's parts as the "
+          "numerator counts", "Def.VII.4",
           b * denominator == a * numerator)
+    claim("the two counts have no common measure but a unit, so the description "
+          "is the plainest there is", "Def.VII.12", coprime(numerator, denominator))
     return Out(terms=(numerator, denominator))
 
 
