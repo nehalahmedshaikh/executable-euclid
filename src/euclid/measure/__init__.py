@@ -7,29 +7,37 @@ text to answer, and which the text alone cannot settle:
   book each degree first becomes necessary;
 * :mod:`gaps` -- where Book X's taxonomy of irrationals stops naming things;
 * :mod:`necessity` -- which of Euclid's stated hypotheses the conclusions turn
-  out not to need.
+  out not to need;
+* :mod:`fields` -- which of them still run when the number field is made
+  smaller, separating a root taken to measure a length from one taken to cross
+  two circles.
 
 Each reports its own method and coverage; a number without those is not a
 finding.
 """
 
 from .depth import Depth, algebraic_depth, ceilings, depth_profile, first_appearances
+from .fields import FieldVerdict, field_profile, field_verdict, partition
 from .gaps import Gap, simplest_gap, taxonomy_gaps
 from .necessity import Necessity, hypothesis_necessity, necessity_report
 from .record import FINDINGS_PATH, load_findings, write_findings
 
 __all__ = [
     "Depth",
+    "FieldVerdict",
     "Gap",
     "FINDINGS_PATH",
     "Necessity",
     "algebraic_depth",
     "ceilings",
     "depth_profile",
+    "field_profile",
+    "field_verdict",
     "first_appearances",
     "hypothesis_necessity",
     "load_findings",
     "necessity_report",
+    "partition",
     "simplest_gap",
     "taxonomy_gaps",
     "write_findings",

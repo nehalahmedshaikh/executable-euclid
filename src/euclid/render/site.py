@@ -588,6 +588,55 @@ def _findings_page(graph, stats, search_rows) -> str:
         "<pre>euclid ledger</pre>",
     ))
 
+    ladder = measured.get("fields") if measured else None
+    if ladder and ladder["counts"].get("measuring_only"):
+        counts = ladder["counts"]
+        blame = {w["ref"]: w for w in ladder["witnesses"]}
+        lucky = ladder["buckets"]["discharged_luckily"]
+        findings.append((
+            "Measured &mdash; every square root in the corpus is one of three things",
+            "<p>Restricting the field a construction may build in and running the corpus "
+            "again is Hilbert's method: make a model where an axiom fails and see what "
+            "breaks. Over the rationals no new root is allowed at all. Over the "
+            "Pythagorean field only roots of sums of two squares are, which is what a "
+            "straightedge and a way to carry a segment produce &mdash; a length may be "
+            "measured, two circles may not be crossed. Between the two rungs, every root "
+            "the corpus takes sorts into measuring, crossing, or the proposition's own "
+            "irrational subject.</p>"
+            '<div class="scroll"><table><tr><th>Over Q</th><th>Propositions</th></tr>'
+            f'<tr><td>complete</td><td>{counts["rational"]}</td></tr>'
+            f'<tr><td>need only a length measured</td><td>{counts["measuring_only"]}</td></tr>'
+            f'<tr><td>need two circles to meet</td><td>{counts["needs_continuity"]}</td></tr>'
+            f'<tr><td>are about an irrational</td><td>{counts["needs_magnitude"]}</td></tr>'
+            f'<tr><td>vary by configuration</td><td>{counts["configuration_dependent"]}</td></tr>'
+            f'<tr><td>have no rational configuration</td><td>{counts["untestable"]}</td></tr>'
+            "</table></div>"
+            + (
+                "<p>The two cases that show what the split is for: <strong>I.1</strong> "
+                f'stops in <span class="mono">{_esc(blame["I.1"]["site"])}</span> asking '
+                f'for <span class="mono">sqrt({_esc(blame["I.1"]["radicand"])})</span>, '
+                "and no rung short of the full constructibles gives it. "
+                "<strong>I.20</strong>, the triangle inequality, stops in "
+                f'<span class="mono">{_esc(blame["I.20"]["site"])}</span> asking for '
+                f'<span class="mono">sqrt({_esc(blame["I.20"]["radicand"])})</span> '
+                "&mdash; and completes over the Pythagorean field, because it only ever "
+                "measures. It is true in the rational plane, and it appears to fail there "
+                "only because our encoding builds a root where squared lengths would "
+                "do.</p>"
+                if "I.1" in blame and "I.20" in blame else ""
+            )
+            + f"<p>{len(lucky)} propositions ({_esc(', '.join(sorted(lucky)))}) complete "
+            "over the Pythagorean field while the ledger records them crossing a circle. "
+            "Their samplers hand them rational triangles, so the circles meet where the "
+            "configuration already was. Counting those as Pythagorean would be a finding "
+            "about our test data, so they are kept apart.</p>"
+            f"<p>The {counts['untestable']} untestable propositions are mostly Book X, "
+            "whose samplers build irrational magnitudes because that is the subject. A "
+            "proposition that completes here did so on the rational configurations tried, "
+            "which is evidence and not a proof of validity in the rational plane.</p>"
+            "<pre>euclid measure --fields</pre>",
+        ))
+
     varies = stats.get("varies", [])
     findings.append((
         "Measured &mdash; four proofs take more than one route through the diagram",

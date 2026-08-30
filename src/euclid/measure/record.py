@@ -67,6 +67,7 @@ def write_findings(trials: int = 16, path: Optional[Path] = None) -> dict:
             ],
         },
         "constructions": _constructions(),
+        "fields": _fields(),
         "book_x_gaps": {
             "candidates_named": named,
             "candidates_unnamed": unnamed,
@@ -84,6 +85,25 @@ def write_findings(trials: int = 16, path: Optional[Path] = None) -> dict:
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return payload
+
+
+def _fields() -> dict:
+    """The field ladder: what each rung of the restriction buys."""
+    from .fields import partition
+
+    found = partition(trials=8)
+    buckets = found["buckets"]
+    return {
+        "buckets": {name: sorted(refs) for name, refs in buckets.items()},
+        "counts": {name: len(refs) for name, refs in buckets.items()},
+        "witnesses": [
+            {"ref": ref, "cause": found["rational"][ref].cause,
+             "site": found["rational"][ref].site,
+             "radicand": found["rational"][ref].radicand}
+            for ref in ("I.1", "I.20")
+            if ref in found["rational"] and found["rational"][ref].cause
+        ],
+    }
 
 
 def _constructions() -> list[dict]:

@@ -32,7 +32,11 @@ __all__ = ["Angle", "RIGHT", "STRAIGHT", "angle_at", "length"]
 def length(a: Point, b: Point) -> Constructible:
     """The exact distance ``|ab|``.  Costs one tower level unless it is rational."""
     dx, dy = vector_between(a, b)
-    return sqrt(dx * dx + dy * dy)
+    # The witness says this root is a hypotenuse, which is what a Pythagorean
+    # field admits. Measuring a length is a different act from intersecting two
+    # circles, and only the second needs continuity; carrying the pair here is
+    # what lets euclid.measure.fields tell them apart.
+    return sqrt(dx * dx + dy * dy, witness=(dx, dy))
 
 
 class Angle:
@@ -50,7 +54,8 @@ class Angle:
         """The unoriented angle ``first-vertex-second``, which lies in ``[0, pi]``."""
         ux, uy = vector_between(vertex, first)
         vx, vy = vector_between(vertex, second)
-        scale = sqrt(ux * ux + uy * uy) * sqrt(vx * vx + vy * vy)
+        scale = (sqrt(ux * ux + uy * uy, witness=(ux, uy))
+                 * sqrt(vx * vx + vy * vy, witness=(vx, vy)))
         if is_zero(scale):
             raise ValueError("an angle needs two rays of positive length")
         cross = ux * vy - uy * vx

@@ -222,8 +222,8 @@ def cmd_measure(args) -> int:
         print(f"wrote {FINDINGS_PATH.name}: {payload['corpus']} propositions measured")
         return 0
 
-    if not (args.depth or args.needless):
-        print("choose --depth, --needless or --write", file=sys.stderr)
+    if not (args.depth or args.needless or args.fields):
+        print("choose --depth, --needless, --fields or --write", file=sys.stderr)
         return 1
 
     if args.depth:
@@ -235,6 +235,31 @@ def cmd_measure(args) -> int:
         print("\nWhere each degree is first needed\n")
         for order, ref in first_appearances(profile).items():
             print(f"  degree {order:<3} {ref:<8} {profile[ref].where}")
+
+    if args.fields:
+        from .measure.fields import partition
+
+        found = partition(trials=8)
+        counts = {name: len(refs) for name, refs in found["buckets"].items()}
+        print("Restricting the field, and what each rung buys\n")
+        print(f"  complete over Q                {counts['rational']:>4}")
+        print(f"  need a length measured         {counts['measuring_only']:>4}"
+              "   (Q^pyth is enough, and they cross no circle)")
+        print(f"  need two circles to meet       {counts['needs_continuity']:>4}")
+        print(f"  are about an irrational        {counts['needs_magnitude']:>4}")
+        print(f"  vary by configuration          {counts['configuration_dependent']:>4}")
+        print(f"  no rational configuration      {counts['untestable']:>4}   (untestable)")
+        lucky = found["buckets"]["discharged_luckily"]
+        if lucky:
+            print(f"\n  {len(lucky)} pass over Q^pyth while carrying continuity debt:")
+            print(f"    {', '.join(sorted(lucky))}")
+            print("    their circles meet where the sampled configuration already was,")
+            print("    so the gain is about the sampler.")
+        for ref in ("I.1", "I.20"):
+            verdict = found["rational"].get(ref)
+            if verdict is not None and verdict.cause:
+                print(f"\n  {ref}: {verdict.cause} at {verdict.site}"
+                      f" -- wants sqrt({verdict.radicand})")
 
     if args.needless:
         report = necessity_report(trials=args.trials)
@@ -345,6 +370,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="the algebraic degree each proposition reaches")
     p.add_argument("--needless", action="store_true",
                    help="hypotheses the conclusions turn out not to need")
+    p.add_argument("--fields", action="store_true",
+                   help="which propositions survive a smaller number field")
     p.add_argument("--write", action="store_true",
                    help="recompute and record findings.json, which the site reads")
     p.add_argument("--trials", type=int, default=16)

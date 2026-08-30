@@ -392,3 +392,106 @@ def test_hypotheses_are_counted_by_running_not_by_grepping():
 
     assert _count_hypotheses(get("VII.24")) == 1
     assert _count_hypotheses(get("I.4")) == 3
+
+
+# --------------------------------------------------------------------------
+# the field ladder
+# --------------------------------------------------------------------------
+
+
+def test_restricting_the_field_changes_nothing_by_default():
+    """A tower with no policy is the kernel as it always was."""
+    from euclid.kernel.field import Tower, sqrt as field_sqrt
+
+    with Context("test:default") as ctx:
+        assert ctx.tower.policy is None
+        assert field_sqrt(2) is not None
+
+
+def test_the_rational_plane_refuses_a_new_root_but_keeps_the_old_ones():
+    """Q has sqrt(4). It does not have sqrt(2). The gate fires only on growth."""
+    from euclid.kernel.field import Rational, RootNotInField, sqrt as field_sqrt
+
+    with Context("test:Q", policy=Rational()):
+        assert field_sqrt(4) == 2
+        with pytest.raises(RootNotInField):
+            field_sqrt(2)
+
+
+def test_the_pythagorean_field_wants_a_witness():
+    """sqrt(a^2 + b^2) is a hypotenuse; anything else is refused.
+
+    Deciding sum-of-two-squares for a general tower element is a norm
+    computation in a multiquadratic field, so the caller carries the pair
+    instead. Sound at every depth, and incomplete on purpose.
+    """
+    from euclid.kernel.field import Pythagorean, RootNotInField, sqrt as field_sqrt
+
+    with Context("test:pyth", policy=Pythagorean()):
+        assert field_sqrt(25, witness=(3, 4)) == 5
+        with pytest.raises(RootNotInField):
+            field_sqrt(2)
+        assert field_sqrt(2, witness=(1, 1)) is not None
+
+
+def test_a_missing_root_is_not_filed_as_an_arithmetic_error():
+    """``necessity`` catches ArithmeticError and calls it well-definedness.
+
+    If RootNotInField inherited from it, every restricted run would be buried
+    among unrelated outcomes.
+    """
+    from euclid.kernel.field import RootNotInField
+
+    assert not issubclass(RootNotInField, ArithmeticError)
+    assert not issubclass(RootNotInField, ValueError)
+
+
+def test_an_irrational_sampler_is_untestable_and_never_blamed():
+    """Book X's samplers build irrational magnitudes because that is the subject.
+
+    Their configurations are rejected before the policy is armed, so the
+    proposition comes back untestable. Calling it ``needs-root`` would blame
+    Euclid for our test data.
+    """
+    from euclid.kernel.field import Rational
+    from euclid.measure.fields import UNTESTABLE, field_verdict
+
+    verdict = field_verdict(get("X.21"), Rational(), trials=6)
+    assert verdict.verdict == UNTESTABLE
+    assert verdict.configurations == 0
+    assert verdict.needs_root == 0
+
+
+def test_the_ladder_separates_measuring_from_intersecting():
+    """The finding, on the two cases that show what it is for.
+
+    I.1 crosses two circles, so it fails on both rungs and the blame lands in
+    ``construct.py``. I.20 only measures lengths, so the Pythagorean rung is
+    enough and the blame lands in ``angles.py``.
+    """
+    from euclid.kernel.field import Pythagorean, Rational
+    from euclid.measure.fields import ALWAYS, CONTINUITY, MEASUREMENT, NEVER, field_verdict
+
+    circles = field_verdict(get("I.1"), Rational(), trials=6)
+    assert circles.verdict == NEVER and circles.cause == CONTINUITY
+    assert field_verdict(get("I.1"), Pythagorean(), trials=6).verdict == NEVER
+
+    measured = field_verdict(get("I.20"), Rational(), trials=6)
+    assert measured.verdict == NEVER and measured.cause == MEASUREMENT
+    assert field_verdict(get("I.20"), Pythagorean(), trials=6).verdict == ALWAYS
+
+
+def test_a_lucky_intersection_is_not_reported_as_pythagorean():
+    """I.23's sampler hands it a rational triangle, so its circles meet where
+    the configuration already was.
+
+    It passes over Q^pyth while carrying continuity debt, which would read as
+    "the angle-copy construction needs only segment transfer" -- a finding about
+    ``samples.triangle``. The ledger is what tells the two apart.
+    """
+    from euclid.kernel.field import Pythagorean
+    from euclid.measure.fields import ALWAYS, field_verdict
+    from euclid.verify.ledger import audit
+
+    assert field_verdict(get("I.23"), Pythagorean(), trials=6).verdict == ALWAYS
+    assert audit("I.23", trials=6).continuity_debt > 0, "no debt: the guard is vacuous"

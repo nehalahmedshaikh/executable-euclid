@@ -35,6 +35,10 @@ from typing import Optional, Union
 from .numeric import Interval
 
 __all__ = [
+    "FieldPolicy",
+    "Pythagorean",
+    "Rational",
+    "RootNotInField",
     "Constructible",
     "Context",
     "Surd",
@@ -55,15 +59,79 @@ Constructible = Union[Fraction, "Surd"]
 MAX_SIGN_PRECISION = 1 << 18
 
 
+class RootNotInField(Exception):
+    """A construction needed a square root the restricted field does not have.
+
+    Deliberately not an ``ArithmeticError``: :mod:`euclid.measure.necessity`
+    catches that and files it as a well-definedness failure, which would bury
+    this among unrelated outcomes.
+    """
+
+    def __init__(self, radicand, field_name: str, depth: int) -> None:
+        self.radicand = radicand
+        self.field_name = field_name
+        self.depth = depth
+        super().__init__(f"{field_name} has no sqrt({fmt(radicand)})")
+
+
+class FieldPolicy:
+    """Which quadratic extensions a restricted model may take."""
+
+    name = "unrestricted"
+
+    def admits(self, tower: "Tower", r: "Constructible", witness) -> bool:
+        return True
+
+
+class Rational(FieldPolicy):
+    """Q itself: no extension at all.
+
+    A construction that completes under this policy never needed a square root
+    it did not already have, so it never needed two circles to cross.
+    """
+
+    name = "Q"
+
+    def admits(self, tower, r, witness) -> bool:
+        return False
+
+
+class Pythagorean(FieldPolicy):
+    """Hilbert's Pythagorean field: only the hypotenuse of a right triangle.
+
+    Closed under ``x -> sqrt(1 + x^2)``, so a root is admitted when the caller
+    hands over ``(u, v)`` with ``r == u*u + v*v``, checked here exactly.
+
+    Sound at every depth, and incomplete on purpose: a radicand that happens to
+    be a sum of two squares but arrives without a witness is refused.  Deciding
+    that in general is a norm computation in a multiquadratic field, which is a
+    computer algebra system and not this kernel.  Carrying the witness models
+    the instrument instead -- a straightedge and a way to transfer a segment.
+    """
+
+    name = "Q^pyth"
+
+    def admits(self, tower, r, witness) -> bool:
+        if witness is None:
+            return False
+        u, v = witness
+        return is_zero(u * u + v * v - r)
+
+
 class Tower:
     """The chain of quadratic extensions built up during one construction."""
 
-    __slots__ = ("radicands", "_sqrt_memo", "_interval_memo")
+    __slots__ = ("radicands", "_sqrt_memo", "_interval_memo", "policy")
 
-    def __init__(self) -> None:
+    def __init__(self, policy: Optional["FieldPolicy"] = None) -> None:
         self.radicands: list[Constructible] = []
         self._sqrt_memo: dict = {}
         self._interval_memo: dict = {}
+        # None is the ordinary constructible field: every square root is
+        # allowed. A policy restricts which extensions may be taken, which is
+        # how a proposition can be run over a smaller field to see whether it
+        # still completes. See euclid.measure.fields.
+        self.policy = policy
 
     @property
     def depth(self) -> int:
@@ -72,8 +140,15 @@ class Tower:
     def radicand(self, level: int) -> Constructible:
         return self.radicands[level - 1]
 
-    def extend(self, r: Constructible) -> "Surd":
-        """Adjoin ``sqrt(r)``.  The caller must have shown ``r`` is a non-square."""
+    def extend(self, r: Constructible, witness=None) -> "Surd":
+        """Adjoin ``sqrt(r)``.  The caller must have shown ``r`` is a non-square.
+
+        The single place the field grows.  ``sqrt`` reaches here only after
+        failing to find the root among the levels already present, so a policy
+        checked here fires exactly when the field genuinely has to get bigger.
+        """
+        if self.policy is not None and not self.policy.admits(self, r, witness):
+            raise RootNotInField(r, self.policy.name, self.depth)
         self.radicands.append(r)
         return Surd(self, self.depth, ZERO, ONE)
 
@@ -393,8 +468,13 @@ def _exact_sqrt_uncached(tower: Tower, x: Constructible, n: int) -> Optional[Con
     return None
 
 
-def sqrt(x, tower: Optional[Tower] = None) -> Constructible:
-    """Exact square root, reusing the tower when possible and extending when not."""
+def sqrt(x, tower: Optional[Tower] = None, witness=None) -> Constructible:
+    """Exact square root, reusing the tower when possible and extending when not.
+
+    ``witness`` is a pair ``(u, v)`` with ``r == u*u + v*v`` when the caller
+    knows one, which is what lets a Pythagorean field admit the root.  It is
+    only consulted if the field has to grow.
+    """
     x = _coerce(x)
     if is_zero(x):
         return ZERO
@@ -409,7 +489,7 @@ def sqrt(x, tower: Optional[Tower] = None) -> Constructible:
         # Both roots satisfy the recursion, and the descent may well surface the
         # negative one; a magnitude must come back non-negative.
         return found if sign(found) >= 0 else _neg(found)
-    return tower.extend(x)
+    return tower.extend(x, witness)
 
 
 def fmt(x: Constructible) -> str:
@@ -450,11 +530,12 @@ class Context:
 
     __slots__ = ("tower", "label")
 
-    def __init__(self, label: str = "", tower: Optional[Tower] = None) -> None:
+    def __init__(self, label: str = "", tower: Optional[Tower] = None,
+                 policy: Optional["FieldPolicy"] = None) -> None:
         # An inherited tower lets a caller feed values it already built into a
         # proposition; a fresh one keeps unrelated constructions from piling up
         # levels on each other.
-        self.tower = tower if tower is not None else Tower()
+        self.tower = tower if tower is not None else Tower(policy)
         self.label = label
 
     def __enter__(self) -> "Context":
@@ -465,8 +546,8 @@ class Context:
         _STACK.pop()
         return False
 
-    def sqrt(self, x) -> Constructible:
-        return sqrt(x, self.tower)
+    def sqrt(self, x, witness=None) -> Constructible:
+        return sqrt(x, self.tower, witness)
 
 
 def active_context() -> Optional[Context]:
