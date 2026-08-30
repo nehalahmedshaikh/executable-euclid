@@ -48,7 +48,8 @@ __all__ = ["build"]
 # between them. The two themes swap black and white; the grey never moves.
 # Nothing here uses a fill or an opacity that would manufacture a fourth shade.
 STYLE = """
-:root { --ink: #000000; --page: #ffffff; --grey: #808080; }
+:root { --ink: #000000; --page: #ffffff; --grey: #808080;
+        --column: min(94vw, 84rem); }
 @media (prefers-color-scheme: dark) {
   :root { --ink: #ffffff; --page: #000000; }
 }
@@ -57,15 +58,14 @@ body {
   margin: 0; background: var(--page); color: var(--ink);
   font: 18px/1.66 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
 }
-/* Prose stays near 44rem because that is about 70 characters a line and longer
-   is harder to read, not easier. Pages that are mostly table or diagram have no
-   such limit and should use the window they are given. */
-.wrap { max-width: 45rem; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
-.wide { max-width: min(96vw, 84rem); }
-/* The bar sits outside the content, so the same eight links wrap the same way
-   on every page instead of shifting with the column width. */
+/* One width, and everything uses it: the nav, the prose, the tables, the
+   diagrams. There used to be two -- a narrow column for prose and a wide one
+   for tables -- which left paragraphs wrapping short inside a container three
+   times their width. That reads as hard-wrapped text with the margins to match,
+   and no amount of tuning the two numbers fixes it. So there is one number. */
+.wrap { max-width: var(--column); margin: 0 auto; padding: 2rem 1.5rem 6rem; }
 .bar { border-bottom: 1px solid var(--grey); margin-bottom: 2.4rem; }
-.bar > nav { max-width: min(96vw, 84rem); margin: 0 auto; padding: 1.1rem 1.5rem .9rem; }
+.bar > nav { max-width: var(--column); margin: 0 auto; padding: 1.1rem 1.5rem .9rem; }
 a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px;
     text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
@@ -132,9 +132,6 @@ ul.claims li { padding: .5rem 0 .5rem 1rem; border-left: 2px solid var(--ink);
 ul.claims li.hyp { border-left: 2px solid var(--grey); }
 .cite { font: .7rem ui-sans-serif, system-ui, sans-serif; color: var(--grey);
         display: block; margin-top: .2rem; letter-spacing: .02em; }
-/* Lets one wide thing -- a 390-entry index, a table -- step outside the prose
-   column without opening out the whole page. */
-.bleed { width: min(94vw, 84rem); margin-left: calc(50% - min(47vw, 42rem)); }
 .grid { display: grid; gap: .25rem .9rem;
         grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); }
 .grid a { display: block; padding: .18rem 0; font-size: .88rem;
@@ -156,8 +153,6 @@ blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-ser
 .note { color: var(--grey); font-size: .95rem; }
 .finding { border-top: 1px solid var(--grey); padding-top: 1.1rem; margin-top: 1.8rem; }
 .finding h3 { margin-top: 0; }
-/* Findings and prose stay readable even on a page opened out for its tables. */
-.wide .finding, .wide .lede, .wide > p, .wide > ul, .wide > ol { max-width: 45rem; }
 .legend { font: .78rem/1.6 ui-sans-serif, system-ui, sans-serif; color: var(--grey);
           display: flex; flex-wrap: wrap; gap: .3rem 1.6rem; margin: .7rem 0 0; }
 .legend span { display: inline-flex; align-items: center; gap: .45rem; }
@@ -165,8 +160,7 @@ blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-ser
             border-top: 2px solid var(--grey); }
 .legend i.dash { border-top-style: dashed; }
 footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--grey);
-         font: .82rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--grey);
-         max-width: 45rem; }
+         font: .82rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--grey); }
 """
 
 NAV = [
@@ -189,7 +183,7 @@ def _slug(ref: str) -> str:
     return ref.replace(".", "-")
 
 
-def _page(title: str, body: str, here: str = "", wide: bool = False) -> str:
+def _page(title: str, body: str, here: str = "") -> str:
     links = "".join(
         '<a href="{}"{}>{}</a>'.format(href, ' class="here"' if href == here else "", label)
         for href, label in NAV
@@ -204,7 +198,7 @@ def _page(title: str, body: str, here: str = "", wide: bool = False) -> str:
         '<link rel="stylesheet" href="style.css">'
         "</head><body>"
         f'<div class="bar"><nav class="top">{links}</nav></div>'
-        f'<div class="wrap{" wide" if wide else ""}">'
+        '<div class="wrap">'
         f"{body}"
         "<footer><p>Every diagram here is the record of a construction that ran and "
         "checked out in exact arithmetic &mdash; not an illustration of one. It shows "
@@ -446,7 +440,6 @@ def _index_page(graph, stats) -> str:
     in_heath: dict[str, int] = {}
     for ref in HEATH:
         in_heath[ref.split(".")[0]] = in_heath.get(ref.split(".")[0], 0) + 1
-    body.append('<div class="bleed">')
     for book, entries in by_book.items():
         title = BOOK_TITLES.get(book, "")
         total = in_heath.get(book, 0)
@@ -458,7 +451,6 @@ def _index_page(graph, stats) -> str:
         for entry in entries:
             body.append(f'<a href="{_slug(entry.ref)}.html">{entry.ref}</a>')
         body.append("</div>")
-    body.append("</div>")
 
     body.append(
         "<h2>What &ldquo;checked&rdquo; means here</h2>"
@@ -743,7 +735,7 @@ def _graph_page(graph) -> str:
         f"<th>Depth</th><th>Statement</th></tr>{rows}</table></div>",
     ]
     return _page("Dependencies — Executable Euclid", "".join(body),
-                 here="graph.html", wide=True)
+                 here="graph.html")
 
 
 def _minimal_page(graph, target: str = "I.47") -> str:
@@ -782,7 +774,7 @@ def _minimal_page(graph, target: str = "I.47") -> str:
         + " ".join(f'<a href="{_slug(ref)}.html">{ref}</a>' for ref in dropped)
         + "</p>",
     ]
-    return _page(f"Shortest route to {target}", "".join(body), here="minimal.html", wide=True)
+    return _page(f"Shortest route to {target}", "".join(body), here="minimal.html")
 
 
 def _ledger_page(ledgers) -> str:
@@ -846,7 +838,7 @@ def _ledger_page(ledgers) -> str:
         f"{rows}</table></div>",
     ]
     return _page("What Euclid assumes — Executable Euclid", "".join(body),
-                 here="ledger.html", wide=True)
+                 here="ledger.html")
 
 
 def _optimizer_page(rows) -> str:
@@ -898,7 +890,7 @@ def _optimizer_page(rows) -> str:
         "in the code.</p>",
     ]
     return _page("Shortest constructions — Executable Euclid", "".join(body),
-                 here="optimizer.html", wide=True)
+                 here="optimizer.html")
 
 
 def _text_page() -> str:
@@ -1054,7 +1046,7 @@ def _book_x_page() -> str:
         "euclid gap</pre>",
     ]
     return _page("Book X — Executable Euclid", "".join(body),
-                 here="book-x.html", wide=True)
+                 here="book-x.html")
 
 
 # ---------------------------------------------------------------------------
