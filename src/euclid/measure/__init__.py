@@ -9,8 +9,7 @@ text to answer, and which the text alone cannot settle:
 * :mod:`necessity` -- which of Euclid's stated hypotheses the conclusions turn
   out not to need.
 
-Each is a measurement rather than a claim about what Euclid knew, and each
-reports its own method and coverage, because a number without those is not a
+Each reports its own method and coverage; a number without those is not a
 finding.
 """
 

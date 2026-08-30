@@ -276,44 +276,56 @@ def test_the_graph_page_no_longer_claims_there_is_no_index():
     assert "executed" in source and "cited" in source.lower()
 
 
-def test_the_readme_findings_match_what_was_measured():
-    """The findings section quotes numbers, and quoted numbers go stale.
+def test_the_readme_quotes_only_numbers_it_still_carries():
+    """The README states very few numbers now, and these are they.
 
-    Every one below is read out of ``findings.json`` or off the graph, so a
-    measurement that moves fails here instead of leaving a wrong claim in the
-    README.  These are the numbers the whole novelty argument rests on.
+    It used to reproduce the whole findings section -- seven write-ups, three
+    tables -- which meant every measurement existed in two places and the copy
+    kept by hand was the one that went stale. The findings live on the generated
+    site, where nothing is typed. What is left here is what a reader needs before
+    deciding to look further.
+
+    Matched against whitespace-normalised text: the previous version embedded the
+    line breaks of one particular wrapping, so it tested paragraph shape rather
+    than the number inside it and broke on any reflow.
     """
     from pathlib import Path
 
-    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(
-        encoding="utf-8"
+    readme = " ".join(
+        (Path(__file__).resolve().parent.parent / "README.md")
+        .read_text(encoding="utf-8").split()
     )
     measured = load_findings()
 
-    tops = measured["depth"]["ceilings"]
-    row = "| **Highest degree** | " + " | ".join(
-        str(tops[book]) for book in BOOK_ORDER if book in tops
-    )
-    assert row in readme, f"the depth table is stale; expected row: {row}"
-
-    deepest = measured["depth"]["deepest"][0]
-    assert f"**{deepest['ref']}, at\ndegree {deepest['degree']}**" in readme
-
-    need = measured["necessity"]
-    assert f"{need['hypotheses']} hypotheses are stated" in readme
-    assert f"**{need['judged']} could be broken" in readme
-    assert f"({100 * need['coverage']:.0f}% coverage)**" in readme
-    assert f"**{need['needed']} proved necessary**" in readme
-    assert f"**{len(need['candidates'])} survived" in readme
-
-    witness = measured["book_x_gaps"]["witnesses"][0]
-    assert witness["expression"] in readme
-    assert witness["minimal_polynomial"] in readme
+    coverage = f"{100 * measured['necessity']['coverage']:.0f}%"
+    assert f"Coverage is {coverage}" in readme
 
     executed, cited = build_graph().provenance()
-    assert f"**{executed} are\nexecuted**" in readme
-    assert f"**{cited} are cited**" in readme
+    assert f"{executed} edges are **executed**" in readme
+    assert f"{cited} are **cited**" in readme
     assert f"only {100 * executed // (executed + cited)}% of the graph" in readme
+
+
+def test_an_uncertified_construction_is_never_labelled_a_theorem():
+    """"Fewest possible" belongs only to a row enumerated exactly.
+
+    The compass-only midpoint is the case that matters: it was stated as
+    "exactly seven circles, six is not enough, and all of them were tried" for a
+    long time while being computed nowhere -- not in a build, not in a test, and
+    not in the benchmark the test suite referred to, which does not exist.
+    """
+    from euclid.render.site import _strength
+
+    rows = {(r["problem"], r["isa"]): r for r in load_findings()["constructions"]}
+
+    certified = rows[("equilateral-triangle", "full")]
+    assert certified["exact_minimal"]
+    assert _strength(certified) == "fewest possible"
+
+    deep = rows[("midpoint", "compass-only")]
+    assert deep["found"] and deep["length"] == 7 and deep["verified"]
+    assert not deep["exact_minimal"], "if this is now certified, the wording can strengthen"
+    assert _strength(deep) == "shortest found"
 
 
 def test_the_graph_knows_which_edges_it_executed():
@@ -324,3 +336,59 @@ def test_the_graph_knows_which_edges_it_executed():
         len(graph.executed.get(ref, ())) + len(graph.cited.get(ref, ()))
         for ref in graph.nodes
     )
+
+
+# --------------------------------------------------------------------------
+# the soundness of the numbers themselves
+# --------------------------------------------------------------------------
+
+
+def test_depth_is_a_maximum_over_configurations_not_the_first_one():
+    """``algebraic_depth`` used to return inside its retry loop.
+
+    ``tries`` only bought a retry when a sample was rejected, so every published
+    ceiling rested on whichever figure happened to come up first.
+    """
+    depth = algebraic_depth(get("I.1"))
+    assert depth.configurations > 1, "only one configuration was examined"
+
+
+def test_a_deep_tower_no_longer_hides_a_degree():
+    """I.45 builds ten levels; the old depth bound refused all 514 magnitudes.
+
+    A ceiling with skipped magnitudes behind it is not a ceiling, so the skips
+    are counted -- and after bounding by the element's own support rather than
+    the tower's depth there are none left to count.
+    """
+    depth = algebraic_depth(get("I.45"))
+    assert depth.tower_height > 8, "I.45 no longer exercises the deep-tower case"
+    assert depth.unmeasured == 0, f"{depth.unmeasured} magnitudes still unmeasured"
+
+
+def test_the_support_bound_is_closed_under_radicands():
+    """Bounding by the levels an element uses *directly* is wrong.
+
+    Squaring sqrt(r_k) gives r_k, which lives below k, so a power reaches out of
+    the set it started in. Assuming otherwise made 2^(1/4) come out degree 2.
+    """
+    from euclid.kernel.field import sqrt
+    from euclid.kernel.minpoly import closed_support, degree
+
+    with Context("test:support"):
+        quartic = sqrt(sqrt(2))
+        assert degree(quartic) == 4
+        assert len(closed_support(quartic)) == 2
+        assert degree(sqrt(sqrt(sqrt(2)))) == 8
+
+
+def test_hypotheses_are_counted_by_running_not_by_grepping():
+    """The coverage denominator came from a text search over source code.
+
+    VII.24 states one hypothesis and states it at runtime; a counter that gives
+    zero for it (because the sampler rejects most triples) is worse than the
+    grep it replaced, so the count retries until the proposition runs.
+    """
+    from euclid.measure.necessity import _count_hypotheses
+
+    assert _count_hypotheses(get("VII.24")) == 1
+    assert _count_hypotheses(get("I.4")) == 3

@@ -12,11 +12,18 @@ drowning:
 * **Bounded scope.**  Points that wander far outside the region of interest are
   dropped, and the search stops at a node budget.
 
-That last point is a real limit and the results say so.  A run reports whether
-it was **exhaustive** -- meaning every construction of that length was examined,
-so a returned answer is genuinely minimal and a failure genuinely proves none
-exists at that depth -- or whether it hit the budget first, in which case the
-answer is an upper bound and nothing more.
+Those three make the search possible and they all bear on the *negative* half of
+its answer, which is the half worth caring about: "shortest" means nothing
+shorter exists.  A dedup at ``1e-7``, a tangency lost at ``EPSILON``, a rounded
+canonical fingerprint, a point outside ``scope`` -- each can hide a construction,
+and hiding one turns a longer answer into a false minimum.
+
+So the two halves are reported separately.  ``exhaustive`` says only that the
+node budget was not hit.  ``exact_minimal`` is the real claim, and it comes from
+:mod:`euclid.search.exact`, which re-enumerates every shorter figure in the
+kernel with no bounds and no dedup at all.  Only ``exact_minimal`` licenses the
+words *provably minimal*; the docstring here used to attach them to
+``exhaustive``, which is a statement about a budget.
 """
 
 from __future__ import annotations
@@ -44,6 +51,14 @@ class Result:
     moves: list[Move] = field(default_factory=list)
     depth_searched: int = 0
     exhaustive: bool = True
+    # `exhaustive` means only that the node budget was not hit. It says nothing
+    # about the arithmetic, and the arithmetic was floating point -- a lost
+    # intersection or an over-eager dedup makes a shorter construction invisible
+    # and the search reports a longer one as minimal. `exact_minimal` is the
+    # real claim: every shorter figure was enumerated in the exact kernel and
+    # none reached the goal. Only that may be called provably minimal.
+    exact_minimal: bool = False
+    exact_figures: int = 0
     nodes: int = 0
     verified: Optional[bool] = None
     point_names: list[str] = field(default_factory=list)
@@ -66,7 +81,13 @@ class Result:
             lines.append(f"  {claim} within {self.depth_searched} moves "
                          f"({self.nodes} figures examined)")
             return "\n".join(lines)
-        quality = "provably minimal" if self.exhaustive else "an upper bound (budget reached)"
+        if self.exact_minimal:
+            quality = ("provably minimal -- every shorter figure was enumerated "
+                       f"exactly ({self.exact_figures} of them)")
+        elif self.exhaustive:
+            quality = "shortest found (the search was exhaustive in floating point)"
+        else:
+            quality = "an upper bound (budget reached)"
         lines.append(f"  {self.length} moves -- {quality}")
         for index, step in enumerate(self.steps(), 1):
             lines.append(f"    {index}. {step}")

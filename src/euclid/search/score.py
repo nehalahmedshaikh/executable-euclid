@@ -15,7 +15,7 @@ The *simplicity* of a construction is the total count; the *exactitude* is the
 count of the placement operations (``S1``, ``C1``, ``C2``), the ones where a
 draughtsman's hand can slip.
 
-A caveat worth stating rather than hiding: with both primitives costing three
+A caveat: with both primitives costing three
 operations apiece, simplicity is three times the move count for the problems
 here.  The breakdown still distinguishes a straightedge-heavy construction from
 a compass-heavy one, which is the comparison that matters when retargeting

@@ -16,8 +16,8 @@ touches the network.  Put the file in ``tools/sources/`` under the name in
 ``EPUB_NAME``.
 
 Nothing is repaired by hand.  An enunciation that fails a check is dropped, not
-mended; it then keeps the short editorial summary carried in the code, and
-everything that displays a statement says which of the two it is showing.
+mended, and nothing stands in for it: a proposition whose ref is missing from
+``heath.json`` raises rather than falling back to anything.
 
 Three checks guard the output.  ``suspicious`` rejects the malformed.  The
 per-book counts in ``EPUB_EXPECTED`` catch a heading the parser missed.  And

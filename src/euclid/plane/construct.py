@@ -8,7 +8,7 @@ Three operations generate everything in the *Elements*:
 ``meet(u, v)``          not a postulate at all
 ======================  =====================================================
 
-That third row is the interesting one.  Euclid draws two circles and then
+The third row is the one that matters.  Euclid draws two circles and then
 *names* their intersection point, but no postulate says two circles ever meet.
 Rather than paper over the gap we make it visible: every intersection is
 recorded as an event, tagged with whether the postulates actually license it,
@@ -91,7 +91,7 @@ def outline(*points: Point, close: bool = True) -> list[Line]:
     Propositions that prove something about a triangle or a parallelogram often
     construct nothing: the figure is handed to them, and the argument is about
     what is already there.  Without this they would produce no diagram at all,
-    which is exactly what a reader wants to look at.
+    which is what a reader wants to look at.
     """
     drawn: list[Line] = []
     ordered = list(points)

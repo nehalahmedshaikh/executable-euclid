@@ -78,7 +78,7 @@ def separating_witness(
     Returns ``(m, n)`` such that ``m*a`` and ``n*b`` compare one way while
     ``m*c`` and ``n*d`` compare the other -- the concrete witness Definition 5
     asks about.  Returns ``None`` when the ratios agree, in which case no such
-    pair exists at all, which is exactly what Eudoxus means by "the same ratio".
+    pair exists at all, which is what Eudoxus means by "the same ratio".
     """
     if a * d == b * c:
         return None

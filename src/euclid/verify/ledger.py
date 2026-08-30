@@ -113,24 +113,41 @@ def audit(ref: str, trials: int = 12, seed: int = 0) -> Ledger:
     if not traces:
         return ledger
 
-    first = traces[0]
+    # Across every configuration, not just the first. These tallies used to be
+    # read off ``traces[0]``, which is only defensible if every configuration
+    # takes the same route -- and four propositions demonstrably do not. For
+    # those the reported debt was whichever route the first sample happened to
+    # take. The debt of a proposition is the most it ever incurs, so each
+    # distinct assumption is counted at its maximum over the configurations.
+    def worst(counters: list[Counter]) -> Counter:
+        combined: Counter = Counter()
+        for counter in counters:
+            for key, count in counter.items():
+                combined[key] = max(combined[key], count)
+        return combined
 
     # --- continuity ------------------------------------------------------
-    tally: Counter = Counter()
-    for event in first.intersections:
-        if not event.guaranteed_by_postulates:
-            tally[(event.kind, event.detail)] += 1
-    for (kind, detail), count in sorted(tally.items()):
+    per_trace: list[Counter] = []
+    for trace in traces:
+        tally: Counter = Counter()
+        for event in trace.intersections:
+            if not event.guaranteed_by_postulates:
+                tally[(event.kind, event.detail)] += 1
+        per_trace.append(tally)
+    for (kind, detail), count in sorted(worst(per_trace).items()):
         ledger.assumptions.append(
             Assumption("continuity", f"a {kind} intersection is used, though {detail}", count)
         )
 
     # --- order -----------------------------------------------------------
-    order_tally: Counter = Counter()
-    for event in first.predicates:
-        if event.order_sensitive:
-            order_tally[event.name] += 1
-    for name, count in sorted(order_tally.items()):
+    per_trace = []
+    for trace in traces:
+        order_tally: Counter = Counter()
+        for event in trace.predicates:
+            if event.order_sensitive:
+                order_tally[event.name] += 1
+        per_trace.append(order_tally)
+    for name, count in sorted(worst(per_trace).items()):
         ledger.assumptions.append(
             Assumption("order", f"the argument reads a '{name}' fact off the figure", count)
         )
@@ -164,18 +181,28 @@ def case_assumptions(traces: list[Trace]) -> list[Assumption]:
                 "than one route through the diagram",
             )
         )
-    else:
-        for position in range(len(first.predicates)):
-            values = {bool(trace.predicates[position].value) for trace in traces}
-            if len(values) > 1:
-                name = first.predicates[position].name
-                found.append(
-                    Assumption(
-                        "case",
-                        f"the '{name}' fact at step {position + 1} is true in some "
-                        "configurations and false in others",
-                    )
+
+    # Keyed by name and position-within-name, never by position in the list.
+    # This check used to sit in the `else` of the branch above, so it never ran
+    # on a proposition whose predicate count varies -- which is precisely where
+    # a proof is branching and a flip is most likely. Three of the four
+    # case-dependent propositions were in that blind spot.
+    occurrences: dict[tuple[str, int], set[bool]] = {}
+    for trace in traces:
+        seen_of_name: Counter = Counter()
+        for event in trace.predicates:
+            index = seen_of_name[event.name]
+            seen_of_name[event.name] += 1
+            occurrences.setdefault((event.name, index), set()).add(bool(event.value))
+    for (name, index), values in sorted(occurrences.items()):
+        if len(values) > 1:
+            found.append(
+                Assumption(
+                    "case",
+                    f"the '{name}' fact (occurrence {index + 1}) is true in some "
+                    "configurations and false in others",
                 )
+            )
 
     counts_by_position: dict[int, set[int]] = {}
     for trace in traces:

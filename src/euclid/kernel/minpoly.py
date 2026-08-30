@@ -5,11 +5,17 @@ basis ``{ prod_{i in S} sqrt(r_i) : S subset {1..n} }`` of dimension ``2^n``.
 Expanding an element into that basis turns "what is the degree of this number?"
 into linear algebra over the rationals, which we do exactly with Fractions.
 
+``2^n`` grows fast enough that the depth of the tower used to decide what was
+measurable at all, and a construction like I.45 -- which reaches ten levels --
+had every one of its magnitudes refused.  But an element of a deep tower need
+not use much of it, and only the part it uses has to be spanned; see
+:func:`closed_support`.  The bound is on the element now, not on its
+surroundings.
+
 That degree is what powers the classical impossibility results.  A constructible
 number always has degree a power of two, so any target whose minimal polynomial
 has degree 3 -- doubling the cube, trisecting 60 degrees, the regular heptagon --
-is out of reach of straightedge and compass, and we can *say why* rather than
-gesture at it.
+is out of reach of straightedge and compass, and we can *say why*.
 
 Note the direction of the implication.  Degree not a power of two proves
 impossibility outright.  Degree a power of two does **not** by itself prove
@@ -29,6 +35,7 @@ __all__ = [
     "FERMAT_PRIMES",
     "Verdict",
     "basis_expand",
+    "closed_support",
     "cube_duplication_verdict",
     "degree",
     "heptagon_verdict",
@@ -66,6 +73,12 @@ def basis_expand(x: Constructible) -> dict[frozenset[int], Fraction]:
 
 def _vector(x: Constructible, keys: list[frozenset[int]]) -> list[Fraction]:
     expansion = basis_expand(x)
+    # A component outside the basis would be dropped here without a word, and
+    # the minimal polynomial would come back wrong rather than absent. That is
+    # how a too-small basis first went unnoticed.
+    missing = set(expansion) - set(keys)
+    if missing:
+        raise ValueError(f"basis misses {sorted(map(sorted, missing))}")
     return [expansion.get(key, Fraction(0)) for key in keys]
 
 
@@ -76,6 +89,48 @@ def _all_keys(depth: int) -> list[frozenset[int]]:
     return keys
 
 
+def _keys_over(levels: Iterable[int]) -> list[frozenset[int]]:
+    """Every subset of the given levels, as basis index sets."""
+    keys: list[frozenset[int]] = [frozenset()]
+    for level in sorted(levels):
+        keys += [key | {level} for key in keys]
+    return keys
+
+
+def support(x: Constructible) -> set[int]:
+    """The tower levels ``x`` expands over, directly."""
+    expansion = basis_expand(x)
+    return set().union(*expansion.keys()) if expansion else set()
+
+
+def closed_support(x: Constructible) -> set[int]:
+    """The levels every power of ``x`` can reach.
+
+    An element of a deep tower need not touch much of it, and the linear algebra
+    only has to span the part it does touch -- ``2^|S|`` rather than
+    ``2^depth``.  That is the difference between measurable and not: I.45 builds
+    a tower ten levels deep, so bounding by depth refused all 514 of its
+    magnitudes and left Book I's ceiling resting on nothing.
+
+    But the levels used directly are not enough, and assuming they were made
+    ``sqrt(sqrt(2))`` come out degree 2 instead of 4.  Squaring ``sqrt(r_k)``
+    gives ``r_k``, and a radicand at level ``k`` is itself built from levels
+    below it, so a power can reach down out of the set it started in.  The
+    support has to be closed under taking radicands before it bounds anything.
+    """
+    levels = support(x)
+    if not isinstance(x, Surd):
+        return levels
+    frontier = list(levels)
+    while frontier:
+        level = frontier.pop()
+        for lower in support(x.tower.radicand(level)):
+            if lower not in levels:
+                levels.add(lower)
+                frontier.append(lower)
+    return levels
+
+
 def min_poly(x: Constructible) -> list[Fraction]:
     """Monic minimal polynomial of ``x`` over Q, as ascending coefficients.
 
@@ -84,13 +139,16 @@ def min_poly(x: Constructible) -> list[Fraction]:
     """
     if isinstance(x, Fraction):
         return [-x, Fraction(1)]
-    depth = x.tower.depth
-    if depth > MAX_TOWER_DEPTH_FOR_DEGREE:
+    # Bound by the levels this element uses, not by how deep the tower happens
+    # to have grown around it. See :func:`support`.
+    levels = closed_support(x)
+    if len(levels) > MAX_TOWER_DEPTH_FOR_DEGREE:
         raise ValueError(
-            f"tower depth {depth} exceeds the degree-computation limit "
-            f"of {MAX_TOWER_DEPTH_FOR_DEGREE} (basis would have 2^{depth} entries)"
+            f"the element spans {len(levels)} tower levels, above the "
+            f"degree-computation limit of {MAX_TOWER_DEPTH_FOR_DEGREE} "
+            f"(basis would have 2^{len(levels)} entries)"
         )
-    keys = _all_keys(depth)
+    keys = _keys_over(levels)
 
     pivots: list[tuple[int, list[Fraction], list[Fraction]]] = []
     power: Constructible = Fraction(1)

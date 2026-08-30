@@ -4,7 +4,7 @@ Each problem states its givens, a goal expressed in floating point (for the
 search) and the exact predicate that the winning construction must satisfy when
 replayed through the kernel.  Several also name the proposition where Euclid
 solves the same problem, so his step count and the optimiser's can be put side
-by side -- which is the whole point of building both.
+by side.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ class Problem:
     points: tuple[tuple[float, float], ...]
     names: list[str]
     goal: Callable[[State], bool]
-    exact_goal: Callable[[list], bool]
+    exact_goal: Callable[[list, list], bool]
     euclid: Optional[str] = None
     given_circle: bool = False
 
@@ -70,7 +70,7 @@ def _equilateral_goal(state: State) -> bool:
     )
 
 
-def _equilateral_exact(points: list) -> bool:
+def _equilateral_exact(points: list, drawn: list) -> bool:
     origin, unit = Point(0, 0), Point(1, 0)
     return any(
         eq_len(p, origin, origin, unit) and eq_len(p, unit, origin, unit)
@@ -82,7 +82,7 @@ def _midpoint_goal(state: State) -> bool:
     return _has_point(state, lambda p: math.dist(p, (0.5, 0.0)) < TOLERANCE)
 
 
-def _midpoint_exact(points: list) -> bool:
+def _midpoint_exact(points: list, drawn: list) -> bool:
     from fractions import Fraction
 
     target = Point(Fraction(1, 2), 0)
@@ -99,12 +99,23 @@ def _bisector_goal(state: State) -> bool:
     )
 
 
-def _bisector_exact(points: list) -> bool:
+def _bisector_exact(points: list, drawn: list) -> bool:
+    """The line x = 1/2 must actually be drawn.
+
+    This used to ask only for two points with x == 1/2, which is a strictly
+    weaker condition than the one the search solves -- the two circles of the
+    usual construction produce both points without drawing anything through
+    them. So the "exact verification" was passing on a figure that does not
+    contain the line, and exact enumeration found a two-move answer to a
+    three-move problem. The goal has to be the same goal.
+    """
     from fractions import Fraction
 
-    half = Fraction(1, 2)
-    on_axis = [p for p in points if p.x == half]
-    return len(on_axis) >= 2
+    return any(
+        isinstance(shape, ExactLine)
+        and shape.a == 1 and is_zero(shape.b) and shape.c == Fraction(1, 2)
+        for shape in drawn
+    )
 
 
 def _perpendicular_at_a_goal(state: State) -> bool:
@@ -113,16 +124,23 @@ def _perpendicular_at_a_goal(state: State) -> bool:
     )
 
 
-def _perpendicular_at_a_exact(points: list) -> bool:
-    # two distinct points on the y-axis pin down the perpendicular at A
-    return len([p for p in points if is_zero(p.x)]) >= 2
+def _perpendicular_at_a_exact(points: list, drawn: list) -> bool:
+    """The y-axis must actually be drawn -- see :func:`_bisector_exact`.
+
+    Points pinning a line down is not the same as the line being there.
+    """
+    return any(
+        isinstance(shape, ExactLine)
+        and shape.a == 1 and is_zero(shape.b) and is_zero(shape.c)
+        for shape in drawn
+    )
 
 
 def _double_goal(state: State) -> bool:
     return _has_point(state, lambda p: math.dist(p, (2.0, 0.0)) < TOLERANCE)
 
 
-def _double_exact(points: list) -> bool:
+def _double_exact(points: list, drawn: list) -> bool:
     return any(p == Point(2, 0) for p in points)
 
 
@@ -137,7 +155,7 @@ def _square_goal(state: State) -> bool:
     )
 
 
-def _square_exact(points: list) -> bool:
+def _square_exact(points: list, drawn: list) -> bool:
     wanted = [Point(0, 1), Point(1, 1)]
     mirrored = [Point(0, -1), Point(1, -1)]
     return all(p in points for p in wanted) or all(p in points for p in mirrored)
@@ -235,7 +253,7 @@ def replay_exactly(problem: Problem, moves: list[Move]) -> bool:
                     if candidate not in points:
                         points.append(candidate)
             drawn.append(shape)
-        return problem.exact_goal(points)
+        return problem.exact_goal(points, drawn)
 
 
 def solve(
@@ -259,4 +277,11 @@ def solve(
     )
     if result.found and isa != "straightedge-only":
         result.verified = replay_exactly(problem, result.moves)
+        # Then the other half of the claim: that nothing shorter exists. The
+        # float search cannot establish that, so refute length - 1 exactly.
+        from .exact import shortest_is_certified
+
+        certified, exhaustion = shortest_is_certified(problem, isa, result.length)
+        result.exact_minimal = certified
+        result.exact_figures = exhaustion.figures
     return result

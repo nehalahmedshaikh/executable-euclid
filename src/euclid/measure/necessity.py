@@ -51,6 +51,7 @@ from ..elements.registry import (
     all_propositions,
     get,
     relaxed_hypotheses,
+    run_sampled,
 )
 from ..kernel.field import Context
 from ..plane.construct import GeometryError
@@ -210,6 +211,35 @@ def necessity_report(entries=None, trials: int = 24) -> NecessityReport:
     return report
 
 
-def _count_hypotheses(entry: Proposition) -> int:
-    """How many hypotheses a proposition states, read from its own source."""
-    return entry.source().count("hypothesis(")
+def _count_hypotheses(entry: Proposition, trials: int = 4) -> int:
+    """How many hypotheses a proposition states, counted by running it.
+
+    This used to be ``entry.source().count("hypothesis(")`` -- a text search over
+    source code, which counts the word in a comment or a docstring and misses a
+    hypothesis raised inside a helper or a loop.  The coverage figure this
+    project publishes is a fraction with this number underneath it, so it should
+    come from the same place every other number does: a trace.
+
+    Taken as the maximum over a few configurations, because a proposition that
+    branches can state a different number of hypotheses on different figures.
+    """
+    rng = random.Random(f"hypotheses:{entry.ref}")
+    most = 0
+    # A sampler that often violates its own hypothesis takes several attempts to
+    # yield a run that completes -- VII.24 wants three pairwise-coprime numbers
+    # and rarely gets them first go. Four bare attempts gave it no completed run
+    # at all, so it reported zero hypotheses: worse than the text search it
+    # replaced.
+    successes = 0
+    for _ in range(trials * 6):
+        if successes >= trials:
+            break
+        with Context(f"hypotheses:{entry.ref}"):
+            try:
+                run = run_sampled(entry.ref, rng)
+            except Exception:
+                continue
+            successes += 1
+            most = max(most, sum(1 for claim in run.trace.claims
+                                 if claim.by == ("hypothesis",)))
+    return most

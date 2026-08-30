@@ -74,7 +74,7 @@ def graph_svg(
             emphasis = " lit" if highlight and ref == highlight else ""
             # Solid where the call was recorded as it happened; dashed where the
             # reference was written beside the step by hand. Most are dashed, and
-            # the picture should say so rather than leaving it to the caption.
+            # the picture says so.
             if required in graph.executed.get(ref, ()):
                 kind = ""
             else:

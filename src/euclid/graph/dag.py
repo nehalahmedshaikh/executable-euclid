@@ -17,8 +17,7 @@ in eight is executed and the rest are cited, and every postulate, definition and
 common-notion edge is cited, because those are not callable objects.  So results
 read off this graph -- what rests on I.1, where Postulate 5 first appears, the
 minimal set behind I.47 -- report *Euclid's own cross-references, faithfully
-transcribed*.  That is worth having.  It is not a discovery, and this module
-used to claim it was.
+transcribed*.  Useful, and not a discovery; this module used to claim it was.
 
 :attr:`Graph.executed` holds only what actually ran; :attr:`Graph.cited` holds
 the rest; :meth:`Graph.provenance` counts both.  :meth:`Graph.needs` and
@@ -37,7 +36,7 @@ Euclid's cross-references:
 * **First principles.**  Which postulates, definitions and common notions a
   result depends on.  That I.27 is neutral geometry and I.29 is not falls out of
   this -- but it falls out of the citations, which is to say out of Heath's
-  margins, and calling it mechanical would be a lie.
+  margins, so it is not mechanical.
 
 Two checks keep the cited edges honest, in :mod:`tests.test_corpus`: every
 citation must name something that exists, and no proposition may cite a later

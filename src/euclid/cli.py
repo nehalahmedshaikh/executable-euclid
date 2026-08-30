@@ -356,7 +356,8 @@ def main(argv: list[str] | None = None) -> int:
 
     p = subs.add_parser("site", help="generate the static site")
     p.add_argument("--out", default="docs")
-    p.add_argument("--no-search", action="store_true", help="skip the optimizer benchmarks")
+    p.add_argument("--no-search", action="store_true",
+                   help="leave the recorded construction searches off the pages")
     p.set_defaults(func=cmd_site)
 
     args = parser.parse_args(argv)

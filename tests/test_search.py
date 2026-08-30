@@ -7,6 +7,7 @@ apiece and live in the benchmark instead.
 import pytest
 
 from euclid.search import INSTRUCTION_SETS, PROBLEMS, solve
+from euclid.search.isa import Move
 from euclid.search.score import score
 
 
@@ -92,3 +93,52 @@ def test_results_report_whether_the_search_was_exhaustive():
     complete = solve("square-on-a-segment", max_depth=2)
     assert not complete.found
     assert complete.exhaustive, "12 figures is the whole of depth 2, so this is a proof"
+
+
+# ---------------------------------------------------------------------------
+# exact enumeration: the negative half of "shortest"
+# ---------------------------------------------------------------------------
+
+
+def test_the_exact_goal_is_the_same_goal_the_search_solved():
+    """A weaker exact goal makes the replay verify something else entirely.
+
+    ``_bisector_exact`` used to ask only for two points with x == 1/2, while the
+    search required the line through them to be drawn. The two circles of the
+    usual construction produce both points at two moves, so exact enumeration
+    "found" a two-move answer to a three-move problem -- and the exact
+    verification had been passing on figures without the line in them.
+    """
+    from euclid.search.exact import enumerate_exactly
+
+    for name in ("perpendicular-bisector", "perpendicular-at-a-point"):
+        problem = PROBLEMS[name]
+        found = solve(name, max_depth=5)
+        assert found.found
+        short = enumerate_exactly(problem, "full", depth=found.length - 1)
+        assert not short.found, f"{name}: exact enumeration beat the search"
+        assert short.exhausted
+
+
+def test_provably_minimal_means_exactly_enumerated():
+    """I.1's two circles, with every one-move figure ruled out in the kernel."""
+    result = solve("equilateral-triangle", max_depth=3)
+    assert result.found and result.length == 2
+    assert result.exact_minimal, "the minimality of I.1 is not certified"
+    assert result.exact_figures > 0
+
+
+def test_exhaustive_alone_does_not_license_provably_minimal():
+    """``exhaustive`` is a statement about a budget, not about arithmetic.
+
+    The whole float search can be exhaustive and still have lost a construction
+    to a 1e-7 dedup, so the report must not promise minimality on that basis.
+    """
+    from euclid.search.optimizer import Result
+
+    row = Result(problem="x", isa="full", found=True, exhaustive=True)
+    row.moves = [Move("line", 0, 1)]
+    assert "provably minimal" not in row.report()
+
+    row.exact_minimal = True
+    assert "provably minimal" in row.report()

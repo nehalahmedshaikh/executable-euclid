@@ -5,11 +5,10 @@ constructions that ran and checked out; the assumption tables come from running
 each proposition over many different figures; the findings come from
 :mod:`euclid.measure`, computed once and recorded.
 
-One thing on these pages is *not* machine-derived, and saying so is the point of
-:func:`_graph_page`: the dependency edges are mostly ``cites`` annotations,
-written beside each step by hand from Heath's marginal references.  Only about an
-eighth of the graph was executed.  Citations are checked, but they are
-transcription, so nothing on the findings page is allowed to rest on them.
+The dependency edges are the exception: mostly ``cites`` annotations, written
+beside each step by hand from Heath's marginal references, with about an eighth
+of the graph executed.  Citations are checked, but they are transcription, so
+nothing on the findings page rests on them.  See :func:`_graph_page`.
 """
 
 from __future__ import annotations
@@ -204,7 +203,7 @@ def _page(title: str, body: str, here: str = "") -> str:
         "checked out in exact arithmetic &mdash; not an illustration of one. It shows "
         "what the machine drew, on the coordinates it was given, with the apparatus of "
         "its helper constructions held back but still there. Euclid's own figures are "
-        "composed; these are not, and do not try to be. Cross-references are a different "
+        "composed; these are not. Cross-references are a different "
         "matter: about one in eight was recorded as a call, and the rest were written "
         'beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p>'
         f"<p>Every proposition statement here is {HEATH_CREDIT} Nothing is "
@@ -420,12 +419,12 @@ def _index_page(graph, stats) -> str:
         '<li><a href="ledger.html">The gaps Euclid never mentions.</a> His rules let you '
         "draw circles, but never say that two circles meet. He uses that fact anyway, "
         "starting on page one.</li>",
-        '<li><a href="optimizer.html">The shortest possible constructions.</a> Found by '
-        "trying every one, then checked exactly. With no straightedge at all, finding the "
-        "middle of a line takes exactly seven circles.</li>",
+        '<li><a href="optimizer.html">The shortest possible constructions.</a> Where the '
+        "table says <em>fewest possible</em>, every shorter figure was ruled out in exact "
+        "arithmetic. With no straightedge at all a midpoint costs seven circles.</li>",
         '<li><a href="graph.html">What depends on what.</a> Two kinds of edge, and the '
         f"page says which is which: {top_ref} carries {top_count} of the others, but most "
-        "of that is Euclid's own cross-references rather than anything discovered.</li>",
+        "of that is Euclid's own cross-references.</li>",
         "</ul>",
         '<p><a href="findings.html"><strong>All the findings in one place &rarr;</strong>'
         "</a></p>",
@@ -567,14 +566,13 @@ def _findings_page(graph, stats, search_rows) -> str:
             "once says nothing about either and is discarded). Of those, "
             f"<strong>{need['needed']}</strong> proved necessary, a claim failing the "
             f"moment they went, and {need['well_defined']} turned out to be holding the "
-            "construction together rather than the conclusion up.</p>"
+            "construction together, which is a weaker kind of necessity.</p>"
             f"<p>{len(candidates)} survived being broken. Those are <em>candidates</em>, "
-            "not results, and the honest first reading of one is that our claims are too "
-            "weak to notice the difference. Which is exactly what happened the first time "
+            "not results, and the likeliest reading of one is that our claims are too "
+            "weak to notice the difference. That is what happened the first time "
             "this ran: seven propositions of Book III were checking things true of any "
             "four points, circle or no circle. They were strengthened, and their "
-            "hypotheses became necessary. The analysis is at least as much a lint on this "
-            "project as a comment on Euclid.</p>"
+            "hypotheses became necessary.</p>"
             "<pre>euclid measure --needless</pre>",
         ))
 
@@ -586,8 +584,7 @@ def _findings_page(graph, stats, search_rows) -> str:
         "properly until the nineteenth century.</p>"
         "<p>Every step that uses an intersection the postulates do not license is counted "
         f"as it happens: <strong>{stats['continuity']} places</strong> across Books I to "
-        "X. Nothing here is transcribed; the count comes from the constructions running."
-        '</p><p><a href="ledger.html">The full ledger &rarr;</a></p>'
+        'X. <a href="ledger.html">The full ledger &rarr;</a></p>'
         "<pre>euclid ledger</pre>",
     ))
 
@@ -608,47 +605,53 @@ def _findings_page(graph, stats, search_rows) -> str:
         "the sharper case: a step asserting two points lie on the same side of a line is "
         "true in some configurations and false in others. That is exactly the shape of "
         "the gap Pasch's axiom was later written to close.</p>"
-        "<p>This page used to say there were none, which was wrong, and wrong in a way "
-        "worth recording: the count was on the ledger page all along and the two pages "
-        "were never compared. The remaining "
-        f"{len(all_propositions()) - len(varies)} propositions do take the same route "
-        "through every figure they are handed. That negative half also earns a caveat: as "
-        "the corpus grew, more samplers came to be <em>built</em> to satisfy their "
-        "hypotheses rather than stumbling into them, so the configurations are less "
-        "adversarial than they were in Book I.</p>"
+        f"<p>The other {len(all_propositions()) - len(varies)} take the same route "
+        "through every figure they are handed &mdash; though as the corpus grew, more "
+        "samplers came to be <em>built</em> to satisfy their hypotheses, which makes the "
+        "configurations less adversarial than they were in Book I.</p>"
         '<p><a href="ledger.html">The ledger &rarr;</a></p>'
         "<pre>euclid ledger</pre>",
     ))
 
     lines = []
-    for euclid_ref, euclid_steps, result in search_rows:
-        if not result.found:
+    certified = 0
+    for euclid_ref, euclid_steps, row in search_rows:
+        if not row["found"]:
             continue
+        certified += bool(row["exact_minimal"])
         reference = (
             '<a href="{}.html">{}</a>'.format(_slug(euclid_ref), euclid_ref)
             if euclid_ref
             else "&mdash;"
         )
+        instrument = "" if row["isa"] == "full" else f" <em>({_esc(row['isa'])})</em>"
         lines.append(
-            f"<tr><td>{_esc(result.problem.replace('-', ' '))}</td><td>{reference}</td>"
-            f"<td>{euclid_steps or '&mdash;'}</td><td>{result.length}</td></tr>"
+            f"<tr><td>{_esc(row['problem'].replace('-', ' '))}{instrument}</td>"
+            f"<td>{reference}</td><td>{euclid_steps or '&mdash;'}</td>"
+            f"<td>{row['length']}</td><td>{_strength(row)}</td></tr>"
         )
     if lines:
         findings.append((
-            "Exhaustive &mdash; I.1 cannot be beaten, and the compass alone costs seven circles",
-            "<p>Every construction up to the stated length was enumerated and checked, so "
-            "where the table says <em>fewest possible</em> that is a theorem and not a "
-            "search that gave up. The two circles of I.1 are the shortest way to an "
-            "equilateral triangle. Mohr in 1672 and Mascheroni in 1797 proved the compass "
-            "alone can find anything the pair can; enumeration puts a price on it, and "
-            "finding the middle of a line with no straightedge costs exactly seven "
-            "circles. Six is not enough, and all of them were tried.</p>"
+            "Exhaustive &mdash; Euclid's first construction cannot be beaten",
+            f"<p>For {certified} of these problems every shorter figure was enumerated in "
+            "exact arithmetic and none reached the goal, so <em>fewest possible</em> is a "
+            "theorem. The two circles of I.1 are the shortest way to an equilateral "
+            "triangle, and nothing of one move comes close.</p>"
+            "<p>The compass-only rows are weaker and the table says so. Mohr in 1672 and "
+            "Mascheroni in 1797 proved the compass alone finds anything the pair can, and "
+            "the search puts a price on it: a midpoint costs <strong>seven circles</strong>, "
+            "and that construction was replayed through the kernel and holds exactly. That "
+            "six circles do not suffice is a different claim, and a weaker one &mdash; the "
+            "search covered every six-circle figure it could represent, but in floating "
+            "point, and enumerating them exactly is out of reach. It is marked "
+            "<em>shortest found</em>, and the table says so.</p>"
             "<p>Some of Euclid's own constructions are far longer than they need to be, "
-            "because he builds them out of results already proved rather than reaching "
-            "for the quickest route.</p>"
+            "because he builds them out of results already proved, buying certainty "
+            "with moves.</p>"
             '<div class="scroll"><table><tr><th>Problem</th><th>Euclid</th><th>His moves'
-            f"</th><th>Fewest possible</th></tr>{''.join(lines)}</table></div>"
-            "<pre>euclid optimize midpoint --isa compass-only</pre>",
+            f"</th><th>Shortest</th><th>Strength of that claim</th></tr>"
+            f"{''.join(lines)}</table></div>"
+            "<pre>euclid optimize midpoint --isa compass-only --depth 7</pre>",
         ))
 
     body = [
@@ -656,14 +659,11 @@ def _findings_page(graph, stats, search_rows) -> str:
         "<h1>Findings</h1>",
         '<p class="lede">Every number on this page was produced by running the corpus, '
         "and each finding carries the command that reproduces it.</p>",
-        '<p class="note">The three labels are not equal in strength. '
-        "<b>Exhaustive</b>: every possibility was enumerated, so a negative answer is a "
-        "theorem. <b>Measured</b>: computed exactly from the constructions as they run, "
-        "so it is as reliable as the encoding. <b>Empirical</b>: sampled over "
-        "configurations, so it is evidence, and it says how much. Nothing read off the "
-        "citations written beside each step appears here at all &mdash; those transcribe "
-        "Euclid's own cross-references, and reporting them back would be no discovery. "
-        '<a href="graph.html">The graph page says which of its edges are which.</a></p>',
+        '<p class="note"><b>Exhaustive</b>: every possibility was enumerated, so a '
+        "negative answer is a theorem. <b>Measured</b>: computed exactly from the "
+        "constructions as they run. <b>Empirical</b>: sampled over configurations, so it "
+        "is evidence, and it says how much. Nothing here is read off the citations "
+        'written beside each step. <a href="graph.html">Which edges are which.</a></p>',
     ]
     for heading, text in findings:
         body.append(f'<div class="finding"><h3>{heading}</h3>{text}</div>')
@@ -707,10 +707,9 @@ def _graph_page(graph) -> str:
         "the marginal references in Heath. Those are faithful to the text, and they are "
         "checked &mdash; every citation must name a proposition that exists, and no "
         "proposition may cite a later one &mdash; but they are transcription, not "
-        "discovery. A finding read off cited edges is a finding about our typing.</p>"
-        '<p class="note">This is why the '
-        '<a href="findings.html">findings page</a> reports nothing derived from '
-        "citations.</p>",
+        "discovery. A finding read off cited edges is a finding about our typing, so "
+        'nothing on the <a href="findings.html">findings page</a> is derived from '
+        "them.</p>",
         "<h2>What actually ran</h2>",
         f"<p>The {executed} executed edges on their own, over the "
         f"{len(executed_refs)} propositions that have one. Small enough to read, and "
@@ -718,9 +717,8 @@ def _graph_page(graph) -> str:
         f'<div class="plot">{graph_svg(graph, executed_refs, only_executed=True)}</div>',
         "<h2>Everything, both kinds together</h2>",
         f"<p>All {len(graph.nodes)} propositions. This is about ten thousand pixels "
-        "wide, so it scrolls rather than shrinking to fit &mdash; shrunk to a page, the "
-        "labels come out a pixel tall and the whole thing reads as a smear. Drag it "
-        "sideways.</p>",
+        "wide, so it scrolls at full size: shrunk to a page the labels come out a pixel "
+        "tall. Drag it sideways.</p>",
         f'<div class="plot">{graph_svg(graph)}</div>',
         '<p class="legend">'
         "<span><i></i>executed &mdash; a recorded call</span>"
@@ -755,9 +753,8 @@ def _minimal_page(graph, target: str = "I.47") -> str:
         f"{len(minimal)} are needed to reach {target}. Below they are in order, each one "
         "resting only on those above it.</p>",
         '<p class="note">This is computed over both kinds of dependency edge, and most of '
-        "them are citations written by hand from Heath's margins rather than calls "
-        'recorded at run time. So read this as a tidy presentation of Euclid\'s own '
-        "cross-references, not as something the machine discovered. "
+        "them are citations written by hand from Heath's margins. So read this as a "
+        "tidy presentation of Euclid's own cross-references. "
         '<a href="graph.html">The split is on the graph page.</a></p>',
         f"<p>{target} is the one shown here because it is the traditional end of Book I "
         "and the obvious thing to aim at. Nothing about the calculation is special to "
@@ -828,10 +825,9 @@ def _ledger_page(ledgers) -> str:
         "that is simply true in some figures and false in others. These are the places "
         "where a case analysis is doing work that the argument does not set out.</p>",
         f"<h2>The {len(owing)} that assume something</h2>",
-        f'<p class="note">The other {clean} assume nothing at all: they draw no '
-        "intersection and read nothing off the picture, so listing them would be "
-        "{0} rows of dashes. The last column shows the first assumption of each, in full "
-        "on the proposition's own page.</p>".format(clean),
+        f'<p class="note">The other {clean} assume nothing at all &mdash; no '
+        "intersection drawn, nothing read off the picture. The last column shows the "
+        "first assumption of each; the rest are on the proposition's own page.</p>",
         '<div class="scroll"><table><tr><th>Proposition</th>'
         '<th class="tally">Points assumed</th><th class="tally">Read off</th>'
         '<th class="tally">Varies</th><th>The first of them</th></tr>'
@@ -841,19 +837,37 @@ def _ledger_page(ledgers) -> str:
                  here="ledger.html")
 
 
+def _strength(row: dict) -> str:
+    """How strong the minimality claim for one row is, in three words or so.
+
+    Three different things, and they were all called "fewest possible":
+    every shorter figure ruled out in exact arithmetic; an exhaustive float
+    search that found nothing shorter; or a search that ran out of budget.
+    """
+    if not row.get("found"):
+        return "none exists" if row.get("exhaustive") else "none found"
+    if row.get("exact_minimal"):
+        return "fewest possible"
+    if row.get("exhaustive"):
+        return "shortest found"
+    return "upper bound"
+
+
 def _optimizer_page(rows) -> str:
     table = []
-    for euclid_ref, euclid_steps, result in rows:
+    for euclid_ref, euclid_steps, row in rows:
         reference = (
             f'<a href="{_slug(euclid_ref)}.html">{euclid_ref}</a>' if euclid_ref else "&mdash;"
         )
+        instrument = "" if row["isa"] == "full" else f" <em>({_esc(row['isa'])})</em>"
         table.append(
-            f"<tr><td>{_esc(result.problem.replace('-', ' '))}</td><td>{reference}</td>"
+            f"<tr><td>{_esc(row['problem'].replace('-', ' '))}{instrument}</td>"
+            f"<td>{reference}</td>"
             f"<td>{euclid_steps or '&mdash;'}</td>"
-            f"<td>{result.length if result.found else 'none'}</td>"
-            f"<td>{'fewest possible' if result.exhaustive else 'not proved shortest'}</td>"
-            f"<td>{result.geometrography.notation()}</td>"
-            f"<td>{'yes' if result.verified else '&mdash;'}</td></tr>"
+            f"<td>{row['length'] if row['found'] else 'none'}</td>"
+            f"<td>{_strength(row)}</td>"
+            f"<td>{_esc(row['notation'])}</td>"
+            f"<td>{'yes' if row['verified'] else '&mdash;'}</td></tr>"
         )
     body = [
         '<p class="kicker">Try everything, then check it exactly</p>',
@@ -879,15 +893,24 @@ def _optimizer_page(rows) -> str:
         "compass and straightedge, compass alone, straightedge alone with one circle "
         "given, or a compass stuck at one setting. The classical theorems say the compass "
         "alone loses nothing, and the search agrees &mdash; at a price in moves.</p>",
-        "<h2>What &ldquo;fewest possible&rdquo; means</h2>",
-        "<p>Where the table says <em>fewest possible</em>, every construction of that "
-        "length was examined, so the answer really is shortest, and a failure really does "
-        "prove that no construction of that length exists. Where the search ran out of "
-        "budget it says so, and the answer is only an upper bound.</p>"
-        "<p>Two limits apply throughout: points that stray far outside the figure are "
-        "ignored, and a figure carrying more than twenty points is abandoned. Either could "
-        "in principle hide a shorter construction. They are stated here rather than buried "
-        "in the code.</p>",
+        "<h2>How strong each answer is</h2>",
+        "<p>Three different things, and they used all to be called <em>fewest "
+        "possible</em>. <strong>Fewest possible</strong> means every shorter figure was "
+        "enumerated in the "
+        "exact kernel and none reached the goal. No floating point enters that claim, and "
+        "neither do the bounds below: the exact enumeration applies no scope limit, no "
+        "point limit and no deduplication at all. It is a theorem.</p>"
+        "<p><strong>Shortest found.</strong> The search covered every shorter figure it "
+        "could represent, but in floating point. A point pair merged at a tolerance of "
+        "10&#8315;&#8311;, a tangency lost at 10&#8315;&#8313;, or two different figures "
+        "sharing a rounded fingerprint would each hide a construction and turn a longer "
+        "answer into a false minimum. Certifying these depths exactly is out of reach.</p>"
+        "<p><strong>Upper bound.</strong> The search hit its node budget. Only the "
+        "construction shown is meaningful.</p>"
+        "<p>The float search is what makes the problem tractable at all, and it carries "
+        "two further limits: points straying far outside the figure are ignored, and a "
+        "figure of more than twenty points is abandoned. Neither touches a "
+        "<em>fewest possible</em> row.</p>",
     ]
     return _page("Shortest constructions — Executable Euclid", "".join(body),
                  here="optimizer.html")
@@ -910,8 +933,7 @@ def _text_page() -> str:
         f"{HEATH_CREDIT}</p>",
         f"<p>All <strong>{len(HEATH)} propositions</strong> of all thirteen books are "
         "parsed from one source and shipped as data. There is no second kind of "
-        "statement: a proposition whose enunciation is missing raises rather than "
-        "falling back to a summary, so a paraphrase cannot reach a page by accident. "
+        "statement: a proposition whose enunciation is missing raises. "
         f"Of the {len(HEATH)}, <strong>{len(encoded)}</strong> have been written out as "
         "programs so far; the rest are text waiting for code.</p>",
         "<h2>Errata</h2>",
@@ -924,7 +946,7 @@ def _text_page() -> str:
         "<h2>The figures are not Euclid's</h2>",
         "<p>The words are his exactly. <strong>The diagrams are not, and are not "
         "meant to be.</strong> If you hold a printed Euclid next to these pages, most "
-        "figures will not match, and that is the design rather than a fault.</p>",
+        "figures will not match.</p>",
         "<p>A figure in a book is <em>composed</em>. The author picks a configuration "
         "that shows the case well, draws the construction lines the argument needs and "
         "no others, and letters the points to suit the proof. Every figure here is a "
@@ -932,7 +954,7 @@ def _text_page() -> str:
         "chosen by a sampler, containing whatever objects the code made, lettered after "
         "the parameters in the code. Three differences follow, and they are permanent:</p>",
         "<ul>"
-        "<li>The shapes and the lettering differ, because ours are sampled rather than "
+        "<li>The shapes and the lettering differ, because ours are sampled and his are "
         "chosen.</li>"
         "<li>Ours often carry fewer points. Euclid needs a construction to <em>argue</em> "
         "steps that exact arithmetic settles outright, so his figure holds scaffolding "
@@ -1025,7 +1047,7 @@ def _book_x_page() -> str:
         "back &mdash; the square is the sum of the squares plus twice the rectangle, and "
         "<em>those</em> come apart &mdash; after which the recovered pair is checked by "
         "adding it up again.</p>",
-        '<p class="note">Three rows repay a look. '
+        '<p class="note">'
         '<span class="mono">sqrt(18) + sqrt(2)</span> is not a binomial: the two parts are '
         'multiples of each other, so it collapses to <span class="mono">4&middot;sqrt(2)</span>, '
         'and the classifier says so. <span class="mono">sqrt(4 + sqrt 7)</span> untangles '
@@ -1033,7 +1055,7 @@ def _book_x_page() -> str:
         "a medial <em>area</em> rather than a medial <em>line</em> &mdash; one square "
         "shallower, and a distinction easy to lose.</p>",
         "<h2>Where the thirteen run out</h2>",
-        "<p>The last row of the table is the interesting one. "
+        "<p>The last row. "
         '<span class="mono">1 + sqrt(2) + sqrt(3)</span> is constructible with a '
         "straightedge and compass like everything above it, and Euclid has no name for "
         "it. His classification comes out of applying areas, which produces sums and "
@@ -1093,15 +1115,24 @@ def build(destination: Path, run_search: bool = True) -> list[Path]:
         "edges": sum(len(e) for e in graph.edges.values()),
     }
 
+    # The construction searches come from findings.json, not from this build.
+    # Running them here meant only the shallow ones ever ran -- max_depth=5 on
+    # the default instruction set -- while the pages stated a compass-only
+    # result that no build and no test computed. Recording them is what lets a
+    # four-minute search stand behind a sentence. `run_search` now only decides
+    # whether to show them, not whether they exist.
+    from ..measure import load_findings
+
+    measured = load_findings() or {}
     search_rows = []
     if run_search:
-        for name, problem in PROBLEMS.items():
-            result = solve(name, max_depth=5)
+        for row in measured.get("constructions", []):
             steps = None
-            if problem.euclid and problem.euclid in graph.nodes:
-                trace = _sample_trace(graph.nodes[problem.euclid])
+            reference = row.get("euclid")
+            if reference and reference in graph.nodes:
+                trace = _sample_trace(graph.nodes[reference])
                 steps = trace.step_count if trace else None
-            search_rows.append((problem.euclid, steps, result))
+            search_rows.append((reference, steps, row))
 
     write("index.html", _index_page(graph, stats))
     write("findings.html", _findings_page(graph, stats, search_rows))

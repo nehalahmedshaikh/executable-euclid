@@ -7,12 +7,11 @@ can produce.  We model them as a **monotonic tower of quadratic extensions**
     Q  subset  Q(sqrt r1)  subset  Q(sqrt r1, sqrt r2)  subset  ...
 
 where each radicand ``r_k`` is guaranteed **not** to be a square in the field
-below it.  That guarantee is the whole ballgame: it makes the representation
+below it.  That guarantee is what makes the representation
 ``a + b*sqrt(r_k)`` unique, which in turn makes equality *structural* and the
 zero test *exact*.  No epsilons appear anywhere in this library.
 
-Two consequences worth stating plainly, because the rest of the project leans
-on them:
+Two consequences the rest of the project leans on:
 
 * A normalised :class:`Surd` is **never zero**.  If ``a + b*sqrt(r) == 0`` with
   ``b != 0`` then ``sqrt(r) = -a/b`` would live in the base field, contradicting

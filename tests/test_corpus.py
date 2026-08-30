@@ -203,3 +203,32 @@ def test_the_kernel_is_never_handed_a_float():
                 if not any(name in line for name in allowed):
                     offenders.append(f"{path.name}:{number}: {line.strip()[:70]}")
     assert not offenders, "float literals in exact code:\n  " + "\n  ".join(offenders)
+
+
+def test_the_ledger_does_not_depend_on_which_configuration_came_first():
+    """Continuity and order used to be tallied from ``traces[0]`` alone.
+
+    For a proposition that takes more than one route through its diagram -- and
+    four of them do -- that reported whichever route the first sample happened
+    to take. The debt is the most it ever incurs, over every configuration.
+    """
+    from euclid.verify.ledger import audit
+
+    for ref in ("III.23", "III.34", "VI.9"):
+        first = audit(ref, trials=8, seed=0)
+        other = audit(ref, trials=8, seed=5)
+        assert first.continuity_debt == other.continuity_debt, ref
+
+
+def test_a_flip_is_found_even_when_the_route_varies():
+    """The per-predicate check sat in an ``else`` and never ran where it mattered.
+
+    A proposition whose predicate count varies is precisely one that branches on
+    its figure, which is where a truth-flip is most likely. III.23 was hiding
+    eight of them behind a count that varied.
+    """
+    from euclid.verify.ledger import audit
+
+    ledger = audit("III.23", trials=8)
+    flips = [item for item in ledger.of_kind("case") if "true in some" in item.detail]
+    assert len(flips) >= 2, f"only {len(flips)} flips found in III.23"

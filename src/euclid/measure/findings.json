@@ -22,10 +22,10 @@
       "32": "X.115"
     },
     "histogram": {
-      "1": 236,
-      "2": 79,
-      "4": 57,
-      "8": 16,
+      "1": 231,
+      "2": 83,
+      "4": 56,
+      "8": 18,
       "32": 1
     },
     "deepest": [
@@ -45,12 +45,12 @@
         "where": "the given line AB"
       },
       {
-        "ref": "X.38",
+        "ref": "X.34",
         "degree": 8,
         "where": "the magnitude it produces"
       },
       {
-        "ref": "X.41",
+        "ref": "X.35",
         "degree": 8,
         "where": "the magnitude it produces"
       }
@@ -451,6 +451,125 @@
       }
     ]
   },
+  "constructions": [
+    {
+      "problem": "equilateral-triangle",
+      "isa": "full",
+      "euclid": "I.1",
+      "found": true,
+      "length": 2,
+      "depth_searched": 2,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 4,
+      "notation": "2C1 + 2C2 + 2C3"
+    },
+    {
+      "problem": "perpendicular-bisector",
+      "isa": "full",
+      "euclid": "I.10",
+      "found": true,
+      "length": 3,
+      "depth_searched": 3,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 13,
+      "notation": "2S1 + 1S2 + 2C1 + 2C2 + 2C3"
+    },
+    {
+      "problem": "midpoint",
+      "isa": "full",
+      "euclid": "I.10",
+      "found": true,
+      "length": 4,
+      "depth_searched": 4,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 94,
+      "notation": "4S1 + 2S2 + 2C1 + 2C2 + 2C3"
+    },
+    {
+      "problem": "perpendicular-at-a-point",
+      "isa": "full",
+      "euclid": "I.11",
+      "found": true,
+      "length": 5,
+      "depth_searched": 5,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 1981,
+      "notation": "2S1 + 1S2 + 4C1 + 4C2 + 4C3"
+    },
+    {
+      "problem": "double-a-segment",
+      "isa": "full",
+      "euclid": "I.3",
+      "found": true,
+      "length": 2,
+      "depth_searched": 2,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 4,
+      "notation": "2S1 + 1S2 + 1C1 + 1C2 + 1C3"
+    },
+    {
+      "problem": "square-on-a-segment",
+      "isa": "full",
+      "euclid": "I.46",
+      "found": true,
+      "length": 5,
+      "depth_searched": 5,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 1981,
+      "notation": "2S1 + 1S2 + 4C1 + 4C2 + 4C3"
+    },
+    {
+      "problem": "equilateral-triangle",
+      "isa": "compass-only",
+      "euclid": "I.1",
+      "found": true,
+      "length": 2,
+      "depth_searched": 2,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 3,
+      "notation": "2C1 + 2C2 + 2C3"
+    },
+    {
+      "problem": "double-a-segment",
+      "isa": "compass-only",
+      "euclid": "I.3",
+      "found": true,
+      "length": 3,
+      "depth_searched": 3,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": true,
+      "exact_figures": 7,
+      "notation": "3C1 + 3C2 + 3C3"
+    },
+    {
+      "problem": "midpoint",
+      "isa": "compass-only",
+      "euclid": "I.10",
+      "found": true,
+      "length": 7,
+      "depth_searched": 7,
+      "verified": true,
+      "exhaustive": true,
+      "exact_minimal": false,
+      "exact_figures": 60000,
+      "notation": "7C1 + 7C2 + 7C3"
+    }
+  ],
   "book_x_gaps": {
     "candidates_named": 66,
     "candidates_unnamed": 50,

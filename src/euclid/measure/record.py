@@ -8,7 +8,7 @@ make the build unusable and CI worse.
 So the numbers are computed on demand, written to ``findings.json`` beside this
 module, and committed. The site reads the file; nothing on a page is computed at
 render time. That has the same shape as ``heath.json``: a artefact you can read,
-diff and argue with, rather than a number that appears when the page is built.
+diff and argue with.
 
 Regenerate with ``euclid measure --write``. The file records the corpus size it
 was computed from, so a stale one can be spotted.
@@ -66,6 +66,7 @@ def write_findings(trials: int = 16, path: Optional[Path] = None) -> dict:
                 for i in sorted(report.candidates, key=lambda x: -x.broken)
             ],
         },
+        "constructions": _constructions(),
         "book_x_gaps": {
             "candidates_named": named,
             "candidates_unnamed": unnamed,
@@ -83,6 +84,49 @@ def write_findings(trials: int = 16, path: Optional[Path] = None) -> dict:
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return payload
+
+
+def _constructions() -> list[dict]:
+    """The shortest-construction searches, run once and written down.
+
+    These used to be computed during the site build, which meant only the
+    shallow ones ever ran: the build called ``solve`` at ``max_depth=5`` on the
+    default instruction set, so no compass-only result was produced anywhere.
+    The site nonetheless stated that the compass alone needs seven circles for a
+    midpoint -- a claim no build and no test computed, and which took four
+    minutes to confirm when finally run.
+
+    Recording them here is what lets a four-minute search back a sentence on a
+    page. Regenerate with ``euclid measure --write``.
+    """
+    from ..search import PROBLEMS
+    from ..search.problems import solve
+
+    wanted = [(name, "full", 5) for name in PROBLEMS]
+    # The deep ones. Only compass-only reaches a goal the straightedge cannot,
+    # and the midpoint at depth 7 is the Mohr-Mascheroni price.
+    wanted += [("equilateral-triangle", "compass-only", 3),
+               ("double-a-segment", "compass-only", 4),
+               ("midpoint", "compass-only", 7)]
+
+    rows: list[dict] = []
+    for name, isa, depth in wanted:
+        result = solve(name, isa=isa, max_depth=depth)
+        rows.append({
+            "problem": name,
+            "isa": isa,
+            "euclid": PROBLEMS[name].euclid,
+            "found": result.found,
+            "length": result.length if result.found else None,
+            "depth_searched": result.depth_searched,
+            "verified": result.verified,
+            # the two halves of "shortest", which are not equally strong
+            "exhaustive": result.exhaustive,        # float search, budget not hit
+            "exact_minimal": result.exact_minimal,  # every shorter figure ruled out exactly
+            "exact_figures": result.exact_figures,
+            "notation": result.geometrography.notation() if result.found else "",
+        })
+    return rows
 
 
 def _histogram(profile: dict) -> dict:

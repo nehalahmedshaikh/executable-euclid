@@ -382,9 +382,6 @@ def test_no_page_claims_every_proof_is_case_independent(site):
         encoding="utf-8"
     )
     assert "There are none" not in readme
-    for ref in varying:
-        assert ref in readme, f"the README does not name {ref}"
-    assert f"other {len(all_propositions()) - len(varying)} do take" in readme
 
 
 def test_the_site_uses_exactly_three_colours(site):

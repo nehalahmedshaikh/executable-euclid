@@ -67,41 +67,59 @@ class Depth:
     degree: int = 1
     where: str = ""          # the labelled point or result that reaches it
     tower_height: int = 0    # how many square roots deep the context went
+    configurations: int = 0  # how many runs the degree is the maximum over
+    unmeasured: int = 0      # magnitudes whose degree could not be computed
 
     def __str__(self) -> str:
-        return f"{self.ref:<8} degree {self.degree:>3}   {self.where}"
+        note = f"  ({self.unmeasured} unmeasured)" if self.unmeasured else ""
+        return f"{self.ref:<8} degree {self.degree:>3}   {self.where}{note}"
 
 
 def algebraic_depth(entry: Proposition, seed: int = 0, tries: int = 8) -> Optional[Depth]:
-    """The highest degree over Q that one proposition's construction reaches."""
+    """The highest degree over Q that one proposition's construction reaches.
+
+    Over every configuration that runs, not the first.  The first version had
+    its ``return`` inside the loop, so ``tries`` only bought a retry when a
+    sample was rejected and every published ceiling rested on one figure.  A
+    proposition can reach different degrees on different configurations, and the
+    ceiling is the highest of them.
+    """
     if entry.sample is None:
         return None
     rng = random.Random(f"depth:{entry.ref}:{seed}")
+    found: Optional[Depth] = None
+
     for _ in range(tries):
         try:
             run = run_sampled(entry.ref, rng)
         except Exception:
             continue
-        found = Depth(entry.ref, tower_height=run.context.tower.depth)
-        for move in run.trace.moves:
-            for magnitude in _magnitudes(move.obj):
-                try:
-                    order = degree(magnitude)
-                except Exception:  # pragma: no cover - a magnitude with no minimal polynomial
-                    continue
-                if order > found.degree:
-                    found.degree = order
-                    found.where = move.label or move.kind
-        for magnitude in _magnitudes(run.value):
+        if found is None:
+            found = Depth(entry.ref)
+        found.configurations += 1
+        found.tower_height = max(found.tower_height, run.context.tower.depth)
+
+        def consider(magnitude, where: str) -> None:
             try:
                 order = degree(magnitude)
-            except Exception:  # pragma: no cover
-                continue
+            except Exception:
+                # A magnitude whose minimal polynomial cannot be computed --
+                # above MAX_TOWER_DEPTH_FOR_DEGREE the basis would have 2^depth
+                # entries. This used to be skipped in silence, which lets a
+                # ceiling be under-reported with nothing to show for it.
+                found.unmeasured += 1
+                return
             if order > found.degree:
                 found.degree = order
-                found.where = "the magnitude it produces"
-        return found
-    return None
+                found.where = where
+
+        for move in run.trace.moves:
+            for magnitude in _magnitudes(move.obj):
+                consider(magnitude, move.label or move.kind)
+        for magnitude in _magnitudes(run.value):
+            consider(magnitude, "the magnitude it produces")
+
+    return found
 
 
 def depth_profile(entries=None) -> dict:

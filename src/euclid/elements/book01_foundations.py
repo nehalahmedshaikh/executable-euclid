@@ -205,7 +205,7 @@ def _apex_pair(rng):
 
     The only two candidates are C itself and its reflection in AB, so the
     sampler offers both; the reflection is rejected by the same-side hypothesis,
-    which is exactly the restriction Euclid states.
+    which is the restriction Euclid states.
     """
     a, b, c = samples.triangle(rng)
     twin = c if rng.random() < 0.5 else _reflect(c, a, b)

@@ -4,7 +4,7 @@ No figure in this project is drawn by hand or positioned by eye.  Each one is
 the record of a construction that ran and verified, so what you see is exactly
 what the machine checked.
 
-That is worth being plain about, because it makes these different in kind from
+These are different in kind from
 the figures printed with Euclid.  His are *composed*: he picks a configuration
 that shows the case well, draws only the arcs the argument needs, and letters
 the points to suit.  These are *traces*: the coordinates come from a sampler,

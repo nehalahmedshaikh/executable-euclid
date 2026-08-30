@@ -2,8 +2,7 @@
 
 Each proposition is run on many configurations that satisfy its hypotheses
 exactly, and every claim is checked against the constructed model.  Two things
-are worth being precise about, since the value of the whole project rests on
-them.
+to be precise about.
 
 **What this establishes.**  For a conclusion that is a polynomial identity in
 the coordinates -- which covers the equalities of length, area and angle that
@@ -16,7 +15,7 @@ does not.
 **What it does not establish.**  This is a model check, not a synthetic
 derivation.  We verify that the conclusion holds of the figure the construction
 built, not that it follows from the postulates by Euclid's rules of inference.
-Configurations the sampler never visits are not covered, which is exactly why
+Configurations the sampler never visits are not covered, which is why
 :mod:`euclid.verify.ledger` exists: it looks for the places where the
 construction's behaviour depends on which configuration it was handed.
 """
