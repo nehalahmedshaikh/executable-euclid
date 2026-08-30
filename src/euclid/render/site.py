@@ -55,10 +55,17 @@ STYLE = """
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--page); color: var(--ink);
-  font: 17px/1.68 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  font: 18px/1.66 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
 }
-.wrap { max-width: 44rem; margin: 0 auto; padding: 3.5rem 1.25rem 6rem; }
-.wide { max-width: 66rem; }
+/* Prose stays near 44rem because that is about 70 characters a line and longer
+   is harder to read, not easier. Pages that are mostly table or diagram have no
+   such limit and should use the window they are given. */
+.wrap { max-width: 45rem; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
+.wide { max-width: min(96vw, 84rem); }
+/* The bar sits outside the content, so the same eight links wrap the same way
+   on every page instead of shifting with the column width. */
+.bar { border-bottom: 1px solid var(--grey); margin-bottom: 2.4rem; }
+.bar > nav { max-width: min(96vw, 84rem); margin: 0 auto; padding: 1.1rem 1.5rem .9rem; }
 a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px;
     text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
@@ -71,20 +78,23 @@ h3 { font-size: 1rem; margin: 1.9rem 0 .5rem; font-weight: 700; }
   letter-spacing: .16em; text-transform: uppercase; color: var(--grey);
   margin: 0 0 .8rem; }
 .lede { color: var(--grey); font-size: 1.05rem; margin: .2rem 0 2rem; }
-nav.top { font: .8rem/2 ui-sans-serif, system-ui, sans-serif; margin-bottom: 2.6rem;
-          padding-bottom: .8rem; border-bottom: 1px solid var(--grey);
-          display: flex; flex-wrap: wrap; gap: 0 1.2rem; }
+nav.top { font: .85rem/1.9 ui-sans-serif, system-ui, sans-serif;
+          display: flex; flex-wrap: wrap; gap: 0 1.35rem; }
 nav.top a { text-decoration: none; color: var(--grey); white-space: nowrap; }
 nav.top a:hover, nav.top a.here { color: var(--ink); text-decoration: underline; }
 code, pre, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
 pre { border: 1px solid var(--grey); padding: .95rem 1.05rem; overflow-x: auto;
-      font-size: .78rem; line-height: 1.6; }
-code { font-size: .86em; }
-table { border-collapse: collapse; width: 100%; font-size: .87rem; }
-th, td { text-align: left; padding: .4rem .65rem; border-bottom: 1px solid var(--grey);
+      font-size: .82rem; line-height: 1.6; }
+code { font-size: .88em; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--grey);
          vertical-align: top; }
-th { font: 700 .68rem/1.5 ui-sans-serif, system-ui, sans-serif;
+th { font: 700 .72rem/1.5 ui-sans-serif, system-ui, sans-serif;
      letter-spacing: .09em; text-transform: uppercase; color: var(--grey); }
+/* Columns that are mostly empty read as a broken table rather than a sparse
+   one, so the numeric ones are narrow and centred and rows with nothing in
+   them are not emitted at all. See _ledger_page. */
+td.tally, th.tally { text-align: center; width: 8.5rem; }
 tbody tr:last-child td { border-bottom: none; }
 .scroll { overflow-x: auto; }
 figure { margin: 1.8rem 0; text-align: center; }
@@ -98,7 +108,16 @@ svg.figure .letter { fill: var(--ink); font: italic 14px Georgia, serif; }
 svg.figure .ray.aside { stroke: var(--grey); stroke-width: .7; }
 svg.figure .arc.aside { stroke: var(--grey); stroke-width: .6; stroke-dasharray: 2 4; }
 svg.figure .dot.aside { fill: var(--grey); }
-svg.graph { max-width: 100%; height: auto; }
+/* The full graph is 10,000px wide. Fitting it to the page renders an 11px
+   label at one pixel, which is why it read as a smear. It keeps its natural
+   size and the box scrolls; a graph that already fits is centred and does not.
+   Centring with flex would make the left edge of a 10,000px graph unreachable:
+   an overflowing flex item cannot be scrolled back to. Auto margins centre a
+   graph that fits and collapse to zero for one that does not. */
+.plot { overflow: auto; border: 1px solid var(--grey); max-height: 78vh;
+        padding: .5rem; }
+.plot svg.graph { display: block; margin: 0 auto; }
+svg.graph { height: auto; }
 svg.graph .edge { fill: none; stroke: var(--grey); stroke-width: 1.1; }
 svg.graph .edge.cited { stroke-dasharray: 3 3; }
 svg.graph .edge.lit { stroke: var(--ink); stroke-width: 1.7; }
@@ -113,6 +132,9 @@ ul.claims li { padding: .5rem 0 .5rem 1rem; border-left: 2px solid var(--ink);
 ul.claims li.hyp { border-left: 2px solid var(--grey); }
 .cite { font: .7rem ui-sans-serif, system-ui, sans-serif; color: var(--grey);
         display: block; margin-top: .2rem; letter-spacing: .02em; }
+/* Lets one wide thing -- a 390-entry index, a table -- step outside the prose
+   column without opening out the whole page. */
+.bleed { width: min(94vw, 84rem); margin-left: calc(50% - min(47vw, 42rem)); }
 .grid { display: grid; gap: .25rem .9rem;
         grid-template-columns: repeat(auto-fill, minmax(4.6rem, 1fr)); }
 .grid a { display: block; padding: .18rem 0; font-size: .88rem;
@@ -131,11 +153,20 @@ blockquote { margin: 0 0 1.2rem; padding: .2rem 0 .2rem 1.1rem;
 blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-serif;
                   color: var(--grey); margin-top: .55rem; letter-spacing: .04em;
                   text-transform: uppercase; }
-.note { color: var(--grey); font-size: .92rem; }
+.note { color: var(--grey); font-size: .95rem; }
 .finding { border-top: 1px solid var(--grey); padding-top: 1.1rem; margin-top: 1.8rem; }
 .finding h3 { margin-top: 0; }
+/* Findings and prose stay readable even on a page opened out for its tables. */
+.wide .finding, .wide .lede, .wide > p, .wide > ul, .wide > ol { max-width: 45rem; }
+.legend { font: .78rem/1.6 ui-sans-serif, system-ui, sans-serif; color: var(--grey);
+          display: flex; flex-wrap: wrap; gap: .3rem 1.6rem; margin: .7rem 0 0; }
+.legend span { display: inline-flex; align-items: center; gap: .45rem; }
+.legend i { display: inline-block; width: 2.2rem; height: 0; font-style: normal;
+            border-top: 2px solid var(--grey); }
+.legend i.dash { border-top-style: dashed; }
 footer { margin-top: 4.5rem; padding-top: 1rem; border-top: 1px solid var(--grey);
-         font: .78rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--grey); }
+         font: .82rem/1.7 ui-sans-serif, system-ui, sans-serif; color: var(--grey);
+         max-width: 45rem; }
 """
 
 NAV = [
@@ -166,15 +197,22 @@ def _page(title: str, body: str, here: str = "", wide: bool = False) -> str:
     return (
         '<!doctype html><html lang="en"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
-        f"<title>{_esc(title)}</title><style>{STYLE}</style></head><body>"
+        f"<title>{_esc(title)}</title>"
+        # One stylesheet, fetched once and cached, rather than the same 5 KB
+        # inlined into all 398 pages. That was 61% of everything shipped, and it
+        # meant a one-line CSS change rewrote every file in docs/.
+        '<link rel="stylesheet" href="style.css">'
+        "</head><body>"
+        f'<div class="bar"><nav class="top">{links}</nav></div>'
         f'<div class="wrap{" wide" if wide else ""}">'
-        f'<nav class="top">{links}</nav>{body}'
+        f"{body}"
         "<footer><p>Every diagram here is the record of a construction that ran and "
         "checked out in exact arithmetic &mdash; not an illustration of one. It shows "
         "what the machine drew, on the coordinates it was given, with the apparatus of "
         "its helper constructions held back but still there. Euclid's own figures are "
-        "composed; these are not, and do not try to be. Every cross-reference was read "
-        "off the call graph, not typed in by hand.</p>"
+        "composed; these are not, and do not try to be. Cross-references are a different "
+        "matter: about one in eight was recorded as a call, and the rest were written "
+        'beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p>'
         f"<p>Every proposition statement here is {HEATH_CREDIT} Nothing is "
         'paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer>'
         "</div></body></html>"
@@ -247,7 +285,8 @@ def _sample_trace(entry: Proposition, seed: int = 3, tries: int = 40) -> Optiona
 # ---------------------------------------------------------------------------
 
 
-def _proposition_page(entry: Proposition, graph, trace: Optional[Trace]) -> str:
+def _proposition_page(entry: Proposition, graph, trace: Optional[Trace],
+                      ledger=None) -> str:
     body = [
         f'<p class="kicker">Book {entry.book} &middot; Proposition {entry.number}</p>',
         f"<h1>{entry.ref}</h1>",
@@ -323,7 +362,11 @@ def _proposition_page(entry: Proposition, graph, trace: Optional[Trace]) -> str:
         f"{'needed' if graph.uses_parallel_postulate(entry.ref) else 'not needed'}.</p>"
     )
 
-    ledger = audit(entry.ref, trials=6)
+    # Handed in by build(), which audits every proposition once. This used to
+    # audit again at trials=6 while the ledger page audited at trials=8, so the
+    # corpus was walked twice for the same answer.
+    if ledger is None:
+        ledger = audit(entry.ref, trials=8)
     body.append("<h2>What it takes on trust</h2>")
     if ledger.is_clean:
         body.append('<p class="note">Nothing. It draws no intersections and reads '
@@ -398,14 +441,24 @@ def _index_page(graph, stats) -> str:
     by_book: dict[str, list[Proposition]] = {}
     for entry in all_propositions():
         by_book.setdefault(entry.book, []).append(entry)
+    # "(complete)" used to be hardcoded to Book I and stayed there while nine
+    # more books were finished. It is counted against the text instead.
+    in_heath: dict[str, int] = {}
+    for ref in HEATH:
+        in_heath[ref.split(".")[0]] = in_heath.get(ref.split(".")[0], 0) + 1
+    body.append('<div class="bleed">')
     for book, entries in by_book.items():
         title = BOOK_TITLES.get(book, "")
-        note = " (complete)" if book == "I" else ""
-        body.append(f"<h3>Book {book} &mdash; {_esc(title)}{note}</h3>")
+        total = in_heath.get(book, 0)
+        note = " &mdash; complete" if total and len(entries) == total else (
+            f" &mdash; {len(entries)} of {total}" if total else ""
+        )
+        body.append(f"<h3>Book {book}: {_esc(title)}{note}</h3>")
         body.append('<div class="grid">')
         for entry in entries:
             body.append(f'<a href="{_slug(entry.ref)}.html">{entry.ref}</a>')
         body.append("</div>")
+    body.append("</div>")
 
     body.append(
         "<h2>What &ldquo;checked&rdquo; means here</h2>"
@@ -546,18 +599,33 @@ def _findings_page(graph, stats, search_rows) -> str:
         "<pre>euclid ledger</pre>",
     ))
 
+    varies = stats.get("varies", [])
     findings.append((
-        "Empirical &mdash; nothing in the book quietly changes its mind",
-        "<p>A worry with old geometry is that a proof may hold only for the figure its "
-        "author happened to draw. Each proposition is run on many configurations and the "
-        "runs compared, looking for a step that holds in one figure and fails in another. "
-        "There are none.</p>"
-        "<p>That is a negative result and it comes with a caveat worth stating: as the "
-        "corpus grew, more samplers came to be <em>built</em> to satisfy their hypotheses "
-        "rather than stumbling into them, which makes the configurations less adversarial "
-        "than they were in Book I. The detector itself is tested directly, on cases "
-        "contrived to trip it.</p>"
-        "<pre>euclid verify</pre>",
+        "Measured &mdash; four proofs take more than one route through the diagram",
+        "<p>A standing worry about old geometry is that a proof may hold only for the "
+        "figure its author happened to draw. Each proposition is run on many "
+        "configurations and the runs compared, looking for a step that holds in one "
+        f"figure and fails in another. <strong>{len(varies)} do</strong>: "
+        + ", ".join(
+            f'<a href="{_slug(ref)}.html">{ref}</a>' for ref in varies
+        )
+        + ".</p>"
+        "<p>Three of them evaluate a different number of facts depending on where the "
+        "points fall &mdash; III.34 checks between four and nine things about the same "
+        "theorem &mdash; which means the argument is branching on the picture. III.32 is "
+        "the sharper case: a step asserting two points lie on the same side of a line is "
+        "true in some configurations and false in others. That is exactly the shape of "
+        "the gap Pasch's axiom was later written to close.</p>"
+        "<p>This page used to say there were none, which was wrong, and wrong in a way "
+        "worth recording: the count was on the ledger page all along and the two pages "
+        "were never compared. The remaining "
+        f"{len(all_propositions()) - len(varies)} propositions do take the same route "
+        "through every figure they are handed. That negative half also earns a caveat: as "
+        "the corpus grew, more samplers came to be <em>built</em> to satisfy their "
+        "hypotheses rather than stumbling into them, so the configurations are less "
+        "adversarial than they were in Book I.</p>"
+        '<p><a href="ledger.html">The ledger &rarr;</a></p>'
+        "<pre>euclid ledger</pre>",
     ))
 
     lines = []
@@ -625,6 +693,11 @@ def _graph_page(graph) -> str:
     )
     executed, cited = graph.provenance()
     total = executed + cited
+    executed_refs = sorted(
+        {ref for ref, needed in graph.executed.items() if needed}
+        | {required for needed in graph.executed.values() for required in needed},
+        key=lambda ref: graph.nodes[ref].sort_key(),
+    )
     body = [
         '<p class="kicker">Two kinds of edge, and they are not the same</p>',
         "<h1>What depends on what</h1>",
@@ -645,12 +718,24 @@ def _graph_page(graph) -> str:
         "discovery. A finding read off cited edges is a finding about our typing.</p>"
         '<p class="note">This is why the '
         '<a href="findings.html">findings page</a> reports nothing derived from '
-        "citations. Everything below mixes both kinds.</p>",
-        f'<div class="scroll">{graph_svg(graph)}</div>',
+        "citations.</p>",
+        "<h2>What actually ran</h2>",
+        f"<p>The {executed} executed edges on their own, over the "
+        f"{len(executed_refs)} propositions that have one. Small enough to read, and "
+        "every line in it is a call that happened.</p>",
+        f'<div class="plot">{graph_svg(graph, executed_refs, only_executed=True)}</div>',
+        "<h2>Everything, both kinds together</h2>",
+        f"<p>All {len(graph.nodes)} propositions. This is about ten thousand pixels "
+        "wide, so it scrolls rather than shrinking to fit &mdash; shrunk to a page, the "
+        "labels come out a pixel tall and the whole thing reads as a smear. Drag it "
+        "sideways.</p>",
+        f'<div class="plot">{graph_svg(graph)}</div>',
+        '<p class="legend">'
+        "<span><i></i>executed &mdash; a recorded call</span>"
+        '<span><i class="dash"></i>cited &mdash; written beside the step</span></p>',
         '<p class="note">Propositions sit on the row matching how many steps of argument '
         "stand between them and the starting rules. Lines run upward from a proposition to "
-        "the ones built on it. A solid line was executed; a dashed line was cited. Most of "
-        "them are dashed.</p>",
+        "the ones built on it.</p>",
         "<h2>Carrying the most weight</h2>",
         "<p>How many other propositions would fall if this one did &mdash; counting both "
         "kinds of edge, so mostly a summary of Euclid's own cross-references.</p>",
@@ -682,8 +767,16 @@ def _minimal_page(graph, target: str = "I.47") -> str:
         'recorded at run time. So read this as a tidy presentation of Euclid\'s own '
         "cross-references, not as something the machine discovered. "
         '<a href="graph.html">The split is on the graph page.</a></p>',
-        f'<div class="scroll">{graph_svg(graph, minimal, highlight=target)}</div>',
-        f'<div class="scroll"><table><tr><th>#</th><th>Statement</th></tr>{rows}</table></div>',
+        f"<p>{target} is the one shown here because it is the traditional end of Book I "
+        "and the obvious thing to aim at. Nothing about the calculation is special to "
+        "it &mdash; any proposition can be tree-shaken the same way, and the command "
+        "takes whichever you like:</p>",
+        "<pre>euclid minimal III.35\neuclid minimal X.115</pre>",
+        f'<div class="plot">{graph_svg(graph, minimal, highlight=target)}</div>',
+        f'<p class="legend"><span><i></i>executed</span>'
+        '<span><i class="dash"></i>cited</span></p>',
+        '<div class="scroll"><table><tr><th>Proposition</th><th>Statement</th></tr>'
+        f"{rows}</table></div>",
         f"<h2>Left out ({len(dropped)})</h2>",
         '<p class="note">'
         + " ".join(f'<a href="{_slug(ref)}.html">{ref}</a>' for ref in dropped)
@@ -692,20 +785,24 @@ def _minimal_page(graph, target: str = "I.47") -> str:
     return _page(f"Shortest route to {target}", "".join(body), here="minimal.html", wide=True)
 
 
-def _ledger_page() -> str:
-    ledgers = [audit(entry.ref, trials=8) for entry in all_propositions()]
+def _ledger_page(ledgers) -> str:
     totals = (
         sum(item.continuity_debt for item in ledgers),
         sum(len(item.of_kind("order")) for item in ledgers),
         sum(len(item.of_kind("case")) for item in ledgers),
     )
+    # Most propositions assume nothing, so listing all 390 produced a table that
+    # was four-fifths empty cells and read as broken rather than sparse. Only the
+    # rows with something in them are drawn, and the count of the rest is stated.
+    owing = [item for item in ledgers if not item.is_clean]
+    clean = len(ledgers) - len(owing)
     rows = "".join(
         f'<tr><td><a href="{_slug(item.ref)}.html">{item.ref}</a></td>'
-        f"<td>{item.continuity_debt or ''}</td>"
-        f"<td>{len(item.of_kind('order')) or ''}</td>"
-        f"<td>{len(item.of_kind('case')) or ''}</td>"
-        f"<td>{item.configurations}</td></tr>"
-        for item in ledgers
+        f"<td class=\"tally\">{item.continuity_debt or '&mdash;'}</td>"
+        f"<td class=\"tally\">{len(item.of_kind('order')) or '&mdash;'}</td>"
+        f"<td class=\"tally\">{len(item.of_kind('case')) or '&mdash;'}</td>"
+        f"<td>{_esc(item.assumptions[0].detail) if item.assumptions else ''}</td></tr>"
+        for item in owing
     )
     body = [
         '<p class="kicker">Found by running the proofs, not by reading them</p>',
@@ -728,10 +825,24 @@ def _ledger_page() -> str:
         "diagram shows but the argument never establishes.</p>",
         "<p><strong>Steps that vary by figure.</strong> Each proposition is run on many "
         "different figures and the runs compared. A step that holds in one figure but not "
-        "another would appear here. The column is empty, which is itself worth knowing: "
-        "every construction here behaves the same way on every figure it is given.</p>",
-        '<div class="scroll"><table><tr><th>Proposition</th><th>Points assumed</th>'
-        "<th>Read off</th><th>Varies</th><th>Figures tried</th></tr>"
+        f"another appears here, and {totals[2]} do &mdash; in "
+        + ", ".join(
+            f'<a href="{_slug(item.ref)}.html">{item.ref}</a>'
+            for item in ledgers if item.of_kind("case")
+        )
+        + ". Three of them evaluate a different number of facts depending on where the "
+        "points fall, which means the proof is taking more than one route through the "
+        "diagram; III.32 has a step about two points lying on the same side of a line "
+        "that is simply true in some figures and false in others. These are the places "
+        "where a case analysis is doing work that the argument does not set out.</p>",
+        f"<h2>The {len(owing)} that assume something</h2>",
+        f'<p class="note">The other {clean} assume nothing at all: they draw no '
+        "intersection and read nothing off the picture, so listing them would be "
+        "{0} rows of dashes. The last column shows the first assumption of each, in full "
+        "on the proposition's own page.</p>".format(clean),
+        '<div class="scroll"><table><tr><th>Proposition</th>'
+        '<th class="tally">Points assumed</th><th class="tally">Read off</th>'
+        '<th class="tally">Varies</th><th>The first of them</th></tr>'
         f"{rows}</table></div>",
     ]
     return _page("What Euclid assumes — Executable Euclid", "".join(body),
@@ -892,6 +1003,9 @@ def _book_x_page() -> str:
             greater, lesser = sqrt((squares + root) / 2), sqrt((squares - root) / 2)
             specimens.append(greater + lesser)
             specimens.append(greater - lesser)
+        # And one the thirteen do not reach, so the table shows its own edge
+        # rather than only the inside of it. See euclid.measure.gaps.
+        specimens.append(1 + sqrt(2) + sqrt(3))
         for value in specimens:
             named = classify(value)
             rows.append(
@@ -926,9 +1040,18 @@ def _book_x_page() -> str:
         "itself before being named. And the second bimedial turns on its rectangle being "
         "a medial <em>area</em> rather than a medial <em>line</em> &mdash; one square "
         "shallower, and a distinction easy to lose.</p>",
+        "<h2>Where the thirteen run out</h2>",
+        "<p>The last row of the table is the interesting one. "
+        '<span class="mono">1 + sqrt(2) + sqrt(3)</span> is constructible with a '
+        "straightedge and compass like everything above it, and Euclid has no name for "
+        "it. His classification comes out of applying areas, which produces sums and "
+        "differences of <em>two</em> terms; this one resolves into three, and falls "
+        "outside. It is the simplest such number the search finds. "
+        '<a href="findings.html">The finding &rarr;</a></p>',
         "<h2>Try it</h2>",
         '<pre>euclid classify "sqrt(3) + sqrt(5)"\n'
-        'euclid classify "(1+sqrt(5))/2"</pre>',
+        'euclid classify "(1+sqrt(5))/2"\n'
+        "euclid gap</pre>",
     ]
     return _page("Book X — Executable Euclid", "".join(body),
                  here="book-x.html", wide=True)
@@ -948,22 +1071,33 @@ def build(destination: Path, run_search: bool = True) -> list[Path]:
     graph = build_graph()
     written: list[Path] = []
 
+    (destination / "style.css").write_text(STYLE, encoding="utf-8")
+    written.append(destination / "style.css")
+
     def write(name: str, text: str) -> None:
         path = destination / name
         path.write_text(text, encoding="utf-8")
         written.append(path)
 
+    # The ledger is audited once and shared. It used to be computed twice at
+    # different trial counts -- trials=3 here and trials=8 on the ledger page --
+    # so the index and the findings page reported 355 unproved assumptions while
+    # the ledger page reported 350, from the same build. One number, one source.
     claims = 0
-    continuity = 0
+    ledgers = []
     for entry in all_propositions():
         trace = _sample_trace(entry)
         claims += certify(entry.ref, trials=4).claims_checked
-        continuity += audit(entry.ref, trials=3).continuity_debt
-        write(f"{_slug(entry.ref)}.html", _proposition_page(entry, graph, trace))
+        ledger = audit(entry.ref, trials=8)
+        ledgers.append(ledger)
+        write(f"{_slug(entry.ref)}.html",
+              _proposition_page(entry, graph, trace, ledger))
 
     stats = {
         "claims": claims,
-        "continuity": continuity,
+        "continuity": sum(item.continuity_debt for item in ledgers),
+        "order": sum(len(item.of_kind("order")) for item in ledgers),
+        "varies": [item.ref for item in ledgers if item.of_kind("case")],
         "edges": sum(len(e) for e in graph.edges.values()),
     }
 
@@ -981,7 +1115,7 @@ def build(destination: Path, run_search: bool = True) -> list[Path]:
     write("findings.html", _findings_page(graph, stats, search_rows))
     write("graph.html", _graph_page(graph))
     write("minimal.html", _minimal_page(graph))
-    write("ledger.html", _ledger_page())
+    write("ledger.html", _ledger_page(ledgers))
     write("optimizer.html", _optimizer_page(search_rows))
     write("book-x.html", _book_x_page())
     write("text.html", _text_page())

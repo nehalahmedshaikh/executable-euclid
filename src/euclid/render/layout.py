@@ -16,8 +16,25 @@ COLUMN = 78
 ROW = 74
 MARGIN = 44
 
+# A row of 129 propositions is 10,000px wide. Scaled to fit a page it becomes a
+# grey smear -- an 11px label rendered at one pixel. So the SVG carries its
+# natural width and height and the page scrolls it instead of shrinking it.
+# Where a graph is short enough to fit, nothing scrolls and nothing is lost.
+TIGHT_ROW = 52  # a near-linear chain wastes less height than a broad one
 
-def graph_svg(graph, refs: Optional[Iterable[str]] = None, highlight: Optional[str] = None) -> str:
+
+def graph_svg(
+    graph,
+    refs: Optional[Iterable[str]] = None,
+    highlight: Optional[str] = None,
+    only_executed: bool = False,
+) -> str:
+    """Lay the chosen propositions out by depth and draw them at natural size.
+
+    With ``only_executed`` the picture is restricted to edges recorded as calls,
+    dropping the citations.  That is a much smaller graph -- and the only one
+    that is an observation rather than a transcription.
+    """
     chosen = [ref for ref in (list(refs) if refs is not None else list(graph.nodes))]
     if not chosen:
         return ""
@@ -30,23 +47,28 @@ def graph_svg(graph, refs: Optional[Iterable[str]] = None, highlight: Optional[s
         rows[level].sort(key=lambda ref: graph.nodes[ref].sort_key())
 
     widest = max(len(members) for members in rows.values())
+    # A tall thin ladder (the tree-shaken sets are mostly one node per row) is
+    # all dead space at full row height.
+    row_height = ROW if widest > 3 else TIGHT_ROW
     width = MARGIN * 2 + max(widest, 1) * COLUMN
-    height = MARGIN * 2 + (max(rows) + 1) * ROW
+    height = MARGIN * 2 + (max(rows) + 1) * row_height
 
     position: dict[str, tuple[float, float]] = {}
     for level, members in rows.items():
         indent = (width - len(members) * COLUMN) / 2 + COLUMN / 2
         for index, ref in enumerate(members):
-            position[ref] = (indent + index * COLUMN, height - MARGIN - level * ROW)
+            position[ref] = (indent + index * COLUMN, height - MARGIN - level * row_height)
 
     parts = [
-        f'<svg viewBox="0 0 {width:.0f} {height:.0f}" xmlns="http://www.w3.org/2000/svg" '
+        f'<svg viewBox="0 0 {width:.0f} {height:.0f}" width="{width:.0f}" '
+        f'height="{height:.0f}" xmlns="http://www.w3.org/2000/svg" '
         'class="graph" role="img" aria-label="dependency graph">'
     ]
     parts.append('<g class="edges">')
     for ref in chosen:
         x2, y2 = position[ref]
-        for required in sorted(graph.needs(ref) & selected):
+        wanted = graph.executed.get(ref, set()) if only_executed else graph.needs(ref)
+        for required in sorted(wanted & selected):
             x1, y1 = position[required]
             midpoint = (y1 + y2) / 2
             emphasis = " lit" if highlight and ref == highlight else ""

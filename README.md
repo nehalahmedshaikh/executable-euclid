@@ -142,13 +142,20 @@ needs them to cross in I.1, on the first page, and simply takes it. Every step
 using an intersection the postulates do not license is counted as it happens:
 **355 places** across Books I to X.
 
-**Empirical — nothing in the book quietly changes its mind.** Each proposition is
-run on many configurations and the runs compared, looking for a step that holds
-in one figure and fails in another. There are none. Caveat worth stating: as the
-corpus grew, more samplers came to be *built* to satisfy their hypotheses rather
-than stumbling into them, which makes the configurations less adversarial than
-they were in Book I. The detector itself is tested directly, on cases contrived
-to trip it.
+**Measured — four proofs take more than one route through the diagram.** Each
+proposition is run on many configurations and the runs compared, looking for a
+step that holds in one figure and fails in another. **Four do: III.23, III.32,
+III.34 and VI.9.** Three evaluate a different number of facts depending on where
+the points fall — III.34 checks between four and nine things about the same
+theorem — so the argument is branching on the picture. III.32 is the sharper
+case: a step asserting two points lie on the same side of a line is true in some
+configurations and false in others, which is the shape of the gap Pasch's axiom
+was later written to close.
+
+The other 386 do take the same route through every figure. That negative half
+earns a caveat: as the corpus grew, more samplers came to be *built* to satisfy
+their hypotheses rather than stumbling into them, so the configurations are less
+adversarial than they were in Book I.
 
 **Exhaustive — I.1 cannot be beaten, and the compass alone costs seven circles.**
 

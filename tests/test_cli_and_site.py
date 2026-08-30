@@ -24,6 +24,7 @@ from euclid.plane.objects import Point
 from euclid.plane.predicates import on_circle, on_line
 from euclid.render.site import _legibility, _sample_trace
 from euclid.render.svg import _collect, _the_propositions_own, render_trace
+from euclid.verify.ledger import audit
 
 
 def test_classify_from_the_command_line(capsys):
@@ -326,19 +327,118 @@ def test_the_findings_page_reports_the_real_results(site):
     assert findings.count("<pre>euclid ") >= findings.count('<div class="finding">') - 1
 
 
+def test_the_pages_agree_with_each_other(site):
+    """The same quantity must not be computed twice and reported differently.
+
+    It was. ``build`` audited each proposition at ``trials=3`` for the headline
+    figure while the ledger page audited at ``trials=8`` for its own, so one
+    build shipped an index saying 355 unproved assumptions and a ledger page
+    saying 350. Nobody compared the two pages. This does.
+    """
+    numbers = {}
+    for page in ("index.html", "findings.html", "ledger.html"):
+        text = (site / page).read_text(encoding="utf-8")
+        found = re.search(r"<b>(\d+)</b><span>(?:unproved assumptions|points assumed"
+                          r" to exist)</span>", text)
+        if found:
+            numbers[page] = int(found.group(1))
+    found = re.search(r"<strong>(\d+) places</strong>",
+                      (site / "findings.html").read_text(encoding="utf-8"))
+    if found:
+        numbers["findings.html/prose"] = int(found.group(1))
+    assert len(set(numbers.values())) == 1, numbers
+
+
+def test_no_page_claims_every_proof_is_case_independent(site):
+    """Four propositions do vary by figure, and every page must say so.
+
+    The ledger page counted them in its own table while the findings page said
+    "There are none" and the ledger prose said "The column is empty". All three
+    were generated from the same build.
+    """
+    # Read the refs off the page, then re-derive the verdict for those and for
+    # controls. Auditing all 390 again here cost five and a half minutes and
+    # duplicated exactly what the build that made this site had just done.
+    ledger_page = (site / "ledger.html").read_text(encoding="utf-8")
+    section = ledger_page.split("Steps that vary by figure")[1].split("</p>")[0]
+    varying = re.findall(r'href="([IVX]+)-(\d+)\.html"', section)
+    varying = [f"{book}.{number}" for book, number in varying]
+    assert varying, "the case detector found nothing; this test is now vacuous"
+
+    for ref in varying:
+        assert audit(ref, trials=8).of_kind("case"), f"{ref} is named but does not vary"
+    controls = ["I.1", "I.47", "III.1", "VI.1"]
+    for ref in controls:
+        assert not audit(ref, trials=8).of_kind("case"), f"{ref} varies but is not named"
+
+    for page in ("findings.html", "ledger.html"):
+        text = (site / page).read_text(encoding="utf-8")
+        assert "There are none" not in text
+        assert "The column is empty" not in text
+        for ref in varying:
+            assert ref in text, f"{page} does not name {ref}"
+
+    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(
+        encoding="utf-8"
+    )
+    assert "There are none" not in readme
+    for ref in varying:
+        assert ref in readme, f"the README does not name {ref}"
+    assert f"other {len(all_propositions()) - len(varying)} do take" in readme
+
+
 def test_the_site_uses_exactly_three_colours(site):
     """Black, white, and one grey exactly halfway between. Nothing else."""
     found = set()
-    for page in site.glob("*.html"):
+    for page in list(site.glob("*.html")) + [site / "style.css"]:
         found |= set(re.findall(r"#([0-9a-fA-F]{6})", page.read_text(encoding="utf-8")))
     assert {value.lower() for value in found} == {"000000", "808080", "ffffff"}
 
 
 def test_the_site_never_fakes_a_fourth_shade(site):
     """Opacity or alpha would manufacture greys outside the palette."""
-    style = (site / "index.html").read_text(encoding="utf-8")
+    style = (site / "style.css").read_text(encoding="utf-8")
     assert "opacity" not in style
     assert "rgba" not in style
+
+
+def test_the_stylesheet_is_shared_rather_than_inlined(site):
+    """It used to be inlined into all 398 pages: 61% of everything shipped.
+
+    Worse than the bytes, a one-line CSS change rewrote every file in docs/, so
+    the git history carried a full copy of the site per tweak.
+    """
+    css = site / "style.css"
+    assert css.exists()
+    for page in site.glob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        assert '<link rel="stylesheet" href="style.css">' in text, page.name
+        assert "<style>" not in text, f"{page.name} still inlines CSS"
+
+
+def test_the_stylesheet_parses(site):
+    """Braces and comments balance, and no rule is stranded outside a block.
+
+    An edit once closed a comment twice, leaving prose where a selector should
+    be. Everything up to the next brace became part of that selector, so the
+    rule after it -- the one making the graph scrollable -- was silently
+    dropped. Nothing failed; the page just quietly lost a feature.
+    """
+    css = (site / "style.css").read_text(encoding="utf-8")
+    assert css.count("{") == css.count("}"), "unbalanced braces"
+    assert css.count("/*") == css.count("*/"), "unbalanced comments"
+
+    stripped = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    for chunk in re.findall(r"(^|\})([^{}]*)\{", stripped, flags=re.M):
+        selector = chunk[1].strip()
+        assert selector, "empty selector"
+        # A real selector is punctuated -- dots, colons, commas, hashes. A run
+        # of four bare lowercase words in a row is a sentence that escaped its
+        # comment. ("nav.top a" has one such word and is fine.)
+        words = [token for token in selector.split() if re.fullmatch(r"[a-z]+", token)]
+        assert len(words) < 4, (
+            f"this looks like prose, not a selector: {selector[:70]!r}"
+        )
 
 
 def test_theorems_draw_the_figures_they_argue_about(site):

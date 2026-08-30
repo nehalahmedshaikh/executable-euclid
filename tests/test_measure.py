@@ -69,6 +69,17 @@ def test_relaxation_does_not_leak_out_of_its_block():
 # depth
 # --------------------------------------------------------------------------
 
+@pytest.fixture(scope="session")
+def profile():
+    """The depth of every proposition, walked once.
+
+    ``depth_profile()`` executes the whole corpus. Four tests below wanted it
+    and each called it again, which was three minutes of an eleven-minute suite
+    spent recomputing the same dictionary.
+    """
+    return depth_profile()
+
+
 
 def test_the_equilateral_triangle_needs_a_square_root():
     """I.1 puts its apex at an irrational height. Degree 1 would be a bug."""
@@ -85,21 +96,20 @@ def test_book_x_is_not_reported_as_rational():
     assert max(item.degree for item in profile.values()) > 2
 
 
-def test_arithmetic_books_never_leave_the_rationals():
+def test_arithmetic_books_never_leave_the_rationals(profile):
     """Books VII to IX are about numbers; a square root there would be a bug."""
-    tops = ceilings(depth_profile())
+    tops = ceilings(profile)
     for book in ("VII", "VIII", "IX"):
         assert tops[book] == 1, f"Book {book} should stay rational, got {tops[book]}"
 
 
-def test_every_degree_is_a_power_of_two():
+def test_every_degree_is_a_power_of_two(profile):
     """Constructible means a tower of quadratic extensions. Nothing else fits."""
-    for item in depth_profile().values():
+    for item in profile.values():
         assert item.degree & (item.degree - 1) == 0, f"{item.ref} has degree {item.degree}"
 
 
-def test_each_book_has_a_ceiling_and_each_degree_a_first_appearance():
-    profile = depth_profile()
+def test_each_book_has_a_ceiling_and_each_degree_a_first_appearance(profile):
     tops = ceilings(profile)
     assert set(tops) <= set(BOOK_ORDER)
     for degree, ref in first_appearances(profile).items():
@@ -221,10 +231,10 @@ def test_the_recorded_findings_match_this_corpus():
     assert measured["corpus"] == len(all_propositions())
 
 
-def test_the_recorded_findings_agree_with_recomputing_them():
+def test_the_recorded_findings_agree_with_recomputing_them(profile):
     """The exact parts are recomputed; the sampled parts cannot be."""
     measured = load_findings()
-    assert measured["depth"]["ceilings"] == ceilings(depth_profile())
+    assert measured["depth"]["ceilings"] == ceilings(profile)
 
 
 def test_the_recorded_findings_state_their_method():
