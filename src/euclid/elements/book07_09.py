@@ -1701,12 +1701,17 @@ def prop_IX_29(a: int, b: int) -> Out:
 
 @proposition("IX.30", THEOREM,
              sample=lambda rng: (2 * rng.randint(1, 15) + 1, rng.randint(1, 20)))
-def prop_IX_30(odd: int, times: int) -> Out:
-    even = odd * 2 * times
-    hypothesis("the number is odd", not measures(2, odd))
-    hypothesis("it measures an even number", measures(odd, even) and measures(2, even))
-    claim("it measures the half of it as well", "IX.30", measures(odd, even // 2))
-    return Out(half=even // 2)
+def prop_IX_30(number: int, multiple: int) -> Out:
+    # The multiple is arbitrary and the evenness is a hypothesis, so oddness has
+    # something to do. Building the even number as ``number * 2 * multiple``
+    # instead makes the half divisible whatever the parity, and the proposition
+    # then holds for reasons of its own construction: 4 measures 12 and does not
+    # measure 6, and no such case could arise.
+    product = number * multiple
+    hypothesis("the number is odd", not measures(2, number))
+    hypothesis("it measures an even number", measures(2, product))
+    claim("it measures the half of it as well", "IX.30", measures(number, product // 2))
+    return Out(half=product // 2)
 
 
 @proposition("IX.31", THEOREM,

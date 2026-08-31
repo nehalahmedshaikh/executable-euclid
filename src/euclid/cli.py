@@ -44,7 +44,18 @@ def cmd_run(args) -> int:
 
     entry = get(args.ref)
     rng = random.Random(args.seed)
-    result = run_sampled(args.ref, rng)
+    # A sampler is allowed to draw a configuration its own proposition rejects;
+    # the fuzzer counts those and moves on. This did the same as `verify` only
+    # by luck, and failed outright on the first draw IX.30 turned down.
+    from .elements.registry import BadConfiguration
+
+    for attempt in range(40):
+        try:
+            result = run_sampled(args.ref, rng)
+            break
+        except BadConfiguration:
+            if attempt == 39:
+                raise
     print(f"{entry.ref}  {entry.statement}")
     print("        (Heath, 1908)\n")
     if entry.note:

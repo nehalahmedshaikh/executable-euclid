@@ -59,6 +59,7 @@ class Result:
     # none reached the goal. Only that may be called provably minimal.
     exact_minimal: bool = False
     exact_figures: int = 0
+    beat_float: bool = False  # exact enumeration found what the float search missed
     nodes: int = 0
     verified: Optional[bool] = None
     point_names: list[str] = field(default_factory=list)

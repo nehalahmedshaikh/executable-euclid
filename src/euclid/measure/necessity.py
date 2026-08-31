@@ -108,6 +108,66 @@ def _jitter(value, rng, size: Fraction):
     return None  # nothing sensible to perturb
 
 
+def _rational_turn(t: Fraction) -> tuple:
+    """An exact rotation: the rational parametrisation of the unit circle."""
+    square = t * t
+    return (1 - square) / (1 + square), 2 * t / (1 + square)
+
+
+def _turned(point: Point, anchor: Point, t: Fraction) -> Point:
+    """``point`` rotated about ``anchor``.  Keeps the distance, moves the angle."""
+    cosine, sine = _rational_turn(t)
+    dx, dy = point.x - anchor.x, point.y - anchor.y
+    return Point(anchor.x + cosine * dx - sine * dy,
+                 anchor.y + sine * dx + cosine * dy)
+
+
+def _stretched(point: Point, anchor: Point, factor: Fraction) -> Point:
+    """``point`` moved along the ray from ``anchor``.  Keeps the angle, moves
+    the distance."""
+    return Point(anchor.x + factor * (point.x - anchor.x),
+                 anchor.y + factor * (point.y - anchor.y))
+
+
+def _moves(arguments: list) -> list:
+    """Every perturbation worth trying on one configuration.
+
+    A blind offset changes both the distance and the direction from every other
+    point at once, so on a proposition like I.4 -- three hypotheses over six
+    points -- it always breaks two hypotheses together and no run can be
+    attributed.  That was the whole of the 64% this analysis could not reach.
+
+    Rotating a point about another keeps their distance and moves the angle;
+    sliding it along the ray keeps the angle and moves the distance.  Between
+    them a hypothesis about a length and a hypothesis about an angle can be
+    broken separately.  Both are exact: the rotation uses the rational
+    parametrisation of the circle, so no configuration leaves the field.
+    """
+    places = [i for i, value in enumerate(arguments) if isinstance(value, Point)]
+    plan = [("offset", i, None) for i in range(len(arguments))]
+    for i in places:
+        for anchor in places:
+            if i != anchor:
+                plan.append(("turn", i, anchor))
+                plan.append(("stretch", i, anchor))
+    return plan
+
+
+def _apply(arguments: list, move, rng, size: Fraction):
+    """Carry out one perturbation, or return None if it does not apply."""
+    kind, index, anchor = move
+    if kind == "offset":
+        return _jitter(arguments[index], rng, size)
+    point, pivot = arguments[index], arguments[anchor]
+    if not (isinstance(point, Point) and isinstance(pivot, Point)):
+        return None
+    if point == pivot:
+        return None
+    if kind == "turn":
+        return _turned(point, pivot, size / 4)
+    return _stretched(point, pivot, 1 + size / 4)
+
+
 def hypothesis_necessity(
     entry: Proposition, trials: int = 24, seed: int = 0
 ) -> list[Necessity]:
@@ -117,6 +177,7 @@ def hypothesis_necessity(
     rng = random.Random(f"necessity:{entry.ref}:{seed}")
     found: dict[str, Necessity] = {}
 
+    plan: list = []
     for trial in range(trials):
         size = Fraction(rng.choice([1, 1, 2, 3]), rng.choice([1, 2, 4]))
         with Context(f"necessity:{entry.ref}"):
@@ -126,11 +187,16 @@ def hypothesis_necessity(
                 continue
             if not arguments:
                 continue
-            index = trial % len(arguments)
-            moved = _jitter(arguments[index], rng, size)
+            if not plan:
+                plan = _moves(arguments)
+            move = plan[trial % len(plan)]
+            if move[1] >= len(arguments) or (move[2] is not None
+                                             and move[2] >= len(arguments)):
+                continue
+            moved = _apply(arguments, move, rng, size)
             if moved is None:
                 continue
-            arguments[index] = moved
+            arguments[move[1]] = moved
 
             with relaxed_hypotheses() as violations:
                 outcome = SURVIVED

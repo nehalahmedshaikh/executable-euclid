@@ -170,19 +170,37 @@ def test_a_hypothesis_that_matters_comes_out_needed(ref, doing_the_work):
     assert verdicts.get(doing_the_work) == NEEDED, verdicts
 
 
-def test_a_hypothesis_that_cannot_be_isolated_is_not_reported_at_all():
-    """I.4 is the honest limit of the method, and worth pinning down.
+def test_side_angle_side_can_now_be_taken_apart():
+    """I.4 was the honest limit of the method, and is no longer.
 
-    Side-angle-side states three hypotheses over six points, and moving any one
-    point breaks at least two of them at once -- move B and both ``AB = DE`` and
-    the included angle go together.  No run can attribute an outcome to one
-    hypothesis, so every run is discarded and I.4 contributes nothing.
+    Three hypotheses over six points: a blind offset changes both the distance
+    and the direction from every other point, so it always broke two at once and
+    every run was discarded for want of attribution. I.4 contributed nothing,
+    and cases like it were the whole of the coverage gap.
 
-    That must show up as *absence*, never as a hypothesis that survived: the
-    difference between "not tested" and "not needed" is the whole credibility of
-    this analysis.  It is also where the 36% coverage figure comes from.
+    Rotating a point about another moves the angle and keeps the distance;
+    sliding it along the ray does the reverse. Each hypothesis can then be
+    broken alone, and all three turn out to be doing work.
     """
-    assert hypothesis_necessity(get("I.4"), trials=24) == []
+    results = hypothesis_necessity(get("I.4"), trials=72)
+    verdicts = {item.text: item.verdict for item in results}
+    assert len(verdicts) == 3, verdicts
+    assert all(v == NEEDED for v in verdicts.values()), verdicts
+
+
+def test_a_perturbation_keeps_the_configuration_exact():
+    """The rotation is the rational parametrisation of the circle, so a moved
+    point is still a point of the field the sampler built in."""
+    from fractions import Fraction as F
+
+    from euclid.measure.necessity import _stretched, _turned
+    from euclid.plane.objects import Point as P
+
+    anchor, point = P(F(0), F(0)), P(F(3), F(4))
+    turned = _turned(point, anchor, F(1, 2))
+    assert turned.x * turned.x + turned.y * turned.y == 25  # distance preserved
+    stretched = _stretched(point, anchor, F(2))
+    assert (stretched.x, stretched.y) == (6, 8)             # direction preserved
 
 
 def test_a_candidate_is_reported_as_a_candidate():
@@ -306,26 +324,43 @@ def test_the_readme_quotes_only_numbers_it_still_carries():
     assert f"only {100 * executed // (executed + cited)}% of the graph" in readme
 
 
-def test_an_uncertified_construction_is_never_labelled_a_theorem():
-    """"Fewest possible" belongs only to a row enumerated exactly.
+def test_only_an_exactly_enumerated_row_is_called_a_theorem():
+    """"Fewest possible" belongs to a row every shorter figure was ruled out for.
 
-    The compass-only midpoint is the case that matters: it was stated as
-    "exactly seven circles, six is not enough, and all of them were tried" for a
-    long time while being computed nowhere -- not in a build, not in a test, and
-    not in the benchmark the test suite referred to, which does not exist.
+    The compass-only midpoint is the case that earned this. It was stated as
+    "exactly seven circles, six is not enough, and all of them were tried" while
+    being computed nowhere; when it was finally computed, the float search said
+    seven and exact enumeration found six. A float-exhaustive search is not a
+    proof that nothing shorter exists, and the label has to track which one
+    produced the answer.
     """
     from euclid.render.site import _strength
 
     rows = {(r["problem"], r["isa"]): r for r in load_findings()["constructions"]}
-
-    certified = rows[("equilateral-triangle", "full")]
-    assert certified["exact_minimal"]
-    assert _strength(certified) == "fewest possible"
+    for row in rows.values():
+        if row["found"] and not row["exact_minimal"]:
+            assert _strength(row) != "fewest possible", row["problem"]
 
     deep = rows[("midpoint", "compass-only")]
-    assert deep["found"] and deep["length"] == 7 and deep["verified"]
-    assert not deep["exact_minimal"], "if this is now certified, the wording can strengthen"
-    assert _strength(deep) == "shortest found"
+    assert deep["found"] and deep["verified"]
+    assert deep["length"] == 6, "the compass-only midpoint is six circles"
+    assert deep["exact_minimal"], "five circles were not ruled out exactly"
+    assert deep["beat_float"], "this row is the one the float search got wrong"
+    assert _strength(deep) == "fewest possible"
+
+
+def test_exact_enumeration_is_authoritative_over_the_float_search():
+    """When the two disagree the exact answer wins, and says that it did.
+
+    Silently keeping the float answer would leave a false minimum on the page,
+    which is what happened for as long as the claim went uncomputed.
+    """
+    from euclid.search.exact import shortest_is_certified
+    from euclid.search.problems import PROBLEMS
+
+    certified, exhaustion = shortest_is_certified(
+        PROBLEMS["midpoint"], "compass-only", 6, budget=200_000)
+    assert certified and not exhaustion.found, "five circles should be ruled out"
 
 
 def test_the_graph_knows_which_edges_it_executed():

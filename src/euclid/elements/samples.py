@@ -18,6 +18,7 @@ records them as the figure's givens when the proposition is called.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from fractions import Fraction
 from typing import Callable, Iterable
 
@@ -25,6 +26,7 @@ from ..plane.angles import Angle
 from ..plane.objects import Point
 
 __all__ = [
+    "comfortable",
     "frame",
     "nonzero",
     "points_round_a_circle",
@@ -33,12 +35,52 @@ __all__ = [
 ]
 
 
+# One draw in six comes from here instead of the comfortable range: a large
+# denominator puts a point very near a lattice position without landing on it,
+# which is what produces a nearly flat triangle or a nearly collinear triple.
+# Those are the configurations a case analysis fails on, and a sampler that only
+# ever draws from small denominators never visits them -- which is why the
+# case-independence result carried a caveat about its own samplers.
+AWKWARD_DENOMINATORS = (17, 23, 41, 97)
+AWKWARD_IN = 6
+
+
+_COMFORTABLE = []
+
+
+@contextmanager
+def comfortable():
+    """Draw only from the easy range, for figures that have to be looked at.
+
+    Verification wants awkward configurations and the site wants legible ones,
+    and those pull in opposite directions. The renderer picks one figure out of
+    many by legibility, so it asks for the comfortable range; nothing that is
+    checked goes through here.
+    """
+    _COMFORTABLE.append(True)
+    try:
+        yield
+    finally:
+        _COMFORTABLE.pop()
+
+
+def _awkward(rng) -> bool:
+    if _COMFORTABLE:
+        return False
+    return rng.randrange(AWKWARD_IN) == 0
+
+
 def scalar(rng, low: int = -6, high: int = 6, denominators: Iterable[int] = (1, 1, 2, 3, 4)) -> Fraction:
+    if _awkward(rng):
+        return Fraction(rng.randint(low * 8, high * 8), rng.choice(AWKWARD_DENOMINATORS))
     return Fraction(rng.randint(low, high), rng.choice(list(denominators)))
 
 
 def nonzero(rng, low: int = 1, high: int = 6, denominators: Iterable[int] = (1, 1, 2, 3)) -> Fraction:
-    value = Fraction(rng.randint(low, high), rng.choice(list(denominators)))
+    if _awkward(rng):
+        value = Fraction(rng.randint(low * 8, high * 8), rng.choice(AWKWARD_DENOMINATORS))
+    else:
+        value = Fraction(rng.randint(low, high), rng.choice(list(denominators)))
     return value if value != 0 else Fraction(1)
 
 

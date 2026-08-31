@@ -34,7 +34,7 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import Optional
 
-from ..kernel.field import Context
+from ..kernel.field import Context, fmt
 from ..plane.construct import meet
 from ..plane.objects import Circle as ExactCircle, Line as ExactLine, Point
 from .isa import INSTRUCTION_SETS, Move, moves_for
@@ -96,6 +96,18 @@ def _replay(problem, moves: list[Move]) -> Optional[tuple[list[Point], list]]:
     return points, drawn
 
 
+def _signature(drawn: list) -> frozenset:
+    """What a figure contains, in a form that survives crossing contexts."""
+    marks = set()
+    for shape in drawn:
+        if isinstance(shape, ExactLine):
+            marks.add(("line", fmt(shape.a), fmt(shape.b), fmt(shape.c)))
+        else:
+            marks.add(("circle", fmt(shape.centre.x), fmt(shape.centre.y),
+                       fmt(shape.r2)))
+    return frozenset(marks)
+
+
 def enumerate_exactly(
     problem,
     isa: str = "full",
@@ -111,6 +123,17 @@ def enumerate_exactly(
     """
     instruction_set = INSTRUCTION_SETS[isa]
     outcome = Exhaustion(depth)
+    # The figures already explored, by what they contain. Two move sequences
+    # that draw the same set of objects have the same points, the same legal
+    # moves and the same goal test, so their subtrees are identical and one of
+    # them is enough. Without this the d! orderings of one figure are each
+    # walked in full, which is what put depth 6 out of reach.
+    #
+    # Keyed on the exact printed form, because each node is replayed in its own
+    # Context and values from different towers may not be compared. Two equal
+    # values reached by different routes could print differently; that costs a
+    # missed merge and never a wrong prune.
+    seen: dict = {}
 
     def walk(sequence: list[Move]) -> bool:
         """True if the goal was reached; sets outcome as a side effect."""
@@ -127,6 +150,11 @@ def enumerate_exactly(
                 outcome.moves = list(sequence)
                 return True
             reach = len(points)
+            key = _signature(drawn)
+        earlier = seen.get(key)
+        if earlier is not None and earlier <= len(sequence):
+            return False
+        seen[key] = len(sequence)
         if len(sequence) >= depth:
             return False
         for move in moves_for(instruction_set, reach):
@@ -154,17 +182,13 @@ def shortest_is_certified(
     * the space to ``length - 1`` was exhausted with nothing found -- the answer
       is minimal, and that is a theorem;
     * the budget ran out -- unknown, so the answer stays an upper bound;
-    * something *was* found -- the float search missed a shorter construction,
-      which is a bug in the optimiser and not a fact about geometry.  The caller
-      must not quietly treat this as "not certified".
+    * something *was* found -- the float search missed a shorter construction.
+      That is not a fact about geometry but about the arithmetic the search runs
+      in, and it has happened: the compass-only midpoint was reported at seven
+      circles for a long time, and exact enumeration finds six.  The caller
+      should adopt the shorter construction, not file this as "not certified".
     """
     if length <= 0:
         return False, Exhaustion(0)
-    outcome = enumerate_exactly(problem, isa, depth=length - 1, budget=budget)
-    if outcome.found:
-        raise AssertionError(
-            f"{problem.name} [{isa}]: the float search reported {length} moves, but "
-            f"exact enumeration found one of {len(outcome.moves)}. The search is "
-            f"losing constructions, not the arithmetic."
-        )
-    return outcome.exhausted, outcome
+    return_value = enumerate_exactly(problem, isa, depth=length - 1, budget=budget)
+    return return_value.exhausted, return_value

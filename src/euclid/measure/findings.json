@@ -58,135 +58,280 @@
   },
   "necessity": {
     "propositions": 390,
-    "hypotheses": 729,
-    "judged": 260,
-    "coverage": 0.3567,
-    "needed": 162,
-    "well_defined": 21,
+    "hypotheses": 730,
+    "judged": 324,
+    "coverage": 0.4438,
+    "needed": 199,
+    "well_defined": 26,
     "candidates": [
-      {
-        "ref": "II.9",
-        "text": "D cuts AB",
-        "configurations": 16
-      },
       {
         "ref": "II.10",
         "text": "B lies between A and D",
-        "configurations": 16
-      },
-      {
-        "ref": "VIII.10",
-        "text": "the ratio is in least terms",
-        "configurations": 10
-      },
-      {
-        "ref": "VIII.8",
-        "text": "the ratio is in least terms",
-        "configurations": 8
-      },
-      {
-        "ref": "VIII.13",
-        "text": "the ratio is in least terms",
-        "configurations": 8
-      },
-      {
-        "ref": "IX.30",
-        "text": "the number is odd",
-        "configurations": 8
-      },
-      {
-        "ref": "IX.34",
-        "text": "the number is neither a doubling from a dyad nor has an odd half",
-        "configurations": 8
+        "configurations": 33
       },
       {
         "ref": "VII.8",
         "text": "the fraction is a genuine one",
-        "configurations": 7
+        "configurations": 30
       },
       {
-        "ref": "IX.16",
-        "text": "the numbers are prime to one another",
-        "configurations": 7
+        "ref": "II.9",
+        "text": "D cuts AB",
+        "configurations": 28
       },
       {
-        "ref": "II.1",
-        "text": "D and E cut BC, in that order",
-        "configurations": 6
+        "ref": "VIII.10",
+        "text": "the ratio is in least terms",
+        "configurations": 24
       },
       {
-        "ref": "V.6",
-        "text": "less is taken away than there is",
-        "configurations": 6
+        "ref": "VIII.13",
+        "text": "the ratio is in least terms",
+        "configurations": 24
       },
       {
-        "ref": "VI.10",
-        "text": "the given line is cut in order",
-        "configurations": 6
-      },
-      {
-        "ref": "VI.12",
-        "text": "the given lines are genuine magnitudes",
-        "configurations": 6
+        "ref": "VIII.8",
+        "text": "the ratio is in least terms",
+        "configurations": 22
       },
       {
         "ref": "X.11",
         "text": "the four are proportional",
-        "configurations": 6
+        "configurations": 22
       },
       {
-        "ref": "VI.32",
-        "text": "the division is a proper one",
-        "configurations": 4
-      },
-      {
-        "ref": "II.1",
-        "text": "BG is at right angles to BC",
-        "configurations": 3
-      },
-      {
-        "ref": "V.15",
-        "text": "the magnitudes are positive",
-        "configurations": 3
-      },
-      {
-        "ref": "V.21",
-        "text": "b : c = d : e",
-        "configurations": 3
-      },
-      {
-        "ref": "VI.24",
-        "text": "the division is a proper one",
-        "configurations": 3
-      },
-      {
-        "ref": "VI.26",
-        "text": "the division is a proper one",
-        "configurations": 3
+        "ref": "V.6",
+        "text": "less is taken away than there is",
+        "configurations": 19
       },
       {
         "ref": "VII.31",
         "text": "the number is composite",
-        "configurations": 3
+        "configurations": 14
       },
       {
-        "ref": "VIII.1",
-        "text": "the ratio is in least terms",
-        "configurations": 3
+        "ref": "II.1",
+        "text": "BG is at right angles to BC",
+        "configurations": 11
       },
       {
-        "ref": "VIII.7",
-        "text": "the ratio and length are genuine",
-        "configurations": 3
+        "ref": "VI.10",
+        "text": "the given line is cut in order",
+        "configurations": 11
+      },
+      {
+        "ref": "IX.10",
+        "text": "the progression is genuine",
+        "configurations": 8
       },
       {
         "ref": "X.1",
         "text": "the second is the less",
+        "configurations": 8
+      },
+      {
+        "ref": "VII.10",
+        "text": "the fraction is a genuine one",
+        "configurations": 7
+      },
+      {
+        "ref": "VIII.7",
+        "text": "the ratio and length are genuine",
+        "configurations": 7
+      },
+      {
+        "ref": "VIII.27",
+        "text": "the sides are genuine numbers",
+        "configurations": 7
+      },
+      {
+        "ref": "VII.7",
+        "text": "the subtraction is a proper one",
+        "configurations": 6
+      },
+      {
+        "ref": "VIII.3",
+        "text": "the ratio is in least terms",
+        "configurations": 6
+      },
+      {
+        "ref": "VIII.25",
+        "text": "the numbers are genuine",
+        "configurations": 6
+      },
+      {
+        "ref": "IX.12",
+        "text": "the progression is genuine",
+        "configurations": 6
+      },
+      {
+        "ref": "X.3",
+        "text": "the magnitudes are positive",
+        "configurations": 6
+      },
+      {
+        "ref": "X.29",
+        "text": "the parameters are genuine",
+        "configurations": 6
+      },
+      {
+        "ref": "VIII.1",
+        "text": "a genuine progression is asked for",
+        "configurations": 5
+      },
+      {
+        "ref": "VIII.6",
+        "text": "a genuine progression is asked for",
+        "configurations": 5
+      },
+      {
+        "ref": "VIII.19",
+        "text": "the sides are genuine numbers",
+        "configurations": 5
+      },
+      {
+        "ref": "IX.17",
+        "text": "a genuine progression is asked for",
+        "configurations": 5
+      },
+      {
+        "ref": "IX.32",
+        "text": "a genuine doubling is asked for",
+        "configurations": 5
+      },
+      {
+        "ref": "X.7",
+        "text": "the magnitudes are positive",
+        "configurations": 5
+      },
+      {
+        "ref": "V.15",
+        "text": "the magnitudes are positive",
+        "configurations": 4
+      },
+      {
+        "ref": "VII.6",
+        "text": "the fraction is a genuine one",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.1",
+        "text": "the ratio is in least terms",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.4",
+        "text": "the ratios are genuine",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.8",
+        "text": "a genuine progression is asked for",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.9",
+        "text": "a genuine progression is asked for",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.17",
+        "text": "the sides are genuine numbers",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.18",
+        "text": "the sides are genuine numbers",
+        "configurations": 4
+      },
+      {
+        "ref": "VIII.23",
+        "text": "the sides are genuine numbers",
+        "configurations": 4
+      },
+      {
+        "ref": "IX.35",
+        "text": "the progression is genuine",
+        "configurations": 4
+      },
+      {
+        "ref": "X.16",
+        "text": "the magnitudes are positive",
+        "configurations": 4
+      },
+      {
+        "ref": "V.5",
+        "text": "the part subtracted is less than the whole",
         "configurations": 3
       },
       {
-        "ref": "X.20",
-        "text": "the line is rational",
+        "ref": "V.7",
+        "text": "the magnitudes are positive",
+        "configurations": 3
+      },
+      {
+        "ref": "VII.39",
+        "text": "the parts are genuine",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.3",
+        "text": "a genuine progression is asked for",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.5",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.12",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.13",
+        "text": "a genuine progression is asked for",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.15",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.20",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.21",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "VIII.26",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "IX.1",
+        "text": "the sides are genuine numbers",
+        "configurations": 3
+      },
+      {
+        "ref": "IX.11",
+        "text": "the progression is genuine",
+        "configurations": 3
+      },
+      {
+        "ref": "X.12",
+        "text": "the magnitudes are positive",
+        "configurations": 3
+      },
+      {
+        "ref": "X.57",
+        "text": "they are commensurable in square only",
         "configurations": 3
       },
       {
@@ -195,8 +340,13 @@
         "configurations": 2
       },
       {
+        "ref": "III.19",
+        "text": "a point of the tangent is taken",
+        "configurations": 2
+      },
+      {
         "ref": "V.5",
-        "text": "the part subtracted is less than the whole",
+        "text": "the magnitudes are positive",
         "configurations": 2
       },
       {
@@ -205,8 +355,18 @@
         "configurations": 2
       },
       {
-        "ref": "V.25",
-        "text": "a : b = c : d",
+        "ref": "VI.18",
+        "text": "the given figure is genuine",
+        "configurations": 2
+      },
+      {
+        "ref": "VI.24",
+        "text": "the division is a proper one",
+        "configurations": 2
+      },
+      {
+        "ref": "VI.32",
+        "text": "the division is a proper one",
         "configurations": 2
       },
       {
@@ -215,23 +375,28 @@
         "configurations": 2
       },
       {
-        "ref": "VII.39",
-        "text": "the parts are genuine",
+        "ref": "VIII.9",
+        "text": "the ratio is in least terms",
         "configurations": 2
       },
       {
-        "ref": "VIII.3",
+        "ref": "VIII.10",
         "text": "a genuine progression is asked for",
         "configurations": 2
       },
       {
-        "ref": "VIII.5",
+        "ref": "VIII.11",
         "text": "the sides are genuine numbers",
         "configurations": 2
       },
       {
-        "ref": "VIII.20",
+        "ref": "VIII.22",
         "text": "the sides are genuine numbers",
+        "configurations": 2
+      },
+      {
+        "ref": "VIII.24",
+        "text": "the numbers are genuine",
         "configurations": 2
       },
       {
@@ -240,24 +405,59 @@
         "configurations": 2
       },
       {
-        "ref": "IX.12",
+        "ref": "IX.5",
+        "text": "the numbers are genuine",
+        "configurations": 2
+      },
+      {
+        "ref": "IX.9",
         "text": "the progression is genuine",
         "configurations": 2
       },
       {
-        "ref": "IX.32",
-        "text": "a genuine doubling is asked for",
+        "ref": "IX.13",
+        "text": "the progression is genuine",
         "configurations": 2
       },
       {
-        "ref": "X.7",
+        "ref": "X.4",
         "text": "the magnitudes are positive",
         "configurations": 2
       },
       {
-        "ref": "X.29",
-        "text": "the parameters are genuine",
+        "ref": "X.5",
+        "text": "the magnitudes are positive",
         "configurations": 2
+      },
+      {
+        "ref": "X.9",
+        "text": "the magnitudes are positive",
+        "configurations": 2
+      },
+      {
+        "ref": "X.15",
+        "text": "the magnitudes are positive",
+        "configurations": 2
+      },
+      {
+        "ref": "X.24",
+        "text": "the scale is a genuine ratio",
+        "configurations": 2
+      },
+      {
+        "ref": "X.30",
+        "text": "the parameter is genuine",
+        "configurations": 2
+      },
+      {
+        "ref": "X.63",
+        "text": "they are commensurable in square only",
+        "configurations": 2
+      },
+      {
+        "ref": "I.40",
+        "text": "the bases are equal and in one straight line",
+        "configurations": 1
       },
       {
         "ref": "II.13",
@@ -265,8 +465,23 @@
         "configurations": 1
       },
       {
-        "ref": "V.5",
+        "ref": "III.8",
+        "text": "P lies outside the circle",
+        "configurations": 1
+      },
+      {
+        "ref": "V.1",
         "text": "the magnitudes are positive",
+        "configurations": 1
+      },
+      {
+        "ref": "V.3",
+        "text": "the magnitudes are positive",
+        "configurations": 1
+      },
+      {
+        "ref": "V.10",
+        "text": "A and B are unequal",
         "configurations": 1
       },
       {
@@ -275,23 +490,28 @@
         "configurations": 1
       },
       {
+        "ref": "VI.26",
+        "text": "the division is a proper one",
+        "configurations": 1
+      },
+      {
+        "ref": "VI.32",
+        "text": "the figure is genuine",
+        "configurations": 1
+      },
+      {
         "ref": "VII.1",
         "text": "the numbers are unequal and greater than a unit",
         "configurations": 1
       },
       {
-        "ref": "VII.7",
-        "text": "the subtraction is a proper one",
+        "ref": "VII.3",
+        "text": "all three are greater than a unit",
         "configurations": 1
       },
       {
         "ref": "VII.8",
         "text": "the subtraction is a proper one",
-        "configurations": 1
-      },
-      {
-        "ref": "VII.10",
-        "text": "the fraction is a genuine one",
         "configurations": 1
       },
       {
@@ -305,143 +525,33 @@
         "configurations": 1
       },
       {
-        "ref": "VIII.1",
+        "ref": "VII.36",
+        "text": "all three are numbers",
+        "configurations": 1
+      },
+      {
+        "ref": "VIII.2",
         "text": "a genuine progression is asked for",
         "configurations": 1
       },
       {
-        "ref": "VIII.3",
-        "text": "the ratio is in least terms",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.4",
-        "text": "the ratios are genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.6",
-        "text": "a genuine progression is asked for",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.9",
-        "text": "a genuine progression is asked for",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.10",
-        "text": "a genuine progression is asked for",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.13",
-        "text": "a genuine progression is asked for",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.15",
+        "ref": "VIII.16",
         "text": "the sides are genuine numbers",
         "configurations": 1
       },
       {
-        "ref": "VIII.17",
-        "text": "the sides are genuine numbers",
+        "ref": "IX.18",
+        "text": "both are numbers",
         "configurations": 1
       },
       {
-        "ref": "VIII.18",
-        "text": "the sides are genuine numbers",
+        "ref": "X.2",
+        "text": "the magnitudes are positive and unequal",
         "configurations": 1
       },
       {
-        "ref": "VIII.19",
-        "text": "the sides are genuine numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.24",
-        "text": "the numbers are genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.25",
-        "text": "the numbers are genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.26",
-        "text": "the sides are genuine numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.27",
-        "text": "the sides are genuine numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.1",
-        "text": "the sides are genuine numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.9",
-        "text": "the progression is genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.10",
-        "text": "the progression is genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.11",
-        "text": "the progression is genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.35",
-        "text": "the progression is genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "X.3",
+        "ref": "X.13",
         "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "X.9",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "X.12",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "X.15",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "X.16",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "X.24",
-        "text": "the scale is a genuine ratio",
-        "configurations": 1
-      },
-      {
-        "ref": "X.30",
-        "text": "the parameter is genuine",
-        "configurations": 1
-      },
-      {
-        "ref": "X.63",
-        "text": "they are commensurable in square only",
         "configurations": 1
       },
       {
@@ -463,6 +573,7 @@
       "exhaustive": true,
       "exact_minimal": true,
       "exact_figures": 4,
+      "beat_float": false,
       "notation": "2C1 + 2C2 + 2C3"
     },
     {
@@ -476,6 +587,7 @@
       "exhaustive": true,
       "exact_minimal": true,
       "exact_figures": 13,
+      "beat_float": false,
       "notation": "2S1 + 1S2 + 2C1 + 2C2 + 2C3"
     },
     {
@@ -488,7 +600,8 @@
       "verified": true,
       "exhaustive": true,
       "exact_minimal": true,
-      "exact_figures": 94,
+      "exact_figures": 49,
+      "beat_float": false,
       "notation": "4S1 + 2S2 + 2C1 + 2C2 + 2C3"
     },
     {
@@ -501,7 +614,8 @@
       "verified": true,
       "exhaustive": true,
       "exact_minimal": true,
-      "exact_figures": 1981,
+      "exact_figures": 574,
+      "beat_float": false,
       "notation": "2S1 + 1S2 + 4C1 + 4C2 + 4C3"
     },
     {
@@ -515,6 +629,7 @@
       "exhaustive": true,
       "exact_minimal": true,
       "exact_figures": 4,
+      "beat_float": false,
       "notation": "2S1 + 1S2 + 1C1 + 1C2 + 1C3"
     },
     {
@@ -527,7 +642,8 @@
       "verified": true,
       "exhaustive": true,
       "exact_minimal": true,
-      "exact_figures": 1981,
+      "exact_figures": 574,
+      "beat_float": false,
       "notation": "2S1 + 1S2 + 4C1 + 4C2 + 4C3"
     },
     {
@@ -541,6 +657,7 @@
       "exhaustive": true,
       "exact_minimal": true,
       "exact_figures": 3,
+      "beat_float": false,
       "notation": "2C1 + 2C2 + 2C3"
     },
     {
@@ -554,6 +671,7 @@
       "exhaustive": true,
       "exact_minimal": true,
       "exact_figures": 7,
+      "beat_float": false,
       "notation": "3C1 + 3C2 + 3C3"
     },
     {
@@ -561,13 +679,14 @@
       "isa": "compass-only",
       "euclid": "I.10",
       "found": true,
-      "length": 7,
+      "length": 6,
       "depth_searched": 7,
       "verified": true,
       "exhaustive": true,
-      "exact_minimal": false,
-      "exact_figures": 60000,
-      "notation": "7C1 + 7C2 + 7C3"
+      "exact_minimal": true,
+      "exact_figures": 2729,
+      "beat_float": true,
+      "notation": "6C1 + 6C2 + 6C3"
     }
   ],
   "fields": {
@@ -643,7 +762,6 @@
         "IX.28",
         "IX.29",
         "IX.3",
-        "IX.30",
         "IX.32",
         "IX.33",
         "IX.34",
@@ -688,6 +806,7 @@
         "VI.17",
         "VI.18",
         "VI.19",
+        "VI.20",
         "VI.21",
         "VI.22",
         "VI.23",
@@ -779,11 +898,9 @@
         "I.20",
         "I.21",
         "II.13",
-        "III.18",
         "III.21",
         "III.22",
         "III.27",
-        "III.31",
         "III.32",
         "III.35",
         "III.7",
@@ -792,12 +909,13 @@
         "IV.3",
         "IV.4",
         "VI.2",
+        "VI.3",
         "VI.33",
         "VI.7",
         "VI.8"
       ],
       "discharged_luckily": [
-        "I.23",
+        "I.22",
         "I.31",
         "I.32",
         "I.43"
@@ -875,19 +993,20 @@
       ],
       "configuration_dependent": [
         "I.14",
-        "I.22",
+        "I.23",
         "I.7",
         "II.12",
+        "III.18",
         "III.20",
+        "III.31",
         "III.4",
         "IX.10",
         "IX.2",
+        "IX.30",
         "IX.31",
         "IX.8",
         "V.6",
-        "VI.20",
         "VI.25",
-        "VI.3",
         "VII.24",
         "VII.26",
         "VII.29",
@@ -979,11 +1098,11 @@
     },
     "counts": {
       "rational": 199,
-      "measuring_only": 21,
+      "measuring_only": 20,
       "discharged_luckily": 4,
       "needs_continuity": 38,
       "needs_magnitude": 29,
-      "configuration_dependent": 20,
+      "configuration_dependent": 21,
       "untestable": 79
     },
     "witnesses": [
@@ -991,13 +1110,13 @@
         "ref": "I.1",
         "cause": "continuity",
         "site": "construct.py:_line_circle:163",
-        "radicand": "64/75"
+        "radicand": "4/75"
       },
       {
         "ref": "I.20",
         "cause": "measurement",
         "site": "angles.py:length:39",
-        "radicand": "1537/324"
+        "radicand": "26/9"
       }
     ]
   },

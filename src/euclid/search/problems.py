@@ -262,6 +262,7 @@ def solve(
     max_depth: int = 5,
     node_budget: int = 400_000,
     max_points: int = 20,
+    exact_budget: int = 60_000,
 ) -> Result:
     """Search for the shortest construction, then verify it exactly."""
     problem = PROBLEMS[name]
@@ -281,7 +282,17 @@ def solve(
         # float search cannot establish that, so refute length - 1 exactly.
         from .exact import shortest_is_certified
 
-        certified, exhaustion = shortest_is_certified(problem, isa, result.length)
+        # Exact enumeration can beat the float search, and does: a dedup at 1e-7
+        # or a tangency lost at EPSILON hides a construction and turns a longer
+        # answer into a false minimum. When that happens the exact answer wins.
+        for _ in range(4):
+            certified, exhaustion = shortest_is_certified(
+                problem, isa, result.length, budget=exact_budget)
+            if not exhaustion.found:
+                break
+            result.moves = list(exhaustion.moves)
+            result.beat_float = True
+            result.verified = replay_exactly(problem, result.moves)
         result.exact_minimal = certified
         result.exact_figures = exhaustion.figures
     return result

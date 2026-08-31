@@ -914,6 +914,13 @@ def prop_III_14(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("the four points lie on the circle",
                all(eq_len(o, p, o, a) for p in (b, c, d)))
     hypothesis("the chords are genuine", a != b and c != d)
+    # A chord through the centre is bisected by it, so the perpendicular Euclid
+    # drops from the centre has no length and there is no line OE to draw. He
+    # states no such proviso and his figure shows neither chord as a diameter.
+    # The theorem survives the case -- a diameter is distance zero from the
+    # centre, and all diameters are equal -- but this proof does not.
+    hypothesis("neither chord passes through the centre",
+               not collinear(a, o, b) and not collinear(c, o, d))
     circle(o, a, "the given circle")
     line(a, b, "the chord AB")
     line(c, d, "the chord CD")

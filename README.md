@@ -102,9 +102,9 @@ cross-references back.
 
 **The necessity analysis is empirical and partial.** A hypothesis that survives
 being broken is reported as a candidate, with the number of configurations behind
-it. Coverage is 36%; the rest is mostly propositions like I.4, where moving any
-one point breaks two hypotheses at once, so no outcome can be attributed to
-either. Those are reported as untested.
+it. Coverage is 44%: a run that breaks two hypotheses at once cannot attribute
+the outcome to either, so it is discarded, and what cannot be broken alone is
+reported as untested.
 
 **Certified and actually tested are not the same.** A claim that cannot come out
 false, or a hypothesis no sampled figure can satisfy, passes every run while

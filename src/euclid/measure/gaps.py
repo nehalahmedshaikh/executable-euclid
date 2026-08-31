@@ -53,6 +53,11 @@ def candidates() -> Iterator[tuple[str, Callable]]:
     then sums of those, then nested roots.  The order is deliberately naive --
     the point is to find the *simplest* thing the taxonomy misses, so the search
     must not be steered toward a clever example.
+
+    This family is enumerated in full, and it is a family, not the
+    constructibles.  "Simplest" therefore means simplest here; settling it
+    outright wants an enumeration of the constructibles by height, which this
+    does not attempt.
     """
     smalls = [1, 2, 3, 5, 6, 7]
     # Two terms: these are the binomials and apotomes, and are all named.

@@ -250,26 +250,29 @@ def _sample_trace(entry: Proposition, seed: int = 3, tries: int = 40) -> Optiona
     """The clearest figure among many valid ones."""
     if entry.sample is None:
         return None
+    from ..elements import samples
+
     rng = random.Random(f"site:{entry.ref}:{seed}")
     best: Optional[Trace] = None
     best_score = -1.0
-    for _ in range(tries):
-        try:
-            trace = run_sampled(entry.ref, rng).trace
-        except (BadConfiguration, GeometryError, ProofFailure):
-            continue
-        # Books V and VII to X argue about magnitudes and draw nothing, so
-        # there is no figure to choose between: searching forty configurations
-        # for the clearest of them is forty runs spent on a picture that does
-        # not exist. Two hundred and forty of the three hundred and ninety
-        # propositions are in that case.
-        if not _collect(trace)[1] and not _collect(trace)[2]:
-            return trace
-        score = _legibility(trace)
-        if score > best_score:
-            best, best_score = trace, score
-        if best_score > 0.75:  # good enough; stop paying for the search
-            break
+    with samples.comfortable():
+        for _ in range(tries):
+          try:
+              trace = run_sampled(entry.ref, rng).trace
+          except (BadConfiguration, GeometryError, ProofFailure):
+              continue
+          # Books V and VII to X argue about magnitudes and draw nothing, so
+          # there is no figure to choose between: searching forty configurations
+          # for the clearest of them is forty runs spent on a picture that does
+          # not exist. Two hundred and forty of the three hundred and ninety
+          # propositions are in that case.
+          if not _collect(trace)[1] and not _collect(trace)[2]:
+              return trace
+          score = _legibility(trace)
+          if score > best_score:
+              best, best_score = trace, score
+          if best_score > 0.75:  # good enough; stop paying for the search
+              break
     return best
 
 
@@ -421,7 +424,7 @@ def _index_page(graph, stats) -> str:
         "starting on page one.</li>",
         '<li><a href="optimizer.html">The shortest possible constructions.</a> Where the '
         "table says <em>fewest possible</em>, every shorter figure was ruled out in exact "
-        "arithmetic. With no straightedge at all a midpoint costs seven circles.</li>",
+        "arithmetic. With no straightedge at all a midpoint costs six circles.</li>",
         '<li><a href="graph.html">What depends on what.</a> Two kinds of edge, and the '
         f"page says which is which: {top_ref} carries {top_count} of the others, but most "
         "of that is Euclid's own cross-references.</li>",
@@ -514,11 +517,13 @@ def _findings_page(graph, stats, search_rows) -> str:
         if gaps["witnesses"]:
             witness = gaps["witnesses"][0]
             findings.append((
-                "Exhaustive &mdash; Book X cannot name every constructible number",
+                "Measured &mdash; Book X cannot name every constructible number",
                 "<p>Book X sorts the irrationals into thirteen named species, and is "
-                "often described as though that were all of them. It is not, and the "
-                "classifier finds the edge: searching constructible numbers in order of "
-                "complexity, the first one Euclid has no word for is</p>"
+                "often described as though that were all of them. It is not. Searching "
+                "sums and differences of up to three terms drawn from the rationals 1, 2, "
+                "3 and the roots of 1, 2, 3, 5, 6, 7 &mdash; a family built the way "
+                "Euclid builds, and enumerated in full &mdash; the simplest number he has "
+                "no word for is</p>"
                 f'<p class="mono">{_esc(witness["expression"])} &nbsp;&asymp;&nbsp; '
                 f'{witness["value"]:.8f}</p>'
                 "<p>It is constructible with straightedge and compass, its degree over "
@@ -527,9 +532,11 @@ def _findings_page(graph, stats, search_rows) -> str:
                 "classifier's own reason is the whole of the explanation: "
                 f"<em>{_esc(witness['reason'])}</em>. Euclid classifies what comes out of "
                 "applying areas, which is sums and differences of <em>two</em> terms, so "
-                "a number needing three falls outside however constructible it is. Of the "
-                f"candidates searched, {gaps['candidates_named']} fall inside the thirteen "
-                f"species and {gaps['candidates_unnamed']} outside.</p>"
+                "a number needing three falls outside however constructible it is. Of that "
+                f"family, {gaps['candidates_named']} fall inside the thirteen species and "
+                f"{gaps['candidates_unnamed']} outside. <em>Simplest</em> is relative to "
+                "the family: settling it outright wants an enumeration of the "
+                "constructibles by height, which this does not attempt.</p>"
                 "<pre>euclid gap --all</pre>",
             ))
 
@@ -686,14 +693,16 @@ def _findings_page(graph, stats, search_rows) -> str:
             "exact arithmetic and none reached the goal, so <em>fewest possible</em> is a "
             "theorem. The two circles of I.1 are the shortest way to an equilateral "
             "triangle, and nothing of one move comes close.</p>"
-            "<p>The compass-only rows are weaker and the table says so. Mohr in 1672 and "
-            "Mascheroni in 1797 proved the compass alone finds anything the pair can, and "
-            "the search puts a price on it: a midpoint costs <strong>seven circles</strong>, "
-            "and that construction was replayed through the kernel and holds exactly. That "
-            "six circles do not suffice is a different claim, and a weaker one &mdash; the "
-            "search covered every six-circle figure it could represent, but in floating "
-            "point, and enumerating them exactly is out of reach. It is marked "
-            "<em>shortest found</em>, and the table says so.</p>"
+            "<p>Mohr in 1672 and Mascheroni in 1797 proved the compass alone finds "
+            "anything the pair can, and the search puts a price on it: a midpoint costs "
+            "<strong>six circles</strong>, and every five-circle figure was enumerated "
+            "exactly to prove it cannot be done in five.</p>"
+            "<p>That number was seven here until the enumeration reached it. The float "
+            "search covered depth six and reported nothing, which is exactly the failure "
+            "the exact pass exists to catch: a point pair merged at a tolerance of "
+            "10&#8315;&#8311;, or two figures sharing a rounded fingerprint, and a real "
+            "construction becomes invisible. The six-circle construction it missed "
+            "replays through the kernel and reaches the midpoint.</p>"
             "<p>Some of Euclid's own constructions are far longer than they need to be, "
             "because he builds them out of results already proved, buying certainty "
             "with moves.</p>"

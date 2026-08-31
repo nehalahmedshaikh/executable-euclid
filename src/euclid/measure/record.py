@@ -30,8 +30,14 @@ __all__ = ["FINDINGS_PATH", "load_findings", "write_findings"]
 FINDINGS_PATH = Path(__file__).with_name("findings.json")
 
 
-def write_findings(trials: int = 16, path: Optional[Path] = None) -> dict:
-    """Compute every measurement and write it down."""
+def write_findings(trials: int = 48, path: Optional[Path] = None) -> dict:
+    """Compute every measurement and write it down.
+
+    The necessity trials are worth paying for: each proposition has a plan of
+    perturbations roughly quadratic in its number of points, and a trial spends
+    one of them, so coverage climbs with the count -- 36% at sixteen, 45% at
+    forty-eight.
+    """
     path = path or FINDINGS_PATH
     profile = depth_profile()
     report = necessity_report(trials=trials)
@@ -131,7 +137,13 @@ def _constructions() -> list[dict]:
 
     rows: list[dict] = []
     for name, isa, depth in wanted:
-        result = solve(name, isa=isa, max_depth=depth)
+        # Certifying a length means enumerating everything shorter, and for the
+        # compass-only midpoint that is depth 6 -- tens of thousands of figures
+        # in exact arithmetic. It is worth the minutes: at the default budget
+        # the enumeration gives up, and the answer stays the one the float
+        # search found, which is wrong.
+        budget = 2_000_000 if depth >= 6 else 60_000
+        result = solve(name, isa=isa, max_depth=depth, exact_budget=budget)
         rows.append({
             "problem": name,
             "isa": isa,
@@ -144,6 +156,7 @@ def _constructions() -> list[dict]:
             "exhaustive": result.exhaustive,        # float search, budget not hit
             "exact_minimal": result.exact_minimal,  # every shorter figure ruled out exactly
             "exact_figures": result.exact_figures,
+            "beat_float": result.beat_float,
             "notation": result.geometrography.notation() if result.found else "",
         })
     return rows

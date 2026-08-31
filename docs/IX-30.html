@@ -1,9 +1,14 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IX.30 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book IX &middot; Proposition 30</p><h1>IX.30</h1><blockquote>If an odd number measure an even number, it will also measure the half of it.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the number is odd<span class="cite">given</span></li><li class="hyp">it measures an even number<span class="cite">given</span></li><li class="">it measures the half of it as well<span class="cite">by <a href="IX-30.html">IX.30</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Used by:</strong> <a href="IX-31.html">IX.31</a></p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition("IX.30", THEOREM,
              sample=lambda rng: (2 * rng.randint(1, 15) + 1, rng.randint(1, 20)))
-def prop_IX_30(odd: int, times: int) -&gt; Out:
-    even = odd * 2 * times
-    hypothesis("the number is odd", not measures(2, odd))
-    hypothesis("it measures an even number", measures(odd, even) and measures(2, even))
-    claim("it measures the half of it as well", "IX.30", measures(odd, even // 2))
-    return Out(half=even // 2)
+def prop_IX_30(number: int, multiple: int) -&gt; Out:
+    # The multiple is arbitrary and the evenness is a hypothesis, so oddness has
+    # something to do. Building the even number as ``number * 2 * multiple``
+    # instead makes the half divisible whatever the parity, and the proposition
+    # then holds for reasons of its own construction: 4 measures 12 and does not
+    # measure 6, and no such case could arise.
+    product = number * multiple
+    hypothesis("the number is odd", not measures(2, number))
+    hypothesis("it measures an even number", measures(2, product))
+    claim("it measures the half of it as well", "IX.30", measures(number, product // 2))
+    return Out(half=product // 2)
 </pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
