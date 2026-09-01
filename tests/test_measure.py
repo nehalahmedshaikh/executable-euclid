@@ -264,6 +264,33 @@ def test_the_recorded_findings_state_their_method():
             + need["surviving_guards"]) == need["judged"]
 
 
+def test_the_recorded_findings_were_computed_at_full_strength():
+    """The same file could be written at two strengths, and was.
+
+    ``write_findings`` took forty-eight trials by default and ``euclid measure
+    --trials`` took sixteen, so regenerating the way this repository documents
+    produced coverage of 36% where the committed file said 45%, along with a
+    different set of candidates. One constant now, written into the payload so
+    a weaker file is visible rather than merely wrong.
+    """
+    from euclid.measure.record import RECORDED_TRIALS
+
+    measured = load_findings()
+    assert measured["necessity"].get("trials") == RECORDED_TRIALS, (
+        "findings.json was recorded at a different strength: "
+        "run `euclid measure --write`")
+
+
+def test_the_command_that_regenerates_records_at_full_strength():
+    """The documented regeneration must not quietly weaken the file."""
+    from euclid.cli import build_parser
+    from euclid.measure.record import RECORDED_TRIALS
+
+    args = build_parser().parse_args(["measure", "--write"])
+    strength = args.trials if args.trials is not None else RECORDED_TRIALS
+    assert strength == RECORDED_TRIALS
+
+
 def test_the_findings_page_reports_only_measured_things():
     """The whole point of the rewrite: no finding derived from citations.
 
@@ -319,10 +346,15 @@ def test_the_readme_quotes_only_numbers_it_still_carries():
     coverage = f"{100 * measured['necessity']['coverage']:.0f}%"
     assert f"Coverage is {coverage}" in readme
 
-    executed, cited = build_graph().provenance()
+    graph = build_graph()
+    executed, cited = graph.provenance()
     assert f"{executed} edges are **executed**" in readme
     assert f"{cited} are **cited**" in readme
-    assert f"only {100 * executed // (executed + cited)}% of the graph" in readme
+    assert f"{round(100 * executed / (executed + cited))}% of the graph" in readme
+
+    rests_on = sum(1 for ref in graph.nodes
+                   if ref != "I.1" and "I.1" in graph.ancestors(ref))
+    assert f'"{rests_on} propositions depend on I.1"' in readme
 
 
 def test_only_an_exactly_enumerated_row_is_called_a_theorem():

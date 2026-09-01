@@ -77,12 +77,14 @@ with the command that reproduces it, graded by how strong the claim is.
 | **X** | **115 / 115** | incommensurables, the thirteen irrationals |
 | XI | 0 / 39 | solid geometry |
 | XII | 0 / 18 | the method of exhaustion |
-| XIII | 0 / 18 | the regular solids |
+| XIII | **12 / 18** | the golden section, the pentagon, the regular solids |
 
-**390 propositions**, 6251 checked steps. Books XI–XIII are solid geometry and
-the kernel is planar by design, so they wait on a decision about that. Books V
-and VII to X argue about numbers and magnitudes, so they draw nothing, as Euclid
-draws nothing there; what they check is exact all the same.
+**402 propositions**, 6453 checked steps. Book XIII divides at its twelfth
+proposition: everything before that is plane geometry and is done, and
+everything after it, with Books XI and XII, is solid and waits on a kernel that
+leaves the plane. Books V and VII to X argue about numbers and magnitudes, so
+they draw nothing, as Euclid draws nothing there; what they check is exact all
+the same.
 
 ## What "checked" means
 
@@ -91,13 +93,14 @@ tested exactly against the figure that was built. So a conclusion is confirmed
 true of the figure. Whether it *follows from the postulates by Euclid's rules of
 inference* is a separate question, and the machine is silent on it.
 
-**Dependencies are two different things, and only one is an observation.** 53
+**Dependencies are two different things, and only one is an observation.** 65
 edges are **executed** — one proposition calls another and the call is recorded
-as it happens. 383 are **cited** — a reference written by hand beside a step,
-following Heath's margins. Citations are checked (each must name a proposition
-that exists, and none may cite a later one), but they are transcription, so
-**only 12% of the graph is executed**. Nothing on the findings page rests on
-them: *"136 propositions depend on I.1"* is true, and it reads Euclid's own
+as it happens. 403 are **cited** — a reference written by hand beside a step,
+following Heath's margins. A citation is checked for naming a proposition that
+exists and for not naming a later one, and that is all: `claim` records its
+warrant without consulting it, so a step could cite the wrong result and stay
+green. **14% of the graph is executed.** Nothing on the findings page rests on
+the rest: *"148 propositions depend on I.1"* is true, and it reads Euclid's own
 cross-references back.
 
 **The necessity analysis is empirical and partial.** A hypothesis that survives

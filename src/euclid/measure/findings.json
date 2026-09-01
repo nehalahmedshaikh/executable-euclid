@@ -1,5 +1,5 @@
 {
-  "corpus": 390,
+  "corpus": 402,
   "method": "Every number here was computed by running the corpus. Depth is exact. The necessity figures are empirical: a hypothesis is broken by moving one given, and what survives is a candidate, not a theorem.",
   "depth": {
     "ceilings": {
@@ -12,7 +12,8 @@
       "VII": 1,
       "VIII": 1,
       "IX": 1,
-      "X": 32
+      "X": 32,
+      "XIII": 8
     },
     "first_appearances": {
       "1": "I.4",
@@ -23,9 +24,9 @@
     },
     "histogram": {
       "1": 231,
-      "2": 83,
-      "4": 56,
-      "8": 18,
+      "2": 88,
+      "4": 62,
+      "8": 19,
       "32": 1
     },
     "deepest": [
@@ -57,13 +58,14 @@
     ]
   },
   "necessity": {
-    "propositions": 390,
-    "hypotheses": 731,
-    "judged": 331,
-    "coverage": 0.4528,
-    "needed": 204,
+    "trials": 48,
+    "propositions": 402,
+    "hypotheses": 748,
+    "judged": 336,
+    "coverage": 0.4492,
+    "needed": 209,
     "well_defined": 26,
-    "surviving_guards": 75,
+    "surviving_guards": 83,
     "candidates": [
       {
         "ref": "II.10",
@@ -121,21 +123,6 @@
         "configurations": 3
       },
       {
-        "ref": "III.18",
-        "text": "a point of the tangent is taken",
-        "configurations": 2
-      },
-      {
-        "ref": "III.19",
-        "text": "a point of the tangent is taken",
-        "configurations": 2
-      },
-      {
-        "ref": "VII.16",
-        "text": "both are numbers",
-        "configurations": 2
-      },
-      {
         "ref": "X.63",
         "text": "they are commensurable in square only",
         "configurations": 2
@@ -161,33 +148,8 @@
         "configurations": 1
       },
       {
-        "ref": "VII.1",
-        "text": "the numbers are unequal and greater than a unit",
-        "configurations": 1
-      },
-      {
-        "ref": "VII.3",
-        "text": "all three are greater than a unit",
-        "configurations": 1
-      },
-      {
         "ref": "VII.30",
         "text": "the first is prime",
-        "configurations": 1
-      },
-      {
-        "ref": "VII.35",
-        "text": "both are numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "VII.36",
-        "text": "all three are numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "IX.18",
-        "text": "both are numbers",
         "configurations": 1
       },
       {
@@ -594,7 +556,8 @@
         "VI.13",
         "VI.27",
         "VI.28",
-        "VI.29"
+        "VI.29",
+        "XIII.12"
       ],
       "needs_magnitude": [
         "IV.11",
@@ -625,7 +588,16 @@
         "X.34",
         "X.35",
         "X.71",
-        "X.72"
+        "X.72",
+        "XIII.1",
+        "XIII.10",
+        "XIII.11",
+        "XIII.3",
+        "XIII.4",
+        "XIII.5",
+        "XIII.6",
+        "XIII.8",
+        "XIII.9"
       ],
       "configuration_dependent": [
         "I.14",
@@ -729,17 +701,19 @@
         "X.96",
         "X.97",
         "X.98",
-        "X.99"
+        "X.99",
+        "XIII.2",
+        "XIII.7"
       ]
     },
     "counts": {
       "rational": 199,
       "measuring_only": 20,
       "discharged_luckily": 4,
-      "needs_continuity": 38,
-      "needs_magnitude": 29,
+      "needs_continuity": 39,
+      "needs_magnitude": 38,
       "configuration_dependent": 21,
-      "untestable": 79
+      "untestable": 81
     },
     "witnesses": [
       {

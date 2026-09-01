@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>XIII.9 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book XIII &middot; Proposition 9</p><h1>XIII.9</h1><blockquote>If the side of the hexagon and that of the decagon inscribed in the same circle be added together, the whole straight line has been cut in extreme and mean ratio, and its greater segment is the side of the hexagon.<span class="src">Heath, 1908</span></blockquote><p class="note">The decagon side is cut from the circle: bisecting the arc the pentagon subtends halves it into two decagon arcs. That the hexagon side is the radius is IV.15's, and is cited here as Euclid cites it.</p><figure><svg viewBox="0 0 520 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="XIII.9" class="figure"><g class="construction aside"><circle cx="193.65" cy="190.00" r="164.03" fill="none" class="arc aside"/><circle cx="357.68" cy="190.00" r="192.83" fill="none" class="arc aside"/><circle cx="244.34" cy="346.00" r="192.83" fill="none" class="arc aside"/><circle cx="60.95" cy="286.41" r="192.83" fill="none" class="arc aside"/><circle cx="60.95" cy="93.59" r="192.83" fill="none" class="arc aside"/><line x1="367.04" y1="177.12" x2="234.98" y2="358.88" class="ray aside"/><line x1="259.48" y1="350.92" x2="45.80" y2="281.49" class="ray aside"/><line x1="60.95" y1="302.34" x2="60.95" y2="77.66" class="ray aside"/><line x1="45.80" y1="98.51" x2="259.48" y2="29.08" class="ray aside"/><line x1="234.98" y1="21.12" x2="367.04" y2="202.88" class="ray aside"/><line x1="180.77" y1="180.64" x2="313.89" y2="277.36" class="ray aside"/><line x1="177.73" y1="190.00" x2="474.98" y2="190.00" class="ray aside"/></g><g class="points"><circle cx="193.65" cy="190.00" r="1.5" class="dot aside"/><circle cx="357.68" cy="190.00" r="1.5" class="dot aside"/><circle cx="244.34" cy="346.00" r="1.5" class="dot aside"/><circle cx="60.95" cy="286.41" r="1.5" class="dot aside"/><circle cx="60.95" cy="93.59" r="1.5" class="dot aside"/><circle cx="244.34" cy="34.00" r="1.5" class="dot aside"/><circle cx="326.35" cy="286.41" r="3.2" class="dot"/><text x="333.35" y="279.41" class="letter">K</text><circle cx="459.05" cy="190.00" r="3.2" class="dot"/><text x="466.05" y="183.00" class="letter">L</text></g></svg><figcaption>14 lines and circles drawn, of which 1 helper construction drew the fainter ones</figcaption></figure><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the circle has positive radius<span class="cite">given</span></li><li class="">K bisects the arc the pentagon side subtends, so AK is the side of the decagon<span class="cite">by <a href="III-30.html">III.30</a></span></li><li class="">OL is the side of the hexagon with the side of the decagon added to it<span class="cite">by <a href="IV-15.html">IV.15</a>, Post.2</span></li><li class="">OL is cut at A in extreme and mean ratio<span class="cite">by <a href="VI-30.html">VI.30</a></span></li><li class="">and its greater segment is the side of the hexagon<span class="cite">by Def.3</span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="III-30.html">III.30</a> <a href="IV-11.html">IV.11</a> <a href="IV-15.html">IV.15</a> <a href="VI-30.html">VI.30</a></p><p><strong>Rests on:</strong> C.N.1, C.N.2, C.N.3, C.N.4, C.N.5, Def.10, Def.15, Def.19, Def.22, Def.3, Def.4, Post.1, Post.2, Post.3, Post.5, V.Def.5</p><p><strong>Depth:</strong> 19 steps of argument above the first principles. <strong>Parallel postulate:</strong> needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a circle-circle intersection is used, though no postulate asserts that two circles meet (&times;4)<span class="cite">continuity</span></li><li>a line-circle intersection is used, though no postulate asserts that a line meets a circle<span class="cite">continuity</span></li><li>the argument reads a 'between' fact off the figure<span class="cite">order</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "XIII.9",
+    THEOREM,
+    sample=samples.segment,
+    note="The decagon side is cut from the circle: bisecting the arc the "
+    "pentagon subtends halves it into two decagon arcs. That the hexagon side "
+    "is the radius is IV.15's, and is cited here as Euclid cites it.",
+)
+def prop_XIII_9(o: Point, a: Point) -&gt; Out:
+    hypothesis("the circle has positive radius", o != a)
+    around = circle(o, a, "the given circle")
+    corners = prop_IV_11(o, a).pentagon
+    tenth = posit(_arc_midpoint(o, corners[0], corners[1], around), "K")
+    decagon = length(corners[0], tenth)
+    hexagon = length(o, a)  # IV.15: the side of the hexagon is the radius
+    end = posit(_along(a, o, -decagon / hexagon), "L")
+    line(o, end, "the hexagon side with the decagon side added to it")
+    result(tenth, end)
+
+    claim("K bisects the arc the pentagon side subtends, so AK is the side of "
+          "the decagon", "III.30",
+          on_circle(tenth, around) and eq_len(tenth, corners[0], tenth, corners[1]))
+    claim("OL is the side of the hexagon with the side of the decagon added "
+          "to it", ["IV.15", "Post.2"],
+          on_line(end, line(o, a)) and length(o, end) == hexagon + decagon
+          and between(o, a, end))
+    claim("OL is cut at A in extreme and mean ratio", "VI.30",
+          length(o, end) * length(a, end) == hexagon * hexagon)
+    claim("and its greater segment is the side of the hexagon", "Def.3",
+          hexagon &gt; decagon)
+    return Out(decagon=decagon, hexagon=hexagon, whole=end)
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

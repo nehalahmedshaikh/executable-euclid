@@ -10,6 +10,7 @@ from . import book05  # noqa: F401
 from . import book06  # noqa: F401
 from . import book07_09  # noqa: F401
 from . import book10  # noqa: F401
+from . import book13  # noqa: F401
 from .registry import (
     BOOK_TITLES,
     CONSTRUCTION,

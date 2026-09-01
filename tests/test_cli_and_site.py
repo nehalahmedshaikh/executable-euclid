@@ -84,6 +84,32 @@ def site(tmp_path_factory):
     return out
 
 
+@pytest.fixture(scope="session")
+def published(tmp_path_factory):
+    """The site as ``euclid site --out docs`` builds it, search rows included."""
+    out = tmp_path_factory.mktemp("published")
+    assert main(["site", "--out", str(out)]) == 0
+    return out
+
+
+def test_the_committed_site_is_the_current_build(published):
+    """``docs/`` is what GitHub Pages serves, so a stale copy is a wrong site.
+
+    The build is reproducible -- every sampler it uses is seeded -- so the only
+    way this differs is that the corpus moved and nobody rebuilt.
+    """
+    committed = Path(__file__).resolve().parent.parent / "docs"
+    fresh = {path.name: path.read_bytes()
+             for path in published.iterdir() if path.is_file()}
+    have = {path.name: path.read_bytes()
+            for path in committed.iterdir() if path.is_file()}
+    rebuild = "rebuild with `euclid site --out docs`"
+    assert set(have) - set(fresh) == set(), f"{rebuild}: extra pages"
+    assert set(fresh) - set(have) == set(), f"{rebuild}: missing pages"
+    stale = sorted(name for name in fresh if fresh[name] != have[name])
+    assert not stale, f"{rebuild}: {len(stale)} pages differ, e.g. {stale[:4]}"
+
+
 def test_site_builds_without_broken_links(site):
     pages = sorted(site.glob("*.html"))
     assert len(pages) > 70
@@ -247,6 +273,9 @@ def test_the_readme_numbers_are_current():
     assert int(headline.group(1)) == len(entries)
 
     assert f"**{len(HEATH)} enunciations**" in readme, "the enunciation count is stale"
+
+    # The measured figures the README quotes are checked in test_measure.py,
+    # beside the file they are read from.
 
     # The coverage table: one row per book, "encoded / total".
     counted = collections.Counter(entry.book for entry in entries)

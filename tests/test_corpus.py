@@ -91,15 +91,30 @@ def test_no_proposition_overwrites_a_given():
     assert not offenders, "givens overwritten:\n  " + "\n  ".join(offenders)
 
 
+# Books being written now, and how far they have got. A book listed here must
+# be encoded up to its stated number with no holes; a book absent from it must
+# be empty or complete. The dict is emptied when the last book lands, and an
+# entry that reaches the book's full size is a stale one.
+IN_PROGRESS = {"XIII": 12}
+
+
 @pytest.mark.parametrize("book", [b for b in BOOK_ORDER if b in BOOK_SIZES])
 def test_each_book_is_complete_or_declared_empty(book):
-    """Books I to X are finished; XI to XIII are not started, and say so."""
+    """A book is finished, untouched, or a declared prefix of itself.
+
+    Partial books are the dangerous state: a gap in the middle looks exactly
+    like a book that is merely unfinished, so nothing would catch a proposition
+    quietly skipped for being hard. Requiring a prefix makes a hole fail.
+    """
     encoded = {entry.number for entry in all_propositions() if entry.book == book}
-    if book in ("XI", "XII", "XIII"):
-        assert not encoded, f"Book {book} has propositions but is declared unstarted"
-        return
-    missing = [n for n in range(1, BOOK_SIZES[book] + 1) if n not in encoded]
+    reached = IN_PROGRESS.get(book, BOOK_SIZES[book] if encoded else 0)
+    assert reached <= BOOK_SIZES[book], f"Book {book} has only {BOOK_SIZES[book]}"
+    assert reached < BOOK_SIZES[book] or book not in IN_PROGRESS, (
+        f"Book {book} is complete: drop it from IN_PROGRESS")
+    missing = [n for n in range(1, reached + 1) if n not in encoded]
+    beyond = sorted(n for n in encoded if n > reached)
     assert not missing, f"Book {book} is missing {missing}"
+    assert not beyond, f"Book {book} jumps ahead to {beyond}, leaving a hole behind"
 
 
 @pytest.fixture(scope="session")

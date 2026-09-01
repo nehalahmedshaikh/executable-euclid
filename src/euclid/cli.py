@@ -227,9 +227,11 @@ def cmd_measure(args) -> int:
 
     if args.write:
         from .measure import FINDINGS_PATH, write_findings
+        from .measure.record import RECORDED_TRIALS
 
-        print("running the corpus; this takes a few minutes")
-        payload = write_findings(trials=args.trials)
+        strength = args.trials if args.trials is not None else RECORDED_TRIALS
+        print(f"running the corpus at {strength} trials; this takes several minutes")
+        payload = write_findings(trials=strength)
         print(f"wrote {FINDINGS_PATH.name}: {payload['corpus']} propositions measured")
         return 0
 
@@ -273,7 +275,7 @@ def cmd_measure(args) -> int:
                       f" -- wants sqrt({verdict.radicand})")
 
     if args.needless:
-        report = necessity_report(trials=args.trials)
+        report = necessity_report(trials=args.trials if args.trials is not None else 16)
         print("\nHypotheses, broken one at a time\n")
         print(report.summary())
         print("\n  Candidates are configurations where the hypothesis was broken and")
@@ -320,7 +322,7 @@ def cmd_site(args) -> int:
 # ---------------------------------------------------------------------------
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="euclid",
         description="Euclid's Elements as executable, exactly-verified software.",
@@ -385,7 +387,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="which propositions survive a smaller number field")
     p.add_argument("--write", action="store_true",
                    help="recompute and record findings.json, which the site reads")
-    p.add_argument("--trials", type=int, default=16)
+    p.add_argument("--trials", type=int, default=None,
+                   help="how hard to try; --write records at 48 unless told otherwise")
     p.set_defaults(func=cmd_measure)
 
     p = subs.add_parser("gap", help="constructible numbers Book X cannot name")
@@ -398,7 +401,11 @@ def main(argv: list[str] | None = None) -> int:
                    help="leave the recorded construction searches off the pages")
     p.set_defaults(func=cmd_site)
 
-    args = parser.parse_args(argv)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
     return args.func(args)
 
 

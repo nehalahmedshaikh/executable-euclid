@@ -742,9 +742,10 @@ def _findings_page(graph, stats, search_rows) -> str:
     body.append(
         '<div class="finding"><h3>Still open</h3>'
         f"<p>All {len(HEATH)} propositions of the thirteen books are here as text; "
-        f"{len(all_propositions())} of them have been written out as programs. Books XI "
-        "to XIII are solid geometry, and the kernel is planar by design, so they wait on "
-        "a decision about that.</p></div>"
+        f"{len(all_propositions())} of them have been written out as programs. What is "
+        "left is solid geometry: Books XI and XII, and Book XIII from its thirteenth "
+        "proposition on. Book XIII's first twelve are plane lemmas about the golden "
+        "section and the pentagon, and they are done.</p></div>"
     )
     return _page("Findings — Executable Euclid", "".join(body), here="findings.html")
 

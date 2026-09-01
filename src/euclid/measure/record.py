@@ -25,12 +25,21 @@ from .depth import ceilings, depth_profile, first_appearances
 from .gaps import named_count, taxonomy_gaps
 from .necessity import necessity_report
 
-__all__ = ["FINDINGS_PATH", "load_findings", "write_findings"]
+__all__ = ["FINDINGS_PATH", "RECORDED_TRIALS", "load_findings", "write_findings"]
 
 FINDINGS_PATH = Path(__file__).with_name("findings.json")
 
+# The strength the recorded file is computed at, in one place because it was in
+# two. ``write_findings`` defaulted to forty-eight and the ``--trials`` flag of
+# ``euclid measure`` defaulted to sixteen, so the command this module names as
+# the way to regenerate produced a materially weaker file than the one beside
+# it: coverage 36% against 45%, and nine candidates the stronger run does not
+# report. The count is written into the payload so a file computed at some
+# other strength can be told apart from this one.
+RECORDED_TRIALS = 48
 
-def write_findings(trials: int = 48, path: Optional[Path] = None) -> dict:
+
+def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -> dict:
     """Compute every measurement and write it down.
 
     The necessity trials are worth paying for: each proposition has a plan of
@@ -61,6 +70,7 @@ def write_findings(trials: int = 48, path: Optional[Path] = None) -> dict:
             ],
         },
         "necessity": {
+            "trials": trials,
             "propositions": report.propositions_tried,
             "hypotheses": report.hypotheses_total,
             "judged": len(report.tested),
