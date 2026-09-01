@@ -321,12 +321,19 @@ def claim(text: str, by: Any, holds: bool, detail: str = "") -> bool:
     return holds
 
 
-def hypothesis(text: str, holds: bool) -> bool:
+def hypothesis(text: str, holds: bool, guard: bool = False) -> bool:
     """Record and enforce a proposition's stated hypothesis.
 
     Hypotheses are checked too, but they are not proof steps: they are the
     contract the caller must satisfy, and a violation is a bad input rather
     than a false theorem.
+
+    ``guard=True`` marks a condition Euclid does not state and the encoding
+    needs anyway -- that a ratio is not 1, that a count is at least three, that
+    a magnitude is positive.  Breaking one says nothing about the *Elements*,
+    only that our own input was well formed, and
+    :mod:`euclid.measure.necessity` reports them apart for that reason.  The
+    default is False, so a hypothesis is Euclid's unless it says otherwise.
     """
     holds = bool(holds)
     trace = current_trace()
@@ -337,7 +344,7 @@ def hypothesis(text: str, holds: bool) -> bool:
         if _RELAXED:
             # Someone is asking what happens *without* this hypothesis, so note
             # the violation and let the proposition carry on. See measure.necessity.
-            _RELAXED[-1].append((owner, text))
+            _RELAXED[-1].append((owner, text, guard))
             return False
         raise BadConfiguration(f"{owner}: hypothesis violated -- {text}")
     return holds

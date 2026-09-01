@@ -54,7 +54,7 @@ def test_relaxing_records_the_violation_instead_of_raising():
         with relaxed_hypotheses() as violations:
             assert hypothesis("this is not so", False) is False
             assert hypothesis("this is so", True) is True
-    assert [text for _ref, text in violations] == ["this is not so"]
+    assert [text for _ref, text, _guard in violations] == ["this is not so"]
 
 
 def test_relaxation_does_not_leak_out_of_its_block():
@@ -260,7 +260,8 @@ def test_the_recorded_findings_state_their_method():
     assert "empirical" in measured["method"].lower()
     need = measured["necessity"]
     assert need["judged"] <= need["hypotheses"]
-    assert need["needed"] + need["well_defined"] + len(need["candidates"]) == need["judged"]
+    assert (need["needed"] + need["well_defined"] + len(need["candidates"])
+            + need["surviving_guards"]) == need["judged"]
 
 
 def test_the_findings_page_reports_only_measured_things():

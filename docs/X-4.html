@@ -5,7 +5,7 @@
     + (_commensurable_pair(rng)[0] * Fraction(rng.randint(1, 4), rng.randint(1, 3)),),
 )
 def prop_X_4(a, b, c) -&gt; Out:
-    hypothesis("the magnitudes are positive", all(sign(x) &gt; 0 for x in (a, b, c)))
+    hypothesis("the magnitudes are positive", all(sign(x) &gt; 0 for x in (a, b, c)), guard=True)
     hypothesis("all three are commensurable",
                commensurable(a, b) and commensurable(b, c))
     first = common_measure(a, b)
@@ -18,4 +18,4 @@ def prop_X_4(a, b, c) -&gt; Out:
           commensurable(measure, a) and commensurable(measure, b)
           and commensurable(measure, c))
     return Out(measure=measure)
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

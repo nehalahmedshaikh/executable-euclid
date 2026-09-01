@@ -8,7 +8,7 @@
 def prop_VI_31(a: Point, b: Point, c: Point) -&gt; Out:
     """The right angle is at B; similar triangles are erected on the three sides."""
     hypothesis("the angle ABC is right", right_angle(a, b, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
 
     def similar_on(first: Point, second: Point) -&gt; tuple[Point, Point, Point]:
         """Erect on the segment a triangle similar to ABC, on a fixed side."""
@@ -36,4 +36,4 @@ def prop_VI_31(a: Point, b: Point, c: Point) -&gt; Out:
     claim("so the figure on the hypotenuse equals the two on the legs", ["I.47", "VI.20"],
           _area(*on_hypotenuse) == _area(*on_first) + _area(*on_second))
     return Out(figures=(on_hypotenuse, on_first, on_second))
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

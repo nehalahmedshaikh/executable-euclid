@@ -70,6 +70,7 @@ class Necessity:
 
     ref: str
     text: str
+    guard: bool = False        # our own well-formedness, not Euclid's condition
     broken: int = 0            # runs where this was the only hypothesis violated
     needed: int = 0            # ...and a claim then failed
     well_defined: int = 0      # ...and the construction broke instead
@@ -212,11 +213,12 @@ def hypothesis_necessity(
 
             # Only a run that broke exactly one hypothesis says anything about
             # that hypothesis; with two broken the outcome cannot be attributed.
-            mine = [text for ref, text in violations if ref == entry.ref]
-            if len(set(mine)) != 1 or len(violations) != len(mine):
+            mine = [(text, guard) for ref, text, guard in violations
+                    if ref == entry.ref]
+            if len({text for text, _ in mine}) != 1 or len(violations) != len(mine):
                 continue
-            text = mine[0]
-            record = found.setdefault(text, Necessity(entry.ref, text))
+            text, is_guard = mine[0]
+            record = found.setdefault(text, Necessity(entry.ref, text, guard=is_guard))
             record.broken += 1
             setattr(record, {NEEDED: "needed", WELL_DEFINED: "well_defined",
                              SURVIVED: "survived"}[outcome],
@@ -239,8 +241,21 @@ class NecessityReport:
 
     @property
     def candidates(self) -> list[Necessity]:
-        """Hypotheses that were broken and whose conclusions held anyway."""
-        return [item for item in self.tested if item.verdict == SURVIVED]
+        """Euclid's hypotheses that were broken and whose conclusions held anyway.
+
+        Guards are left out.  Breaking "the ratio is not 1" and finding the
+        conclusion intact says something about our input handling, and standing
+        it beside a real surviving hypothesis made the count read as much more
+        than it was.
+        """
+        return [item for item in self.tested
+                if item.verdict == SURVIVED and not item.guard]
+
+    @property
+    def surviving_guards(self) -> list[Necessity]:
+        """Well-formedness conditions of our own that the code tolerates."""
+        return [item for item in self.tested
+                if item.verdict == SURVIVED and item.guard]
 
     @property
     def coverage(self) -> float:
@@ -259,7 +274,9 @@ class NecessityReport:
             f"({100 * self.coverage:.0f}% coverage)\n"
             f"  needed             : {counts[NEEDED]}\n"
             f"  keeps construction : {counts[WELL_DEFINED]}\n"
-            f"  survived breaking  : {counts[SURVIVED]}  <- candidates, not results"
+            f"  survived breaking  : {len(self.candidates)}  <- candidates, not results\n"
+            f"  our own guards     : {len(self.surviving_guards)}  "
+            "(well-formedness we added, tolerated by the code)"
         )
 
 

@@ -443,3 +443,45 @@ def test_theorems_draw_the_figures_they_argue_about(site):
     for ref in ("I-41", "I-4", "I-37", "I-20", "VI-4"):
         page = (site / f"{ref}.html").read_text(encoding="utf-8")
         assert page.count("<line ") >= 3, f"{ref} renders as bare dots"
+
+
+def test_numbers_written_into_prose_match_their_source(site):
+    """A figure typed into a sentence goes stale silently.
+
+    Most numbers on these pages are interpolated from a measurement. These are
+    not -- they are spelled out because the sentence reads better that way --
+    so each is tied back to the constant it describes. Changing the constant
+    now breaks a test instead of leaving the page quietly wrong.
+    """
+    from euclid.elements.samples import AWKWARD_IN
+    from euclid.measure.gaps import COEFFICIENT, SQUAREFREE
+    from euclid.search.optimizer import DEFAULT_MAX_POINTS
+    from euclid.search.state import EPSILON
+
+    # The construction rows are recorded, and this site is built with
+    # --no-search, so they appear only where the index states them in words.
+    everything = "".join((site / name).read_text(encoding="utf-8") for name in
+                         ("index.html", "findings.html", "optimizer.html", "graph.html"))
+
+    assert AWKWARD_IN == 6, "the findings page says one draw in six"
+    assert DEFAULT_MAX_POINTS == 20, "the optimizer page says more than twenty points"
+    assert COEFFICIENT == 2, "the Book X finding says coefficients up to 2"
+    assert max(SQUAREFREE) == 11, "the Book X finding says squarefree up to 11"
+    assert EPSILON == 1e-9, "the optimizer page says a tangency lost at 10^-9"
+
+    from euclid.graph.dag import build as build_graph
+
+    executed, cited = build_graph().provenance()
+    share = executed / (executed + cited)
+    assert 0.11 <= share <= 0.14, (
+        f"the footer says about one edge in eight; it is {share:.1%}")
+
+    # The compass-only result is stated in words on two pages and must track
+    # what was actually enumerated.
+    from euclid.measure import load_findings
+
+    rows = {(r["problem"], r["isa"]): r for r in load_findings()["constructions"]}
+    if ("midpoint", "compass-only") in rows:
+        length = rows[("midpoint", "compass-only")]["length"]
+        assert length == 6 and "six circles" in everything
+        assert "seven circles" not in everything

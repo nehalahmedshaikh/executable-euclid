@@ -2,7 +2,7 @@
              sample=lambda rng, _k=kind: _terms_for(_k)
              + (Fraction(rng.randint(1, 5), rng.randint(1, 4)),))
 def _same_kind(a, b, scale, _k=kind, _sub=subtractive) -&gt; Out:
-    hypothesis("the scale is a genuine ratio", sign(scale) &gt; 0)
+    hypothesis("the scale is a genuine ratio", sign(scale) &gt; 0, guard=True)
     compound = (a - b) if _sub else (a + b)
     hypothesis("the compound is positive", sign(compound) &gt; 0)
     wanted = (SUBTRACTED_NAMES if _sub else ADDED_NAMES)[_k]
@@ -18,4 +18,4 @@ def _same_kind(a, b, scale, _k=kind, _sub=subtractive) -&gt; Out:
           other_named.name == named.name
           or other_named.family == named.family)
     return Out(other=other)
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

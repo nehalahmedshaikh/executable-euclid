@@ -199,15 +199,12 @@ def _page(title: str, body: str, here: str = "") -> str:
         f'<div class="bar"><nav class="top">{links}</nav></div>'
         '<div class="wrap">'
         f"{body}"
-        "<footer><p>Every diagram here is the record of a construction that ran and "
-        "checked out in exact arithmetic &mdash; not an illustration of one. It shows "
-        "what the machine drew, on the coordinates it was given, with the apparatus of "
-        "its helper constructions held back but still there. Euclid's own figures are "
-        "composed; these are not. Cross-references are a different "
-        "matter: about one in eight was recorded as a call, and the rest were written "
-        'beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p>'
-        f"<p>Every proposition statement here is {HEATH_CREDIT} Nothing is "
-        'paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer>'
+        "<footer><p>The diagrams record constructions that ran, so they do not resemble "
+        "Euclid's composed figures. About one cross-reference in eight was recorded as a "
+        "call; the rest were written beside the step by hand. "
+        '<a href="graph.html">Which is which &rarr;</a></p>'
+        f"<p>Every proposition statement here is {HEATH_CREDIT} "
+        '<a href="text.html">Where the text comes from &rarr;</a></p></footer>'
         "</div></body></html>"
     )
 
@@ -517,13 +514,15 @@ def _findings_page(graph, stats, search_rows) -> str:
         if gaps["witnesses"]:
             witness = gaps["witnesses"][0]
             findings.append((
-                "Measured &mdash; Book X cannot name every constructible number",
+                "Exhaustive &mdash; Book X cannot name every constructible number",
                 "<p>Book X sorts the irrationals into thirteen named species, and is "
-                "often described as though that were all of them. It is not. Searching "
-                "sums and differences of up to three terms drawn from the rationals 1, 2, "
-                "3 and the roots of 1, 2, 3, 5, 6, 7 &mdash; a family built the way "
-                "Euclid builds, and enumerated in full &mdash; the simplest number he has "
-                "no word for is</p>"
+                "often described as though that were all of them. A constructible number "
+                "of degree at most four lies in some <span class=\"mono\">Q(sqrt m, "
+                "sqrt n)</span>, where it is <span class=\"mono\">a + b&middot;sqrt m + "
+                "c&middot;sqrt n + d&middot;sqrt(mn)</span>. Taking every such number with "
+                "coefficients up to 2 in size and <span class=\"mono\">m &lt; n</span> "
+                "squarefree up to 11, in order of height, the simplest Euclid has no word "
+                "for is</p>"
                 f'<p class="mono">{_esc(witness["expression"])} &nbsp;&asymp;&nbsp; '
                 f'{witness["value"]:.8f}</p>'
                 "<p>It is constructible with straightedge and compass, its degree over "
@@ -532,11 +531,13 @@ def _findings_page(graph, stats, search_rows) -> str:
                 "classifier's own reason is the whole of the explanation: "
                 f"<em>{_esc(witness['reason'])}</em>. Euclid classifies what comes out of "
                 "applying areas, which is sums and differences of <em>two</em> terms, so "
-                "a number needing three falls outside however constructible it is. Of that "
-                f"family, {gaps['candidates_named']} fall inside the thirteen species and "
-                f"{gaps['candidates_unnamed']} outside. <em>Simplest</em> is relative to "
-                "the family: settling it outright wants an enumeration of the "
-                "constructibles by height, which this does not attempt.</p>"
+                "a number needing three falls outside however constructible it is. The "
+                f"enumeration holds {gaps['candidates_named'] + gaps['candidates_unnamed']} "
+                f"magnitudes; Book X names {gaps['candidates_named']} of them and has no "
+                f"word for {gaps['candidates_unnamed']}. Height ties are broken by "
+                "preferring the form written without a subtraction, and the bound is a "
+                "bound: a constructible of degree 8, or one with a larger radicand, lies "
+                "outside the set and is not searched.</p>"
                 "<pre>euclid gap --all</pre>",
             ))
 
@@ -662,9 +663,13 @@ def _findings_page(graph, stats, search_rows) -> str:
         "true in some configurations and false in others. That is exactly the shape of "
         "the gap Pasch's axiom was later written to close.</p>"
         f"<p>The other {len(all_propositions()) - len(varies)} take the same route "
-        "through every figure they are handed &mdash; though as the corpus grew, more "
-        "samplers came to be <em>built</em> to satisfy their hypotheses, which makes the "
-        "configurations less adversarial than they were in Book I.</p>"
+        "through every figure they are handed. Configurations have to be built to satisfy "
+        "a proposition's hypotheses, so one draw in six is now taken from a deliberately "
+        "awkward range &mdash; a large denominator puts a point very near a lattice "
+        "position without landing on it, which is what makes a triangle nearly flat or a "
+        "triple nearly collinear. That range found an assumption Euclid leaves unstated in "
+        '<a href="III-14.html">III.14</a>: a chord through the centre is bisected by it, '
+        "so the perpendicular he drops has no length and there is no line to draw.</p>"
         '<p><a href="ledger.html">The ledger &rarr;</a></p>'
         "<pre>euclid ledger</pre>",
     ))
@@ -722,6 +727,15 @@ def _findings_page(graph, stats, search_rows) -> str:
         "constructions as they run. <b>Empirical</b>: sampled over configurations, so it "
         "is evidence, and it says how much. Nothing here is read off the citations "
         'written beside each step. <a href="graph.html">Which edges are which.</a></p>',
+        '<p class="note">All of it is measured over <em>this encoding</em> of the '
+        "<em>Elements</em>, and the encoding is 390 functions written by hand. Heath's "
+        "words are parsed and never retyped; turning them into hypotheses and claims is "
+        "authored, and that is the part to doubt. Exact arithmetic catches a claim that "
+        "is <em>false</em> the moment it runs. A hypothesis that is merely <em>narrower</em> "
+        "than Euclid's makes the proposition weaker and still passes forever, so the "
+        "necessity analysis below is also the test for it: a condition doing no work "
+        "survives being broken. That is how VIII.8, VIII.10 and VIII.13 were caught "
+        "requiring a ratio in least terms, which Euclid nowhere asks for.</p>",
     ]
     for heading, text in findings:
         body.append(f'<div class="finding"><h3>{heading}</h3>{text}</div>')

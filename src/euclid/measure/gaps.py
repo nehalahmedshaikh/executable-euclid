@@ -20,7 +20,7 @@ from fractions import Fraction
 from typing import Callable, Iterator, Optional
 
 from ..elements.book10 import classify
-from ..kernel.field import Context, fmt, sqrt, to_float
+from ..kernel.field import Context, fmt, sign, sqrt, to_float
 from ..kernel.minpoly import degree, min_poly, poly_str
 
 __all__ = ["Gap", "candidates", "simplest_gap", "taxonomy_gaps"]
@@ -46,47 +46,62 @@ class Gap:
                 f"  because           : {self.reason}")
 
 
+SQUAREFREE = (2, 3, 5, 6, 7, 10, 11)
+COEFFICIENT = 2
+
+
+def _squarefree_pairs():
+    for i, m in enumerate(SQUAREFREE):
+        for n in SQUAREFREE[i + 1:]:
+            yield m, n
+
+
 def candidates() -> Iterator[tuple[str, Callable]]:
-    """Constructible numbers in rough order of complexity.
+    """Every biquadratic constructible of bounded height, in order of height.
 
-    Built the way Euclid builds: rationals, then square roots of rationals,
-    then sums of those, then nested roots.  The order is deliberately naive --
-    the point is to find the *simplest* thing the taxonomy misses, so the search
-    must not be steered toward a clever example.
+    A number of degree at most four over Q that a straightedge and compass can
+    reach lies in some ``Q(sqrt m, sqrt n)``, where it is
+    ``a + b sqrt m + c sqrt n + d sqrt(mn)`` with rational coefficients.  Fixing
+    ``m < n`` squarefree up to 11 and integer coefficients up to 2 in size gives
+    a finite set, and this walks all of it ordered by height -- the coefficients
+    and the radicands together -- so "the simplest thing Book X cannot name"
+    means least height in a set that was enumerated, not first hit in a list
+    somebody wrote out.
 
-    This family is enumerated in full, and it is a family, not the
-    constructibles.  "Simplest" therefore means simplest here; settling it
-    outright wants an enumeration of the constructibles by height, which this
-    does not attempt.
+    The bound is stated rather than hidden: a constructible of degree 8, or one
+    with a larger radicand, is outside this and could in principle be simpler on
+    some other measure.  Within the set the search is exhaustive.
     """
-    smalls = [1, 2, 3, 5, 6, 7]
-    # Two terms: these are the binomials and apotomes, and are all named.
-    for a in (1, 2, 3):
-        for b in smalls:
-            yield f"{a} + sqrt{b}", (lambda a=a, b=b: a + sqrt(b))
-    # Two irrational terms.
-    for b in smalls:
-        for c in smalls:
-            if b < c:
-                yield f"sqrt{b} + sqrt{c}", (lambda b=b, c=c: sqrt(b) + sqrt(c))
-    # Three terms: a rational and two roots.
-    for a in (1, 2, 3):
-        for b in smalls:
-            for c in smalls:
-                if b < c:
-                    yield (f"{a} + sqrt{b} + sqrt{c}",
-                           (lambda a=a, b=b, c=c: a + sqrt(b) + sqrt(c)))
-    # Three irrational terms.
-    for b in smalls:
-        for c in smalls:
-            for d in smalls:
-                if b < c < d:
-                    yield (f"sqrt{b} + sqrt{c} + sqrt{d}",
-                           (lambda b=b, c=c, d=d: sqrt(b) + sqrt(c) + sqrt(d)))
-    # Nested roots, which Book X does reach: some of these are named.
-    for a in (1, 2, 3):
-        for b in smalls:
-            yield f"sqrt({a} + sqrt{b})", (lambda a=a, b=b: sqrt(a + sqrt(b)))
+    rows: list[tuple[int, str, Callable]] = []
+    span = range(-COEFFICIENT, COEFFICIENT + 1)
+    for m, n in _squarefree_pairs():
+        for a in span:
+            for b in span:
+                for c in span:
+                    for d in span:
+                        if b == c == d == 0:
+                            continue  # a rational: Book X is not about these
+                        height = abs(a) + abs(b) + abs(c) + abs(d) + m + n
+                        parts = ([str(a)] if a else [])
+                        for coefficient, radicand in ((b, m), (c, n), (d, m * n)):
+                            if coefficient:
+                                head = "" if coefficient == 1 else (
+                                    "-" if coefficient == -1 else f"{coefficient}*")
+                                parts.append(f"{head}sqrt{radicand}")
+                        name = " + ".join(parts).replace("+ -", "- ")
+                        subtractions = sum(1 for k in (a, b, c, d) if k < 0)
+                        rows.append((
+                            height, subtractions, name,
+                            (lambda a=a, b=b, c=c, d=d, m=m, n=n:
+                             a + b * sqrt(m) + c * sqrt(n) + d * sqrt(m * n)),
+                        ))
+    # Height first, then fewest subtractions, then the name for determinism.
+    # Many numbers tie on height alone -- at the minimum they are all three-term
+    # -- and preferring the one written without a minus sign picks the form a
+    # reader would state.
+    rows.sort(key=lambda row: (row[0], row[1], row[2]))
+    for _height, _subtractions, name, build in rows:
+        yield name, build
 
 
 def _examine(name: str, build: Callable) -> Optional[Gap]:
@@ -95,6 +110,11 @@ def _examine(name: str, build: Callable) -> Optional[Gap]:
         try:
             value = build()
         except Exception:  # pragma: no cover - a negative under a root
+            return None
+        # Book X classifies magnitudes, so a lattice point that comes out
+        # negative or zero is not a candidate at all. Enumerating a whole
+        # coefficient box produces plenty of them.
+        if sign(value) <= 0:
             return None
         named = classify(value)
         if named.name != UNNAMED:
@@ -136,6 +156,8 @@ def named_count() -> tuple[int, int]:
                 value = build()
             except Exception:  # pragma: no cover
                 continue
+            if sign(value) <= 0:
+                continue  # Book X classifies magnitudes, so these are not candidates
             if classify(value).name == UNNAMED:
                 unnamed += 1
             else:

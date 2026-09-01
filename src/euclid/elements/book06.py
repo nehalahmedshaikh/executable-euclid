@@ -160,7 +160,7 @@ def _bisected_angle(rng):
     "and the converse holds too, so the ratio identifies the bisector.",
 )
 def prop_VI_3(a: Point, b: Point, c: Point, d: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("D lies on the base BC", on_line(d, Line.through(b, c)) and d != b and d != c)
     outline(a, b, c)
     line(a, d, "the line AD")
@@ -257,7 +257,7 @@ def prop_VI_7(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
 def prop_VI_8(a: Point, b: Point, c: Point) -> Out:
     """The right angle is at B; the perpendicular falls from B to AC."""
     hypothesis("the angle at B is right", right_angle(a, b, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
 
     ux, uy = c.x - a.x, c.y - a.y
@@ -282,7 +282,7 @@ def prop_VI_8(a: Point, b: Point, c: Point) -> Out:
 def prop_VI_9(a: Point, b: Point, parts: int) -> Out:
     """Cut off from AB the prescribed part -- one of `parts` equal pieces."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("a genuine part is asked for", parts >= 2)
+    hypothesis("a genuine part is asked for", parts >= 2, guard=True)
     line(a, b, "the given line AB")
 
     # Euclid lays off equal lengths on a second line through A and joins the
@@ -342,7 +342,7 @@ def prop_VI_10(a: Point, b: Point, first, second) -> Out:
 def prop_VI_11(a: Point, b: Point, ratio) -> Out:
     """To AB and AC, find the third proportional: AB : AC = AC : x."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("the second line is a genuine magnitude", sign(ratio) > 0)
+    hypothesis("the second line is a genuine magnitude", sign(ratio) > 0, guard=True)
     line(a, b, "the first given line AB")
     c = posit(_along(a, b, ratio), "C")
 
@@ -370,7 +370,7 @@ def prop_VI_12(a: Point, b: Point, second, third) -> Out:
     """To three given lines, find the fourth proportional."""
     hypothesis("A and B are distinct", a != b)
     hypothesis("the given lines are genuine magnitudes",
-               sign(second) > 0 and sign(third) > 0)
+               sign(second) > 0 and sign(third) > 0, guard=True)
     line(a, b, "the first given line AB")
     c = posit(_along(a, b, second), "C")
 
@@ -516,7 +516,7 @@ def prop_VI_16(a: Point, b: Point, c: Point, d: Point,
     first, second = length(a, b), length(c, d)
     third, fourth = length(e, f), length(g, h)
     hypothesis("the four lines are genuine magnitudes",
-               all(sign(x) > 0 for x in (first, second, third, fourth)))
+               all(sign(x) > 0 for x in (first, second, third, fourth)), guard=True)
     # Proportion for magnitudes is Eudoxus' Definition 5, which is decided by
     # looking for equimultiples that separate the ratios. Stating the hypothesis
     # that way keeps the two halves of this proposition from collapsing into one
@@ -563,7 +563,7 @@ def prop_VI_17(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Ou
         line(*pair)
     first, mean, last = length(a, b), length(c, d), length(e, f)
     hypothesis("the three lines are genuine magnitudes",
-               all(sign(x) > 0 for x in (first, mean, last)))
+               all(sign(x) > 0 for x in (first, mean, last)), guard=True)
     hypothesis("they are proportional", first * last == mean * mean)
 
     # The rectangle contained by the extremes, and the square on the mean, both
@@ -590,7 +590,7 @@ def prop_VI_17(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Ou
 def prop_VI_18(a: Point, b: Point, c: Point, d: Point, p: Point, q: Point) -> Out:
     """On PQ, describe a figure similar to the given quadrilateral ABCD."""
     hypothesis("the given figure is genuine",
-               not collinear(a, b, c) and not collinear(a, c, d))
+               not collinear(a, b, c) and not collinear(a, c, d), guard=True)
     hypothesis("P and Q are distinct", p != q)
     outline(a, b, c, d)
     line(p, q, "the given line PQ")
@@ -672,7 +672,7 @@ def prop_VI_22(a: Point, b: Point, c: Point, d: Point,
     first, second = length(a, b), length(c, d)
     third, fourth = length(e, f), length(g, h)
     hypothesis("the four lines are genuine magnitudes",
-               all(sign(x) > 0 for x in (first, second, third, fourth)))
+               all(sign(x) > 0 for x in (first, second, third, fourth)), guard=True)
     hypothesis("they are proportional", first * fourth == second * third)
     for pair in ((a, b), (c, d), (e, f), (g, h)):
         line(*pair)
@@ -738,8 +738,8 @@ def _parallelogram_with_similar_corner(rng):
 )
 def prop_VI_24(a: Point, b: Point, d: Point, part) -> Out:
     """The parallelograms about the diameter of ABCD."""
-    hypothesis("the parallelogram is genuine", not collinear(a, b, d))
-    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the parallelogram is genuine", not collinear(a, b, d), guard=True)
+    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
     whole = _parallelogram_on(a, b, d)
     outline(*whole)
     diameter = line(a, whole[2], "the diameter AC")
@@ -765,7 +765,7 @@ def prop_VI_24(a: Point, b: Point, d: Point, part) -> Out:
 )
 def prop_VI_25(a: Point, b: Point, c: Point, wanted) -> Out:
     """Build a triangle similar to ABC and equal to a given area."""
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("a positive area is asked for", sign(wanted) > 0)
     outline(a, b, c)
     target = _area(a, b, c) * wanted
@@ -800,7 +800,7 @@ def _deficient_application(rng):
 def prop_VI_27(a: Point, b: Point, part) -> Out:
     """Parallelograms on AB deficient by a figure similar to that on the half."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
     line(a, b, "the given line AB")
     middle = posit(prop_I_10(a, b).midpoint, "C")
 
@@ -843,7 +843,7 @@ def prop_VI_27(a: Point, b: Point, part) -> Out:
 def prop_VI_28(a: Point, b: Point, part) -> Out:
     """Apply to AB a parallelogram equal to a given area, deficient by a square."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
     line(a, b, "the given line AB")
     middle = posit(prop_I_10(a, b).midpoint, "C")
 
@@ -878,7 +878,7 @@ def prop_VI_28(a: Point, b: Point, part) -> Out:
 def prop_VI_29(a: Point, b: Point, part) -> Out:
     """Apply to AB a parallelogram equal to a given area, exceeding by a square."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the application is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
     line(a, b, "the given line AB")
     middle = posit(prop_I_10(a, b).midpoint, "C")
 
@@ -910,8 +910,8 @@ def prop_VI_29(a: Point, b: Point, part) -> Out:
     "deficient parallelogram sits.",
 )
 def prop_VI_26(a: Point, b: Point, d: Point, part) -> Out:
-    hypothesis("the parallelogram is genuine", not collinear(a, b, d))
-    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the parallelogram is genuine", not collinear(a, b, d), guard=True)
+    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
     whole = _parallelogram_on(a, b, d)
     outline(*whole)
     inner = _parallelogram_on(a, posit(_along(a, b, part), "E"),
@@ -968,8 +968,8 @@ def prop_VI_30(a: Point, b: Point) -> Out:
 )
 def prop_VI_32(a: Point, b: Point, d: Point, part) -> Out:
     """Two similar triangles set together at a corner, with sides parallel."""
-    hypothesis("the figure is genuine", not collinear(a, b, d))
-    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0)
+    hypothesis("the figure is genuine", not collinear(a, b, d), guard=True)
+    hypothesis("the division is a proper one", sign(part) > 0 and sign(1 - part) > 0, guard=True)
 
     # Two triangles sharing the vertex A, the second the first scaled about it,
     # so corresponding sides are parallel and the outer sides fall in a line.
@@ -1079,7 +1079,7 @@ def prop_VI_20(
 def prop_VI_31(a: Point, b: Point, c: Point) -> Out:
     """The right angle is at B; similar triangles are erected on the three sides."""
     hypothesis("the angle ABC is right", right_angle(a, b, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
 
     def similar_on(first: Point, second: Point) -> tuple[Point, Point, Point]:
         """Erect on the segment a triangle similar to ABC, on a fixed side."""

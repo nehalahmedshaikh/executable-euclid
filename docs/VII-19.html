@@ -6,7 +6,7 @@
     "products say the same thing.",
 )
 def prop_VII_19(a: int, b: int, c: int, d: int) -&gt; Out:
-    hypothesis("all four are numbers", all(n &gt; 1 for n in (a, b, c, d)))
+    hypothesis("all four are numbers", all(n &gt; 1 for n in (a, b, c, d)), guard=True)
     # Def.VII.20: numbers are proportional when the first is the same multiple,
     # part or parts of the second that the third is of the fourth -- which is to
     # say the two pairs agree once reduced to least terms.
@@ -20,4 +20,4 @@ def prop_VII_19(a: int, b: int, c: int, d: int) -&gt; Out:
               for x, y, z, w in ((a, b, c, d), (c, d, a, b))
               if x * w == y * z))
     return Out()
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

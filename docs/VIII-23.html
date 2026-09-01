@@ -4,10 +4,10 @@
     sample=lambda rng: (rng.randint(2, 8), rng.randint(2, 8)),
 )
 def prop_VIII_23(a: int, b: int) -&gt; Out:
-    hypothesis("the sides are genuine numbers", a &gt; 1 and b &gt; 1)
+    hypothesis("the sides are genuine numbers", a &gt; 1 and b &gt; 1, guard=True)
     terms = [a ** 3, a * a * b, a * b * b, b ** 3]
     hypothesis("the four are in continued proportion", in_continued_proportion(terms))
     hypothesis("the first is cube", is_cube(terms[0]))
     claim("the fourth is cube also", "VIII.23", is_cube(terms[3]))
     return Out()
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

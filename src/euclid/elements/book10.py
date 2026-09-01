@@ -479,7 +479,7 @@ def common_measure(a: Constructible, b: Constructible) -> Optional[Constructible
 )
 def prop_X_1(greater, part) -> Out:
     """Take away more than half, repeatedly, and any magnitude is undercut."""
-    hypothesis("the magnitudes are positive", sign(greater) > 0 and sign(part) > 0)
+    hypothesis("the magnitudes are positive", sign(greater) > 0 and sign(part) > 0, guard=True)
     lesser = greater * part
     hypothesis("the second is the less", sign(greater - lesser) > 0)
 
@@ -504,7 +504,7 @@ def prop_X_1(greater, part) -> Out:
 )
 def prop_X_2(a, b) -> Out:
     hypothesis("the magnitudes are positive and unequal",
-               sign(a) > 0 and sign(b) > 0 and a != b)
+               sign(a) > 0 and sign(b) > 0 and a != b, guard=True)
     greater, lesser = (a, b) if sign(a - b) > 0 else (b, a)
     quotients, ended = anthyphairesis(greater, lesser, steps=40)
 
@@ -521,7 +521,7 @@ def prop_X_2(a, b) -> Out:
     sample=_commensurable_pair,
 )
 def prop_X_3(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are commensurable", commensurable(a, b))
     measure = common_measure(a, b)
 
@@ -541,7 +541,7 @@ def prop_X_3(a, b) -> Out:
     + (_commensurable_pair(rng)[0] * Fraction(rng.randint(1, 4), rng.randint(1, 3)),),
 )
 def prop_X_4(a, b, c) -> Out:
-    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c)))
+    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c)), guard=True)
     hypothesis("all three are commensurable",
                commensurable(a, b) and commensurable(b, c))
     first = common_measure(a, b)
@@ -562,7 +562,7 @@ def prop_X_4(a, b, c) -> Out:
     sample=_commensurable_pair,
 )
 def prop_X_5(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are commensurable", commensurable(a, b))
     ratio = a / b
     claim("the ratio is that of a number to a number", "X.5",
@@ -580,7 +580,7 @@ def prop_X_5(a, b) -> Out:
 def prop_X_6(base, numerator: int, denominator: int) -> Out:
     """The converse of X.5."""
     hypothesis("the magnitude is positive", sign(base) > 0)
-    hypothesis("the numbers are genuine", numerator > 0 and denominator > 0)
+    hypothesis("the numbers are genuine", numerator > 0 and denominator > 0, guard=True)
     a = base * numerator
     b = base * denominator
     claim("the two stand in the ratio of the given numbers", "Def.X.1",
@@ -595,7 +595,7 @@ def prop_X_6(base, numerator: int, denominator: int) -> Out:
     sample=_incommensurable_pair,
 )
 def prop_X_7(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are incommensurable", not commensurable(a, b))
     claim("their ratio is not that of any number to a number", "X.7",
           not isinstance(a / b, Fraction))
@@ -612,7 +612,7 @@ def prop_X_7(a, b) -> Out:
 )
 def prop_X_8(a, b) -> Out:
     """The converse of X.7."""
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("no numbers put them in proportion",
                not any(a * q == b * p for p in range(1, 25) for q in range(1, 25)))
     claim("they are incommensurable", "X.8", not commensurable(a, b))
@@ -627,7 +627,7 @@ def prop_X_8(a, b) -> Out:
     "the squares standing in the ratio of two square numbers.",
 )
 def prop_X_9(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     ratio_of_squares = (a * a) / (b * b)
     square_ratio = (
         isinstance(ratio_of_squares, Fraction)
@@ -674,7 +674,7 @@ def _proportional_magnitudes(rng):
     sample=_proportional_magnitudes,
 )
 def prop_X_11(a, b, c, d) -> Out:
-    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c, d)))
+    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("the four are proportional", a * d == b * c)
     claim("commensurability passes across the proportion", "X.11",
           commensurable(a, b) == commensurable(c, d))
@@ -688,7 +688,7 @@ def prop_X_11(a, b, c, d) -> Out:
     + (Fraction(rng.randint(1, 5), rng.randint(1, 4)),),
 )
 def prop_X_12(a, b, scale) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("both are commensurable with the same", commensurable(a, b))
     c = b * scale
     claim("each is commensurable with the third", "X.12",
@@ -704,7 +704,7 @@ def prop_X_12(a, b, scale) -> Out:
     sample=lambda rng: _commensurable_pair(rng) + (_magnitude(rng),),
 )
 def prop_X_13(a, b, c) -> Out:
-    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c)))
+    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c)), guard=True)
     hypothesis("the first two are commensurable", commensurable(a, b))
     hypothesis("the first is incommensurable with the third", not commensurable(a, c))
     claim("then the second is incommensurable with it too", "X.13",
@@ -728,7 +728,7 @@ def _four_lines_with_excess(rng):
     "whose square is the excess is commensurable with the greater.",
 )
 def prop_X_14(a, b, c, d) -> Out:
-    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c, d)))
+    hypothesis("the magnitudes are positive", all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("the four are proportional", a * d == b * c)
     hypothesis("the squares of the greater exceed those of the less",
                sign(a * a - b * b) > 0 and sign(c * c - d * d) > 0)
@@ -745,7 +745,7 @@ def prop_X_14(a, b, c, d) -> Out:
     sample=_commensurable_pair,
 )
 def prop_X_15(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are commensurable", commensurable(a, b))
     claim("the whole is commensurable with each of them", "X.15",
           commensurable(a + b, a) and commensurable(a + b, b))
@@ -760,7 +760,7 @@ def prop_X_15(a, b) -> Out:
     sample=_incommensurable_pair,
 )
 def prop_X_16(a, b) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are incommensurable", not commensurable(a, b))
     claim("the whole is incommensurable with each of them", "X.16",
           not commensurable(a + b, a) and not commensurable(a + b, b))
@@ -786,7 +786,7 @@ def prop_X_17(greater, less) -> Out:
     """The parallelogram equal to a quarter the square on the less, deficient
     by a square, divides the greater at these two points."""
     hypothesis("the lines are positive and unequal",
-               sign(greater) > 0 and sign(less) > 0 and sign(greater - less) > 0)
+               sign(greater) > 0 and sign(less) > 0 and sign(greater - less) > 0, guard=True)
     excess = sqrt(greater * greater - less * less)
     parts = ((greater - excess) / 2, (greater + excess) / 2)
 
@@ -807,7 +807,7 @@ def prop_X_17(greater, less) -> Out:
 def prop_X_18(greater, less) -> Out:
     """The other half of X.17, stated for the incommensurable case."""
     hypothesis("the lines are positive and unequal",
-               sign(greater) > 0 and sign(less) > 0 and sign(greater - less) > 0)
+               sign(greater) > 0 and sign(less) > 0 and sign(greater - less) > 0, guard=True)
     excess = sqrt(greater * greater - less * less)
     parts = ((greater - excess) / 2, (greater + excess) / 2)
 
@@ -917,7 +917,7 @@ def prop_X_22(medial, rational) -> Out:
 )
 def prop_X_23(medial, scale) -> Out:
     hypothesis("the first is medial", is_medial(medial))
-    hypothesis("the scale is a genuine ratio", sign(scale) > 0)
+    hypothesis("the scale is a genuine ratio", sign(scale) > 0, guard=True)
     other = medial * scale
     claim("the second is commensurable with the first", "X.23", commensurable(medial, other))
     claim("and is itself medial", "X.23", is_medial(other))
@@ -931,7 +931,7 @@ def prop_X_23(medial, scale) -> Out:
 )
 def prop_X_24(medial, scale) -> Out:
     hypothesis("the first is medial", is_medial(medial))
-    hypothesis("the scale is a genuine ratio", sign(scale) > 0)
+    hypothesis("the scale is a genuine ratio", sign(scale) > 0, guard=True)
     other = medial * scale
     hypothesis("the two are commensurable in length", commensurable(medial, other))
     claim("both are medial", "X.23", is_medial(medial) and is_medial(other))
@@ -1042,7 +1042,7 @@ def prop_X_28(radicand: int) -> Out:
 )
 def prop_X_29(scale: int, offset: int) -> Out:
     """Rational lines in square only, the excess commensurable with the greater."""
-    hypothesis("the parameters are genuine", scale > 1 and offset > 0)
+    hypothesis("the parameters are genuine", scale > 1 and offset > 0, guard=True)
     # A Pythagorean-style pair: a = 5k, b = 4k gives excess 3k, commensurable.
     a = Fraction(5 * scale)
     b = Fraction(4 * scale)
@@ -1064,7 +1064,7 @@ def prop_X_29(scale: int, offset: int) -> Out:
 )
 def prop_X_30(scale: int) -> Out:
     """The same, but with the excess incommensurable with the greater."""
-    hypothesis("the parameter is genuine", scale > 1)
+    hypothesis("the parameter is genuine", scale > 1, guard=True)
     a = Fraction(2 * scale)
     b = Fraction(scale)
     excess = sqrt(a * a - b * b)  # sqrt(3) * scale
@@ -1121,7 +1121,7 @@ def prop_X_32(radicand: int) -> Out:
     note="The pair behind the *major* line: squares rational, rectangle medial.",
 )
 def prop_X_33(scale) -> Out:
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     squares = scale * scale
     rectangle = squares * sqrt(2) / 4
     a, b = _pair_from(squares, rectangle)
@@ -1619,7 +1619,7 @@ for _ref, _kind in {**_COMMENSURABLE_ADDED, **_COMMENSURABLE_SUBTRACTED}.items()
                      sample=lambda rng, _k=kind: _terms_for(_k)
                      + (Fraction(rng.randint(1, 5), rng.randint(1, 4)),))
         def _same_kind(a, b, scale, _k=kind, _sub=subtractive) -> Out:
-            hypothesis("the scale is a genuine ratio", sign(scale) > 0)
+            hypothesis("the scale is a genuine ratio", sign(scale) > 0, guard=True)
             compound = (a - b) if _sub else (a + b)
             hypothesis("the compound is positive", sign(compound) > 0)
             wanted = (SUBTRACTED_NAMES if _sub else ADDED_NAMES)[_k]
@@ -1648,7 +1648,7 @@ for _ref, _kind in {**_COMMENSURABLE_ADDED, **_COMMENSURABLE_SUBTRACTED}.items()
              note="Adding a rational area to a medial one produces one of four "
              "of the thirteen, and never anything outside them.")
 def prop_X_71(scale) -> Out:
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     rational_area = scale * scale
     medial_area = scale * scale * sqrt(2)
     side = sqrt(rational_area + medial_area)
@@ -1679,7 +1679,7 @@ def prop_X_72(radicand: int) -> Out:
 @proposition("X.108", THEOREM, sample=lambda rng: (Fraction(rng.randint(3, 8)),))
 def prop_X_108(scale) -> Out:
     """A medial area subtracted from a rational one."""
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     rational_area = scale * scale
     medial_area = sqrt(2)
     hypothesis("the medial area is the less", sign(rational_area - medial_area) > 0)
@@ -1695,7 +1695,7 @@ def prop_X_108(scale) -> Out:
 @proposition("X.109", THEOREM, sample=lambda rng: (Fraction(rng.randint(3, 8)),))
 def prop_X_109(scale) -> Out:
     """A rational area subtracted from a medial one."""
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     medial_area = scale * scale * sqrt(2)
     rational_area = Fraction(1)
     hypothesis("the rational area is the less", sign(medial_area - rational_area) > 0)
@@ -1731,7 +1731,7 @@ def prop_X_110(radicand: int) -> Out:
              note="The thirteen are genuinely thirteen: an apotome is never a "
              "binomial, so the two halves of the book do not overlap.")
 def prop_X_111(scale) -> Out:
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     binomial = scale + sqrt(2)
     apotome = scale - sqrt(2)
     hypothesis("the apotome is positive", sign(apotome) > 0)
@@ -1748,7 +1748,7 @@ def prop_X_111(scale) -> Out:
 @proposition("X.112", THEOREM, sample=lambda rng: (Fraction(rng.randint(2, 6)),))
 def prop_X_112(scale) -> Out:
     """A rational square applied to a binomial gives an apotome as breadth."""
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     binomial = 3 + sqrt(2)
     square = scale * scale
     breadth = square / binomial
@@ -1762,7 +1762,7 @@ def prop_X_112(scale) -> Out:
 @proposition("X.113", THEOREM, sample=lambda rng: (Fraction(rng.randint(2, 6)),))
 def prop_X_113(scale) -> Out:
     """The dual of X.112: a rational square applied to an apotome."""
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     apotome = 3 - sqrt(2)
     square = scale * scale
     breadth = square / apotome
@@ -1775,7 +1775,7 @@ def prop_X_113(scale) -> Out:
 @proposition("X.114", THEOREM, sample=lambda rng: (Fraction(rng.randint(2, 6)),))
 def prop_X_114(scale) -> Out:
     """An area contained by an apotome and a binomial with the same terms."""
-    hypothesis("the scale is genuine", sign(scale) > 0)
+    hypothesis("the scale is genuine", sign(scale) > 0, guard=True)
     binomial = scale + sqrt(2)
     apotome = scale - sqrt(2)
     hypothesis("the apotome is positive", sign(apotome) > 0)

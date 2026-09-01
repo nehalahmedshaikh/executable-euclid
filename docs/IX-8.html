@@ -6,7 +6,7 @@
     "square, the fourth a cube, the seventh both -- because 2, 3 and 6 are.",
 )
 def prop_IX_8(ratio: int, count: int) -&gt; Out:
-    hypothesis("the progression is genuine", ratio &gt; 1 and count &gt;= 7)
+    hypothesis("the progression is genuine", ratio &gt; 1 and count &gt;= 7, guard=True)
     terms = [ratio ** k for k in range(count)]  # 1, r, r^2, ...
     claim("the terms are in continued proportion from a unit", "Def.VII.20",
           terms[0] == 1 and in_continued_proportion(terms))
@@ -17,4 +17,4 @@ def prop_IX_8(ratio: int, count: int) -&gt; Out:
     claim("and the seventh is at once square and cube", "IX.8",
           is_square(terms[6]) and is_cube(terms[6]))
     return Out(terms=terms)
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

@@ -218,7 +218,7 @@ def _parallel_through(point: Point, first: Point, second: Point) -> Line:
     sample=samples.triangle,
 )
 def prop_I_32(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     d = posit(Point(c.x + (c.x - b.x), c.y + (c.y - b.y)), "D")
     line(b, d, "BC produced to D")
     _parallel_through(c, a, b)
@@ -468,8 +468,8 @@ def _triangle_and_angle(rng):
     sample=_triangle_and_angle,
 )
 def prop_I_42(a: Point, b: Point, c: Point, p: Point, q: Point, r: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
-    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r), guard=True)
     outline(p, q, r, close=False)  # the arms of the given angle
 
     middle = posit(prop_I_10(b, c).midpoint, "E")
@@ -520,8 +520,8 @@ def prop_I_44(
     away_from: "Point | None" = None,
 ) -> Out:
     hypothesis("A and B are distinct", a != b)
-    hypothesis("CDE is a genuine triangle", not collinear(c, d, e))
-    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    hypothesis("CDE is a genuine triangle", not collinear(c, d, e), guard=True)
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r), guard=True)
     outline(p, q, r, close=False)  # the arms of the given angle
 
     # Carry a parallelogram equal to the triangle, in the given angle, over to B,
@@ -621,10 +621,10 @@ def _figure_and_angle(rng):
 def prop_I_45(a: Point, b: Point, c: Point, d: Point, p: Point, q: Point, r: Point) -> Out:
     """The quadrilateral is cut into two triangles; the first gets a
     parallelogram by I.42, the second is applied to its side by I.44."""
-    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r), guard=True)
     outline(p, q, r, close=False)  # the arms of the given angle
     hypothesis("ABCD is a genuine quadrilateral",
-               not collinear(a, b, c) and not collinear(a, c, d))
+               not collinear(a, b, c) and not collinear(a, c, d), guard=True)
     diameter = line(a, c, "the diameter AC dividing the figure")
 
     first = prop_I_42(a, b, c, p, q, r)
@@ -692,7 +692,7 @@ def prop_I_46(a: Point, b: Point) -> Out:
 def prop_I_47(a: Point, b: Point, c: Point) -> Out:
     """The right angle is at B."""
     hypothesis("the angle ABC is right", right_angle(a, b, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
 
     on_hypotenuse = prop_I_46(a, c).square
     on_first = prop_I_46(b, a).square
@@ -717,7 +717,7 @@ def prop_I_47(a: Point, b: Point, c: Point) -> Out:
     sample=samples.right_triangle,
 )
 def prop_I_48(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("the square on AC equals those on AB and BC",
                len2(a, c) == len2(a, b) + len2(b, c))
     outline(a, b, c)

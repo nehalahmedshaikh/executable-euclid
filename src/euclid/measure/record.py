@@ -67,6 +67,7 @@ def write_findings(trials: int = 48, path: Optional[Path] = None) -> dict:
             "coverage": round(report.coverage, 4),
             "needed": sum(1 for i in report.tested if i.verdict == "needed"),
             "well_defined": sum(1 for i in report.tested if i.verdict == "well-definedness"),
+            "surviving_guards": len(report.surviving_guards),
             "candidates": [
                 {"ref": i.ref, "text": i.text, "configurations": i.broken}
                 for i in sorted(report.candidates, key=lambda x: -x.broken)

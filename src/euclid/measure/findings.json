@@ -58,11 +58,12 @@
   },
   "necessity": {
     "propositions": 390,
-    "hypotheses": 730,
-    "judged": 324,
-    "coverage": 0.4438,
-    "needed": 199,
+    "hypotheses": 731,
+    "judged": 331,
+    "coverage": 0.4528,
+    "needed": 204,
     "well_defined": 26,
+    "surviving_guards": 75,
     "candidates": [
       {
         "ref": "II.10",
@@ -70,28 +71,13 @@
         "configurations": 33
       },
       {
-        "ref": "VII.8",
-        "text": "the fraction is a genuine one",
-        "configurations": 30
-      },
-      {
         "ref": "II.9",
         "text": "D cuts AB",
         "configurations": 28
       },
       {
-        "ref": "VIII.10",
-        "text": "the ratio is in least terms",
-        "configurations": 24
-      },
-      {
-        "ref": "VIII.13",
-        "text": "the ratio is in least terms",
-        "configurations": 24
-      },
-      {
-        "ref": "VIII.8",
-        "text": "the ratio is in least terms",
+        "ref": "VIII.9",
+        "text": "the extremes are prime to one another",
         "configurations": 22
       },
       {
@@ -120,213 +106,13 @@
         "configurations": 11
       },
       {
-        "ref": "IX.10",
-        "text": "the progression is genuine",
-        "configurations": 8
-      },
-      {
         "ref": "X.1",
         "text": "the second is the less",
         "configurations": 8
       },
       {
-        "ref": "VII.10",
-        "text": "the fraction is a genuine one",
-        "configurations": 7
-      },
-      {
-        "ref": "VIII.7",
-        "text": "the ratio and length are genuine",
-        "configurations": 7
-      },
-      {
-        "ref": "VIII.27",
-        "text": "the sides are genuine numbers",
-        "configurations": 7
-      },
-      {
-        "ref": "VII.7",
-        "text": "the subtraction is a proper one",
-        "configurations": 6
-      },
-      {
-        "ref": "VIII.3",
-        "text": "the ratio is in least terms",
-        "configurations": 6
-      },
-      {
-        "ref": "VIII.25",
-        "text": "the numbers are genuine",
-        "configurations": 6
-      },
-      {
-        "ref": "IX.12",
-        "text": "the progression is genuine",
-        "configurations": 6
-      },
-      {
-        "ref": "X.3",
-        "text": "the magnitudes are positive",
-        "configurations": 6
-      },
-      {
-        "ref": "X.29",
-        "text": "the parameters are genuine",
-        "configurations": 6
-      },
-      {
-        "ref": "VIII.1",
-        "text": "a genuine progression is asked for",
-        "configurations": 5
-      },
-      {
-        "ref": "VIII.6",
-        "text": "a genuine progression is asked for",
-        "configurations": 5
-      },
-      {
-        "ref": "VIII.19",
-        "text": "the sides are genuine numbers",
-        "configurations": 5
-      },
-      {
-        "ref": "IX.17",
-        "text": "a genuine progression is asked for",
-        "configurations": 5
-      },
-      {
-        "ref": "IX.32",
-        "text": "a genuine doubling is asked for",
-        "configurations": 5
-      },
-      {
-        "ref": "X.7",
-        "text": "the magnitudes are positive",
-        "configurations": 5
-      },
-      {
-        "ref": "V.15",
-        "text": "the magnitudes are positive",
-        "configurations": 4
-      },
-      {
-        "ref": "VII.6",
-        "text": "the fraction is a genuine one",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.1",
-        "text": "the ratio is in least terms",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.4",
-        "text": "the ratios are genuine",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.8",
-        "text": "a genuine progression is asked for",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.9",
-        "text": "a genuine progression is asked for",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.17",
-        "text": "the sides are genuine numbers",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.18",
-        "text": "the sides are genuine numbers",
-        "configurations": 4
-      },
-      {
-        "ref": "VIII.23",
-        "text": "the sides are genuine numbers",
-        "configurations": 4
-      },
-      {
-        "ref": "IX.35",
-        "text": "the progression is genuine",
-        "configurations": 4
-      },
-      {
-        "ref": "X.16",
-        "text": "the magnitudes are positive",
-        "configurations": 4
-      },
-      {
         "ref": "V.5",
         "text": "the part subtracted is less than the whole",
-        "configurations": 3
-      },
-      {
-        "ref": "V.7",
-        "text": "the magnitudes are positive",
-        "configurations": 3
-      },
-      {
-        "ref": "VII.39",
-        "text": "the parts are genuine",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.3",
-        "text": "a genuine progression is asked for",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.5",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.12",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.13",
-        "text": "a genuine progression is asked for",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.15",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.20",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.21",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "VIII.26",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "IX.1",
-        "text": "the sides are genuine numbers",
-        "configurations": 3
-      },
-      {
-        "ref": "IX.11",
-        "text": "the progression is genuine",
-        "configurations": 3
-      },
-      {
-        "ref": "X.12",
-        "text": "the magnitudes are positive",
         "configurations": 3
       },
       {
@@ -345,108 +131,8 @@
         "configurations": 2
       },
       {
-        "ref": "V.5",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "V.24",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "VI.18",
-        "text": "the given figure is genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "VI.24",
-        "text": "the division is a proper one",
-        "configurations": 2
-      },
-      {
-        "ref": "VI.32",
-        "text": "the division is a proper one",
-        "configurations": 2
-      },
-      {
         "ref": "VII.16",
         "text": "both are numbers",
-        "configurations": 2
-      },
-      {
-        "ref": "VIII.9",
-        "text": "the ratio is in least terms",
-        "configurations": 2
-      },
-      {
-        "ref": "VIII.10",
-        "text": "a genuine progression is asked for",
-        "configurations": 2
-      },
-      {
-        "ref": "VIII.11",
-        "text": "the sides are genuine numbers",
-        "configurations": 2
-      },
-      {
-        "ref": "VIII.22",
-        "text": "the sides are genuine numbers",
-        "configurations": 2
-      },
-      {
-        "ref": "VIII.24",
-        "text": "the numbers are genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "IX.3",
-        "text": "the number is genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "IX.5",
-        "text": "the numbers are genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "IX.9",
-        "text": "the progression is genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "IX.13",
-        "text": "the progression is genuine",
-        "configurations": 2
-      },
-      {
-        "ref": "X.4",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "X.5",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "X.9",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "X.15",
-        "text": "the magnitudes are positive",
-        "configurations": 2
-      },
-      {
-        "ref": "X.24",
-        "text": "the scale is a genuine ratio",
-        "configurations": 2
-      },
-      {
-        "ref": "X.30",
-        "text": "the parameter is genuine",
         "configurations": 2
       },
       {
@@ -470,33 +156,8 @@
         "configurations": 1
       },
       {
-        "ref": "V.1",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "V.3",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
         "ref": "V.10",
         "text": "A and B are unequal",
-        "configurations": 1
-      },
-      {
-        "ref": "V.13",
-        "text": "the magnitudes are positive",
-        "configurations": 1
-      },
-      {
-        "ref": "VI.26",
-        "text": "the division is a proper one",
-        "configurations": 1
-      },
-      {
-        "ref": "VI.32",
-        "text": "the figure is genuine",
         "configurations": 1
       },
       {
@@ -507,11 +168,6 @@
       {
         "ref": "VII.3",
         "text": "all three are greater than a unit",
-        "configurations": 1
-      },
-      {
-        "ref": "VII.8",
-        "text": "the subtraction is a proper one",
         "configurations": 1
       },
       {
@@ -530,28 +186,8 @@
         "configurations": 1
       },
       {
-        "ref": "VIII.2",
-        "text": "a genuine progression is asked for",
-        "configurations": 1
-      },
-      {
-        "ref": "VIII.16",
-        "text": "the sides are genuine numbers",
-        "configurations": 1
-      },
-      {
         "ref": "IX.18",
         "text": "both are numbers",
-        "configurations": 1
-      },
-      {
-        "ref": "X.2",
-        "text": "the magnitudes are positive and unequal",
-        "configurations": 1
-      },
-      {
-        "ref": "X.13",
-        "text": "the magnitudes are positive",
         "configurations": 1
       },
       {
@@ -1121,21 +757,14 @@
     ]
   },
   "book_x_gaps": {
-    "candidates_named": 66,
-    "candidates_unnamed": 50,
+    "candidates_named": 1134,
+    "candidates_unnamed": 5376,
     "witnesses": [
       {
         "expression": "1 + sqrt2 + sqrt3",
         "value": 4.1462643699,
         "degree": 4,
         "minimal_polynomial": "x^4 - 4*x^3 - 4*x^2 + 16*x - 8 = 0",
-        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
-      },
-      {
-        "expression": "1 + sqrt2 + sqrt5",
-        "value": 4.6502815399,
-        "degree": 4,
-        "minimal_polynomial": "x^4 - 4*x^3 - 8*x^2 + 24*x - 4 = 0",
         "reason": "it resolves into 3 terms, where Book X's definitions treat two"
       },
       {
@@ -1146,24 +775,31 @@
         "reason": "it resolves into 3 terms, where Book X's definitions treat two"
       },
       {
-        "expression": "1 + sqrt2 + sqrt7",
-        "value": 5.0599648734,
-        "degree": 4,
-        "minimal_polynomial": "x^4 - 4*x^3 - 12*x^2 + 32*x + 8 = 0",
-        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
-      },
-      {
-        "expression": "1 + sqrt3 + sqrt5",
-        "value": 4.9681187851,
-        "degree": 4,
-        "minimal_polynomial": "x^4 - 4*x^3 - 10*x^2 + 28*x - 11 = 0",
-        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
-      },
-      {
         "expression": "1 + sqrt3 + sqrt6",
         "value": 5.1815405504,
         "degree": 4,
         "minimal_polynomial": "x^4 - 4*x^3 - 12*x^2 + 32*x - 8 = 0",
+        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
+      },
+      {
+        "expression": "sqrt2 + sqrt3 + sqrt6",
+        "value": 5.5957541127,
+        "degree": 4,
+        "minimal_polynomial": "x^4 - 22*x^2 - 48*x - 23 = 0",
+        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
+      },
+      {
+        "expression": "-1 + sqrt2 + sqrt3",
+        "value": 2.1462643699,
+        "degree": 4,
+        "minimal_polynomial": "x^4 + 4*x^3 - 4*x^2 - 16*x - 8 = 0",
+        "reason": "it resolves into 3 terms, where Book X's definitions treat two"
+      },
+      {
+        "expression": "-1 + sqrt2 + sqrt6",
+        "value": 2.8637033052,
+        "degree": 4,
+        "minimal_polynomial": "x^4 + 4*x^3 - 10*x^2 - 28*x + 1 = 0",
         "reason": "it resolves into 3 terms, where Book X's definitions treat two"
       }
     ]

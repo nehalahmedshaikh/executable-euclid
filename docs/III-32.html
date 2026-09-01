@@ -9,7 +9,7 @@ def prop_III_32(o: Point, a: Point, b: Point, c: Point) -&gt; Out:
     """The tangent at A, and the chord AB, with C in the alternate segment."""
     hypothesis("the points lie on the circle",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     circle(o, a, "the given circle")
     outline(a, b, c)
     _tangent_at(o, a, "the tangent at A")
@@ -29,4 +29,4 @@ def prop_III_32(o: Point, a: Point, b: Point, c: Point) -&gt; Out:
     claim("the angle between tangent and chord equals the angle in the alternate "
           "segment", "III.21", eq_angle(alternate, a, b, a, c, b))
     return Out(tangent_angle=angle_at(alternate, a, b))
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

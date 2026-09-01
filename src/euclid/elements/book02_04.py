@@ -461,7 +461,7 @@ def _foot_of_the_perpendicular(apex: Point, first: Point, second: Point) -> Poin
 )
 def prop_II_12(a: Point, b: Point, c: Point) -> Out:
     """The obtuse angle is at B; the perpendicular from A falls on CB produced."""
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("the angle at B is obtuse", angle_at(a, b, c) > RIGHT)
     outline(a, b, c)
 
@@ -491,7 +491,7 @@ def prop_II_12(a: Point, b: Point, c: Point) -> Out:
 )
 def prop_II_13(a: Point, b: Point, c: Point) -> Out:
     """The angle at B is acute; the perpendicular from A falls inside CB."""
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("the angle at B is acute", angle_at(a, b, c) < RIGHT)
     outline(a, b, c)
 
@@ -913,7 +913,7 @@ def prop_III_14(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     """AB and CD are two chords of the circle about O."""
     hypothesis("the four points lie on the circle",
                all(eq_len(o, p, o, a) for p in (b, c, d)))
-    hypothesis("the chords are genuine", a != b and c != d)
+    hypothesis("the chords are genuine", a != b and c != d, guard=True)
     # A chord through the centre is bisected by it, so the perpendicular Euclid
     # drops from the centre has no length and there is no line OE to draw. He
     # states no such proviso and his figure shows neither chord as a diameter.
@@ -948,7 +948,7 @@ def prop_III_14(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
 def prop_III_15(o: Point, a: Point, b: Point, c: Point) -> Out:
     """AB is a chord; the diameter through A is compared with it."""
     hypothesis("the points lie on the circle", eq_len(o, a, o, b) and eq_len(o, a, o, c))
-    hypothesis("the chords are genuine", a != b and a != c)
+    hypothesis("the chords are genuine", a != b and a != c, guard=True)
     circle(o, a, "the given circle")
     far = posit(Point(o.x - (a.x - o.x), o.y - (a.y - o.y)), "D")
     line(a, far, "the diameter AD")
@@ -1043,7 +1043,7 @@ def prop_III_17(o: Point, a: Point, beyond) -> Out:
 def prop_III_18(o: Point, a: Point, reach) -> Out:
     """The tangent at A, and the radius drawn to A."""
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("a point of the tangent is taken", sign(reach) > 0)
+    hypothesis("a point of the tangent is taken", sign(reach) > 0, guard=True)
     circle(o, a, "the given circle")
     tangent = _tangent_at(o, a, "the tangent at A")
     across = _across(o, a)
@@ -1064,7 +1064,7 @@ def prop_III_18(o: Point, a: Point, reach) -> Out:
 )
 def prop_III_19(o: Point, a: Point, reach) -> Out:
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("a point of the tangent is taken", sign(reach) > 0)
+    hypothesis("a point of the tangent is taken", sign(reach) > 0, guard=True)
     circle(o, a, "the given circle")
     _tangent_at(o, a, "the tangent at A")
     across = _across(o, a)
@@ -1332,7 +1332,7 @@ def prop_III_32(o: Point, a: Point, b: Point, c: Point) -> Out:
     """The tangent at A, and the chord AB, with C in the alternate segment."""
     hypothesis("the points lie on the circle",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     circle(o, a, "the given circle")
     outline(a, b, c)
     _tangent_at(o, a, "the tangent at A")
@@ -1362,7 +1362,7 @@ def prop_III_32(o: Point, a: Point, b: Point, c: Point) -> Out:
 def prop_III_33(a: Point, b: Point, p: Point, q: Point, r: Point) -> Out:
     """On AB, describe a segment admitting an angle equal to PQR."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r), guard=True)
     line(a, b, "the given line AB")
     outline(p, q, r, close=False)
 
@@ -1411,7 +1411,7 @@ def prop_III_33(a: Point, b: Point, p: Point, q: Point, r: Point) -> Out:
 def prop_III_34(o: Point, a: Point, p: Point, q: Point, r: Point) -> Out:
     """From the given circle, cut off a segment admitting the given angle."""
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("PQR is a genuine angle", not collinear(p, q, r))
+    hypothesis("PQR is a genuine angle", not collinear(p, q, r), guard=True)
     around = circle(o, a, "the given circle")
     outline(p, q, r, close=False)
 
@@ -1562,7 +1562,7 @@ def prop_III_20(o: Point, a: Point, b: Point, c: Point) -> Out:
     hypothesis("A, B and C lie on the circle centred at O",
                eq_len(o, a, o, b) and eq_len(o, a, o, c))
     hypothesis("the three points are distinct", a != b and b != c and a != c)
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     circle(o, a, "the circle")
     outline(a, b, c)
     line(o, a, "a radius")
@@ -1739,7 +1739,7 @@ def _centre_of(a: Point, b: Point, c: Point) -> Point:
 def prop_IV_1(o: Point, a: Point, c: Point, d: Point) -> Out:
     """Fit into the circle about O a chord equal to the given line CD."""
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("CD is a genuine magnitude", c != d)
+    hypothesis("CD is a genuine magnitude", c != d, guard=True)
     hypothesis("CD is not greater than the diameter", len2(c, d) <= 4 * len2(o, a))
     given = circle(o, a, "the given circle")
     line(c, d, "the given line CD")
@@ -1762,7 +1762,7 @@ def prop_IV_1(o: Point, a: Point, c: Point, d: Point) -> Out:
     "cross, and stays rational when the vertices are.",
 )
 def prop_IV_5(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
 
     centre = posit(_centre_of(a, b, c), "O")
@@ -1963,7 +1963,7 @@ def _tangent_at(centre: Point, touch: Point, label: str = "") -> Line:
 def prop_IV_2(o: Point, a: Point, d: Point, e: Point, f: Point) -> Out:
     """Inscribe in the circle about O a triangle equiangular with DEF."""
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("DEF is a genuine triangle", not collinear(d, e, f))
+    hypothesis("DEF is a genuine triangle", not collinear(d, e, f), guard=True)
     around = circle(o, a, "the given circle")
     outline(d, e, f)
 
@@ -1996,7 +1996,7 @@ def prop_IV_2(o: Point, a: Point, d: Point, e: Point, f: Point) -> Out:
 def prop_IV_3(o: Point, a: Point, d: Point, e: Point, f: Point) -> Out:
     """Circumscribe about the circle a triangle equiangular with DEF."""
     hypothesis("the circle has positive radius", o != a)
-    hypothesis("DEF is a genuine triangle", not collinear(d, e, f))
+    hypothesis("DEF is a genuine triangle", not collinear(d, e, f), guard=True)
     around = circle(o, a, "the given circle")
     outline(d, e, f)
 
@@ -2065,7 +2065,7 @@ def prop_IV_12(o: Point, a: Point) -> Out:
     "the circumcentre it is irrational in general -- the kernel carries it exactly.",
 )
 def prop_IV_4(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
 
     # Where two angle bisectors cross. Weighting each vertex by the opposite

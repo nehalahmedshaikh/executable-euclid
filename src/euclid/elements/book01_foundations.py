@@ -75,7 +75,7 @@ def prop_I_2(a: Point, b: Point, c: Point) -> Out:
     """Euclid cannot simply carry a length across the plane -- his compass
     collapses -- so he transports it through an equilateral triangle."""
     hypothesis("A and B are distinct", a != b)
-    hypothesis("BC is a genuine magnitude", b != c)
+    hypothesis("BC is a genuine magnitude", b != c, guard=True)
     line(b, c, "the given line BC")
 
     apex = posit(prop_I_1(a, b).apex, "D")
@@ -403,7 +403,7 @@ def prop_I_14(a: Point, b: Point, c: Point, d: Point) -> Out:
 def prop_I_15(a: Point, b: Point, c: Point, d: Point) -> Out:
     crossing = posit(meet_one(line(a, b), line(c, d)), "E")
     hypothesis("the lines genuinely cross between the endpoints",
-               between(a, crossing, b) and between(c, crossing, d))
+               between(a, crossing, b) and between(c, crossing, d), guard=True)
 
     claim("angle AEC and angle CEB together are two right angles", "I.13",
           angle_at(a, crossing, c) + angle_at(c, crossing, b) == STRAIGHT)
@@ -429,7 +429,7 @@ def prop_I_15(a: Point, b: Point, c: Point, d: Point) -> Out:
     "of a step that fails on a sphere.",
 )
 def prop_I_16(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
 
     # produce BC to D
     d = posit(Point(c.x + (c.x - b.x), c.y + (c.y - b.y)), "D")
@@ -457,7 +457,7 @@ def prop_I_16(a: Point, b: Point, c: Point) -> Out:
     sample=samples.triangle,
 )
 def prop_I_17(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
     alpha, beta, gamma = angle_at(b, a, c), angle_at(a, b, c), angle_at(a, c, b)
     claim("angle A and angle B together fall short of two right angles", "I.16",
@@ -483,7 +483,7 @@ def _unequal_sides(rng):
     sample=_unequal_sides,
 )
 def prop_I_18(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("AC is greater than AB", len2(a, c) > len2(a, b))
     outline(a, b, c)
     claim("cutting AD equal to AB from the greater side and using I.5 and I.16, "
@@ -498,7 +498,7 @@ def prop_I_18(a: Point, b: Point, c: Point) -> Out:
     sample=_unequal_sides,
 )
 def prop_I_19(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("the angle ABC is greater than the angle BCA", angle_cmp(a, b, c, b, c, a) > 0)
     outline(a, b, c)
     claim("were AC not greater than AB, I.5 or I.18 would contradict the hypothesis",
@@ -513,7 +513,7 @@ def prop_I_19(a: Point, b: Point, c: Point) -> Out:
     note="The triangle inequality -- which the Epicureans mocked as evident even to an ass.",
 )
 def prop_I_20(a: Point, b: Point, c: Point) -> Out:
-    hypothesis("ABC is a genuine triangle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
     ab, bc, ca = length(a, b), length(b, c), length(c, a)
     claim("BA together with AC is greater than BC", ["I.5", "I.19"], ab + ca > bc)
@@ -637,7 +637,7 @@ def prop_I_23(
     beside: "Point | None" = None,
     apart_from: "Point | None" = None,
 ) -> Out:
-    hypothesis("ABC is a genuine angle", not collinear(a, b, c))
+    hypothesis("ABC is a genuine angle", not collinear(a, b, c), guard=True)
     hypothesis("P and Q are distinct", p != q)
 
     outline(a, b, c, close=False)  # the arms of the given angle

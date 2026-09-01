@@ -102,7 +102,7 @@ cross-references back.
 
 **The necessity analysis is empirical and partial.** A hypothesis that survives
 being broken is reported as a candidate, with the number of configurations behind
-it. Coverage is 44%: a run that breaks two hypotheses at once cannot attribute
+it. Coverage is 45%: a run that breaks two hypotheses at once cannot attribute
 the outcome to either, so it is discarded, and what cannot be broken alone is
 reported as untested.
 

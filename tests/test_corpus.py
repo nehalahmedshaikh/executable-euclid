@@ -232,3 +232,45 @@ def test_a_flip_is_found_even_when_the_route_varies():
     ledger = audit("III.23", trials=8)
     flips = [item for item in ledger.of_kind("case") if "true in some" in item.detail]
     assert len(flips) >= 2, f"only {len(flips)} flips found in III.23"
+
+
+def test_no_proposition_states_a_condition_euclid_does_not(corpus):
+    """An added hypothesis narrows a theorem, and narrowing it is not faithful.
+
+    VIII.8, VIII.10 and VIII.13 required their ratio to be in least terms.
+    Heath's enunciations say no such thing -- squaring a continued proportion
+    gives a continued proportion whatever the ratio -- and the necessity
+    analysis found all three, because a condition that does no work survives
+    being broken.
+
+    The guard here is narrow and mechanical: where Euclid's own words say
+    "least", the encoding must too. It cannot detect an over-constraint whose
+    vocabulary differs from his.
+    """
+    from euclid.elements.registry import HEATH
+
+    missing = [entry.ref for entry in all_propositions()
+               if "least" in HEATH[entry.ref].lower()
+               and "least" not in entry.source().lower()]
+    assert not missing, f"leastness dropped from {missing}"
+
+
+def test_a_guard_is_marked_as_one(corpus):
+    """Well-formedness conditions are ours; Euclid's hypotheses are his.
+
+    A ratio that is not 1, a count of at least three, a positive magnitude --
+    breaking those says nothing about the Elements. Reporting them beside real
+    hypotheses made the necessity figure mean less than it looked like.
+    """
+    import re
+
+    unmarked = []
+    for entry in all_propositions():
+        source = entry.source()
+        for match in re.finditer(r'hypothesis\(\s*"([^"]+)"', source):
+            text = match.group(1).lower()
+            if any(word in text for word in ("genuine", "are positive", "proper one")):
+                tail = source[match.start():match.start() + 400]
+                if "guard=True" not in tail.split("hypothesis(")[1][:300]:
+                    unmarked.append((entry.ref, match.group(1)))
+    assert not unmarked, f"unmarked well-formedness guards: {unmarked[:5]}"

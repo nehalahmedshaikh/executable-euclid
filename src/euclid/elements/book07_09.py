@@ -148,7 +148,7 @@ def _a_part_of(rng):
     "the subtraction runs down to a unit exactly when the numbers are coprime.",
 )
 def prop_VII_1(a: int, b: int) -> Out:
-    hypothesis("the numbers are unequal and greater than a unit", a > b > 1)
+    hypothesis("the numbers are unequal and greater than a unit", a > b > 1, guard=True)
     trail = anthyphairesis_integers(a, b)
     reached_a_unit = gcd(a, b) == 1
 
@@ -172,7 +172,7 @@ def _three_numbers(rng):
     sample=_three_numbers,
 )
 def prop_VII_3(a: int, b: int, c: int) -> Out:
-    hypothesis("all three are greater than a unit", a > 1 and b > 1 and c > 1)
+    hypothesis("all three are greater than a unit", a > 1 and b > 1 and c > 1, guard=True)
     measure = gcd(gcd(a, b), c)
     claim("the measure found measures all three", "VII.2",
           all(measures(measure, n) for n in (a, b, c)))
@@ -190,7 +190,7 @@ def prop_VII_3(a: int, b: int, c: int) -> Out:
     "numerator is a unit, 'parts' when it is not.",
 )
 def prop_VII_4(a: int, b: int) -> Out:
-    hypothesis("the numbers are unequal and greater than a unit", a > b > 1)
+    hypothesis("the numbers are unequal and greater than a unit", a > b > 1, guard=True)
     numerator, denominator = least_terms(b, a)
     claim("the less is a part of the greater when it measures it", "Def.VII.3",
           (numerator == 1) == measures(b, a))
@@ -227,7 +227,7 @@ def prop_VII_5(part: int, whole: int, other: int) -> Out:
 def prop_VII_6(numerator: int, denominator: int, first: int, second: int) -> Out:
     """The 'parts' version of VII.5: a fraction, not just a unit fraction."""
     hypothesis("the fraction is a genuine one",
-               denominator > numerator > 0)
+               denominator > numerator > 0, guard=True)
     hypothesis("it applies to both numbers exactly",
                measures(denominator, first) and measures(denominator, second))
     a = first * numerator // denominator
@@ -246,7 +246,7 @@ def prop_VII_6(numerator: int, denominator: int, first: int, second: int) -> Out
 )
 def prop_VII_7(times: int, whole: int, taken: int) -> Out:
     """A part subtracted from a part leaves the same part of the remainder."""
-    hypothesis("the subtraction is a proper one", whole > taken > 0 and times > 1)
+    hypothesis("the subtraction is a proper one", whole > taken > 0 and times > 1, guard=True)
     big, small = whole * times, taken * times
     claim("each is the same part of its own", "Def.VII.3",
           big == whole * times and small == taken * times)
@@ -263,8 +263,8 @@ def prop_VII_7(times: int, whole: int, taken: int) -> Out:
 )
 def prop_VII_8(numerator: int, denominator: int, whole: int, taken: int) -> Out:
     """The 'parts' version of VII.7."""
-    hypothesis("the fraction is a genuine one", denominator > numerator > 0)
-    hypothesis("the subtraction is a proper one", whole > taken > 0)
+    hypothesis("the fraction is a genuine one", denominator > numerator > 0, guard=True)
+    hypothesis("the subtraction is a proper one", whole > taken > 0, guard=True)
     big, small = whole * denominator, taken * denominator
     claim("the remainder is the same parts of the remainder", "VII.8",
           (big - small) * numerator == (whole - taken) * denominator * numerator)
@@ -293,7 +293,7 @@ def prop_VII_9(part: int, whole: int, other: int) -> Out:
 )
 def prop_VII_10(numerator: int, denominator: int, first: int, second: int) -> Out:
     """The 'parts' version of VII.9."""
-    hypothesis("the fraction is a genuine one", denominator > numerator > 0)
+    hypothesis("the fraction is a genuine one", denominator > numerator > 0, guard=True)
     hypothesis("it applies to both numbers exactly",
                measures(denominator, first) and measures(denominator, second))
     a = first * numerator // denominator
@@ -354,7 +354,7 @@ def prop_VII_13(a: int, b: int, c: int, d: int) -> Out:
 )
 def prop_VII_14(a: int, b: int, c: int, scale: int) -> Out:
     """Three numbers and three more, in the same ratio two and two."""
-    hypothesis("the numbers are genuine", a > 1 and b > 1 and c > 1 and scale > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1 and c > 1 and scale > 1, guard=True)
     d, e, f = a * scale, b * scale, c * scale
     claim("the pairs are in the same ratio", "VII.13", a * e == b * d and b * f == c * e)
     claim("so ex aequali the first is to the third as the fourth to the sixth",
@@ -369,7 +369,7 @@ def prop_VII_14(a: int, b: int, c: int, scale: int) -> Out:
 )
 def prop_VII_15(number: int, times: int) -> Out:
     """A unit measures a number as that number measures its multiple."""
-    hypothesis("the numbers are genuine", number > 1 and times > 1)
+    hypothesis("the numbers are genuine", number > 1 and times > 1, guard=True)
     product = number * times
     claim("the unit measures the number as many times as the number itself",
           "Def.VII.2", 1 * number == number)
@@ -386,7 +386,7 @@ def prop_VII_15(number: int, times: int) -> Out:
     "is 'a taken b times' and that is not obviously the same as b taken a times.",
 )
 def prop_VII_16(a: int, b: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1)
+    hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     claim("a taken b times equals b taken a times", "VII.16",
           sum(a for _ in range(b)) == sum(b for _ in range(a)))
     claim("so the two products are equal", "VII.16", a * b == b * a)
@@ -399,7 +399,7 @@ def prop_VII_16(a: int, b: int) -> Out:
     sample=_three_numbers,
 )
 def prop_VII_17(a: int, b: int, c: int) -> Out:
-    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1)
+    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     claim("the products have the same ratio as the numbers multiplied", "VII.17",
           (a * b) * c == (a * c) * b)
     return Out()
@@ -411,7 +411,7 @@ def prop_VII_17(a: int, b: int, c: int) -> Out:
     sample=_three_numbers,
 )
 def prop_VII_18(a: int, b: int, c: int) -> Out:
-    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1)
+    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     claim("the products have the same ratio as the multipliers", "VII.18",
           (a * c) * b == (b * c) * a)
     return Out()
@@ -425,7 +425,7 @@ def prop_VII_18(a: int, b: int, c: int) -> Out:
     "products say the same thing.",
 )
 def prop_VII_19(a: int, b: int, c: int, d: int) -> Out:
-    hypothesis("all four are numbers", all(n > 1 for n in (a, b, c, d)))
+    hypothesis("all four are numbers", all(n > 1 for n in (a, b, c, d)), guard=True)
     # Def.VII.20: numbers are proportional when the first is the same multiple,
     # part or parts of the second that the third is of the fourth -- which is to
     # say the two pairs agree once reduced to least terms.
@@ -450,7 +450,7 @@ def prop_VII_19(a: int, b: int, c: int, d: int) -> Out:
 )
 def prop_VII_20(a: int, b: int, c: int, d: int) -> Out:
     hypothesis("the four are proportional", a * d == b * c)
-    hypothesis("all four are numbers", all(n > 1 for n in (a, b, c, d)))
+    hypothesis("all four are numbers", all(n > 1 for n in (a, b, c, d)), guard=True)
     least = least_terms(a, b)
     claim("the least terms measure the greater the same number of times as the "
           "less", "VII.20",
@@ -481,7 +481,7 @@ def prop_VII_21(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 200), rng.randint(2, 200)),
 )
 def prop_VII_22(a: int, b: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1)
+    hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     least = least_terms(a, b)
     claim("the least of the ratio are prime to one another", "VII.22",
           coprime(*least))
@@ -600,7 +600,7 @@ def prop_VII_30(p: int, a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 500),),
 )
 def prop_VII_32(n: int) -> Out:
-    hypothesis("the number is greater than a unit", n > 1)
+    hypothesis("the number is greater than a unit", n > 1, guard=True)
     factors = prime_factors(n)
     claim("the number is prime, or some prime measures it", "VII.31",
           is_prime(n) or (bool(factors) and is_prime(factors[0])
@@ -614,7 +614,7 @@ def prop_VII_32(n: int) -> Out:
     sample=lambda rng: (rng.randint(2, 200), rng.randint(2, 200)),
 )
 def prop_VII_33(a: int, b: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1)
+    hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     least = least_terms(a, b)
     claim("the pair found has the same ratio", "VII.33", least[0] * b == least[1] * a)
     claim("it is in least terms, being prime to one another", "VII.22",
@@ -631,7 +631,7 @@ def prop_VII_33(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 60), rng.randint(2, 60)),
 )
 def prop_VII_34(a: int, b: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1)
+    hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     least = lcm(a, b)
     claim("the number found is measured by both", "VII.34",
           measures(a, least) and measures(b, least))
@@ -646,7 +646,7 @@ def prop_VII_34(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 30), rng.randint(2, 30), rng.randint(2, 10)),
 )
 def prop_VII_35(a: int, b: int, times: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1 and times > 0)
+    hypothesis("both are numbers", a > 1 and b > 1 and times > 0, guard=True)
     common = lcm(a, b) * times
     claim("both measure the common multiple", "Def.VII.3",
           measures(a, common) and measures(b, common))
@@ -661,7 +661,7 @@ def prop_VII_35(a: int, b: int, times: int) -> Out:
     sample=lambda rng: (rng.randint(2, 20), rng.randint(2, 20), rng.randint(2, 20)),
 )
 def prop_VII_36(a: int, b: int, c: int) -> Out:
-    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1)
+    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     least = lcm(lcm(a, b), c)
     claim("the number found is measured by all three", "VII.34",
           all(measures(n, least) for n in (a, b, c)))
@@ -707,7 +707,7 @@ def prop_VII_38(part: int, whole: int) -> Out:
     "their names -- the last proposition of Book VII, and the one Book IX uses.",
 )
 def prop_VII_39(a: int, b: int, c: int) -> Out:
-    hypothesis("the parts are genuine", a > 1 and b > 1 and c > 1)
+    hypothesis("the parts are genuine", a > 1 and b > 1 and c > 1, guard=True)
     least = lcm(lcm(a, b), c)
     claim("the number found has all three parts", "VII.38",
           all(measures(n, least) for n in (a, b, c)))
@@ -725,7 +725,7 @@ def prop_VII_39(a: int, b: int, c: int) -> Out:
     "than numbers, becomes the anthyphairesis of Book X.",
 )
 def prop_VII_2(a: int, b: int) -> Out:
-    hypothesis("both numbers are greater than a unit", a > 1 and b > 1)
+    hypothesis("both numbers are greater than a unit", a > 1 and b > 1, guard=True)
     measure = gcd(a, b)
     claim("the result measures both numbers", "VII.1", a % measure == 0 and b % measure == 0)
     claim("and every common measure measures it", "VII.2",
@@ -810,8 +810,8 @@ def _progression(rng):
     "of its kind -- and VIII.3 is the converse.",
 )
 def prop_VIII_1(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the extremes are prime to one another", coprime(terms[0], terms[-1]))
 
@@ -835,8 +835,13 @@ def prop_VIII_1(p: int, q: int, count: int) -> Out:
 )
 def prop_VIII_2(p: int, q: int, count: int) -> Out:
     """Find the least numbers in continued proportion in a given ratio."""
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    # Leastness is what this proposition sets out to produce, and the
+    # construction delivers it only for a ratio already in least terms. Euclid's
+    # own enunciation says "the least that are in a given ratio", so this is his
+    # condition and not our bookkeeping.
+    hypothesis("the given ratio is in least terms", coprime(p, q))
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
 
     claim("as many numbers as were asked for were found", "VIII.2", len(terms) == count)
@@ -854,8 +859,8 @@ def prop_VIII_2(p: int, q: int, count: int) -> Out:
     sample=_progression,
 )
 def prop_VIII_3(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("they are the least of their ratio", common_measure(terms) == 1)
     claim("the extremes are prime to one another", "VII.27",
@@ -874,7 +879,7 @@ def prop_VIII_3(p: int, q: int, count: int) -> Out:
 )
 def prop_VIII_4(a: int, b: int, c: int, d: int) -> Out:
     """Given the ratios a:b and c:d, find the least continued proportion in them."""
-    hypothesis("the ratios are genuine", all(n > 1 for n in (a, b, c, d)))
+    hypothesis("the ratios are genuine", all(n > 1 for n in (a, b, c, d)), guard=True)
     first, second = least_terms(a, b)
     third, fourth = least_terms(c, d)
     # The middle term must be measured by both consequents, so take the least
@@ -900,7 +905,7 @@ def prop_VIII_4(a: int, b: int, c: int, d: int) -> Out:
 )
 def prop_VIII_5(a: int, b: int, c: int, d: int) -> Out:
     """The plane numbers are a*b and c*d."""
-    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, d)))
+    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, d)), guard=True)
     first, second = a * b, c * d
     claim("the plane numbers have the ratio compounded of the ratios of the sides",
           "VII.17", first * (c * d) == second * (a * b))
@@ -915,8 +920,8 @@ def prop_VIII_5(a: int, b: int, c: int, d: int) -> Out:
     sample=_progression,
 )
 def prop_VIII_6(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the first does not measure the second", not measures(terms[0], terms[1]))
     claim("then no one of them measures any other", "VIII.6",
@@ -932,7 +937,7 @@ def prop_VIII_6(p: int, q: int, count: int) -> Out:
 )
 def prop_VIII_7(ratio: int, count: int) -> Out:
     """A progression whose ratio is a whole number, so the first measures the last."""
-    hypothesis("the ratio and length are genuine", ratio > 1 and count >= 3)
+    hypothesis("the ratio and length are genuine", ratio > 1 and count >= 3, guard=True)
     terms = continued_proportion(1, (ratio, 1), count)
     hypothesis("the first measures the last", measures(terms[0], terms[-1]))
     claim("then it measures the second also", "VIII.7", measures(terms[0], terms[1]))
@@ -947,8 +952,8 @@ def prop_VIII_7(ratio: int, count: int) -> Out:
     sample=_progression,
 )
 def prop_VIII_8(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     scaled = [term * 3 for term in terms]
     claim("as many fall between the scaled pair as between the original", "VIII.8",
@@ -964,8 +969,8 @@ def prop_VIII_8(p: int, q: int, count: int) -> Out:
     sample=_progression,
 )
 def prop_VIII_9(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the extremes are prime to one another", coprime(terms[0], terms[-1]))
     # p^(n-1) and q^(n-1) are the extremes; each reaches down to a unit through
@@ -987,8 +992,8 @@ def prop_VIII_9(p: int, q: int, count: int) -> Out:
 )
 def prop_VIII_10(p: int, q: int, count: int) -> Out:
     """The converse of VIII.9."""
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     from_unit_first = [q ** k for k in range(count)]
     from_unit_last = [p ** k for k in range(count)]
     hypothesis("progressions run from a unit up to each number",
@@ -1008,7 +1013,7 @@ def prop_VIII_10(p: int, q: int, count: int) -> Out:
     "The arithmetical twin of VI.19.",
 )
 def prop_VIII_11(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     first, second = a * a, b * b
     mean = a * b
     claim("the number found is a mean proportional", "VIII.11",
@@ -1026,7 +1031,7 @@ def prop_VIII_11(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10)),
 )
 def prop_VIII_12(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     first, second = a ** 3, b ** 3
     means = [a * a * b, a * b * b]
     claim("two mean proportionals fall between the cubes", "VIII.12",
@@ -1042,8 +1047,8 @@ def prop_VIII_12(a: int, b: int) -> Out:
     sample=_progression,
 )
 def prop_VIII_13(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     squares = [term * term for term in terms]
     cubes = [term ** 3 for term in terms]
@@ -1059,7 +1064,7 @@ def prop_VIII_13(p: int, q: int, count: int) -> Out:
     sample=lambda rng: (rng.randint(2, 15), rng.randint(2, 15)),
 )
 def prop_VIII_14(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     claim("if the square measures the square, the side measures the side", "VIII.14",
           measures(a * a, b * b) == measures(a, b))
     return Out()
@@ -1071,7 +1076,7 @@ def prop_VIII_14(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10)),
 )
 def prop_VIII_15(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     claim("if the cube measures the cube, the side measures the side", "VIII.15",
           measures(a ** 3, b ** 3) == measures(a, b))
     return Out()
@@ -1084,7 +1089,7 @@ def prop_VIII_15(a: int, b: int) -> Out:
 )
 def prop_VIII_16(a: int, b: int) -> Out:
     """The contrapositive of VIII.14, which Euclid states separately."""
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     claim("if the square does not measure the square, neither does the side",
           "VIII.14", (not measures(a * a, b * b)) == (not measures(a, b)))
     return Out()
@@ -1096,7 +1101,7 @@ def prop_VIII_16(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10)),
 )
 def prop_VIII_17(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     claim("if the cube does not measure the cube, neither does the side", "VIII.15",
           (not measures(a ** 3, b ** 3)) == (not measures(a, b)))
     return Out()
@@ -1117,7 +1122,7 @@ def _similar_planes(rng):
     "behave exactly as similar rectangles do in Book VI.",
 )
 def prop_VIII_18(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
     first, second = a * b, (a * scale) * (b * scale)
     mean = a * b * scale
     claim("the sides are proportional, so the planes are similar", "Def.VII.21",
@@ -1137,7 +1142,7 @@ def prop_VIII_18(a: int, b: int, scale: int) -> Out:
 )
 def prop_VIII_19(a: int, b: int, c: int, scale: int) -> Out:
     """Similar solid numbers: three sides each, in proportion."""
-    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, scale)))
+    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, scale)), guard=True)
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
     means = [first * scale, first * scale * scale]
@@ -1155,7 +1160,7 @@ def prop_VIII_19(a: int, b: int, c: int, scale: int) -> Out:
 )
 def prop_VIII_20(a: int, b: int) -> Out:
     """The converse of VIII.18: a mean proportional makes the numbers similar planes."""
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     first, second, mean = a * a, b * b, a * b
     hypothesis("a mean proportional falls between them", first * second == mean * mean)
     claim("the two are similar plane numbers, with proportional sides", "Def.VII.21",
@@ -1170,7 +1175,7 @@ def prop_VIII_20(a: int, b: int) -> Out:
 )
 def prop_VIII_21(a: int, b: int) -> Out:
     """The converse of VIII.19."""
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     first, second = a ** 3, b ** 3
     means = [a * a * b, a * b * b]
     hypothesis("two mean proportionals fall between them",
@@ -1186,7 +1191,7 @@ def prop_VIII_21(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 12), rng.randint(2, 12)),
 )
 def prop_VIII_22(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     terms = [a * a, a * b, b * b]
     hypothesis("the three are in continued proportion", in_continued_proportion(terms))
     hypothesis("the first is square", is_square(terms[0]))
@@ -1200,7 +1205,7 @@ def prop_VIII_22(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 8), rng.randint(2, 8)),
 )
 def prop_VIII_23(a: int, b: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     terms = [a ** 3, a * a * b, a * b * b, b ** 3]
     hypothesis("the four are in continued proportion", in_continued_proportion(terms))
     hypothesis("the first is cube", is_cube(terms[0]))
@@ -1214,7 +1219,7 @@ def prop_VIII_23(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10), rng.randint(2, 6)),
 )
 def prop_VIII_24(a: int, b: int, scale: int) -> Out:
-    hypothesis("the numbers are genuine", a > 1 and b > 1 and scale > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1 and scale > 1, guard=True)
     first, second = a * a * scale * scale, b * b * scale * scale
     hypothesis("the two have the ratio of a square to a square",
                first * (b * b) == second * (a * a))
@@ -1229,7 +1234,7 @@ def prop_VIII_24(a: int, b: int, scale: int) -> Out:
     sample=lambda rng: (rng.randint(2, 6), rng.randint(2, 6), rng.randint(2, 4)),
 )
 def prop_VIII_25(a: int, b: int, scale: int) -> Out:
-    hypothesis("the numbers are genuine", a > 1 and b > 1 and scale > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1 and scale > 1, guard=True)
     first, second = (a * scale) ** 3, (b * scale) ** 3
     hypothesis("the two have the ratio of a cube to a cube",
                first * b ** 3 == second * a ** 3)
@@ -1244,7 +1249,7 @@ def prop_VIII_25(a: int, b: int, scale: int) -> Out:
     sample=_similar_planes,
 )
 def prop_VIII_26(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
     first, second = a * b, (a * scale) * (b * scale)
     claim("similar plane numbers have the ratio of a square to a square", "VIII.18",
           first * (scale * scale) == second and is_square(scale * scale))
@@ -1258,7 +1263,7 @@ def prop_VIII_26(a: int, b: int, scale: int) -> Out:
                         rng.randint(2, 4)),
 )
 def prop_VIII_27(a: int, b: int, c: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, scale)))
+    hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, scale)), guard=True)
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
     claim("similar solid numbers have the ratio of a cube to a cube", "VIII.19",
@@ -1282,7 +1287,7 @@ def _from_a_unit(rng):
     sample=_similar_planes,
 )
 def prop_IX_1(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1)
+    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
     first, second = a * b, (a * scale) * (b * scale)
     claim("the two are similar plane numbers", "Def.VII.21",
           a * (b * scale) == b * (a * scale))
@@ -1300,7 +1305,7 @@ def prop_IX_1(a: int, b: int, scale: int) -> Out:
 )
 def prop_IX_2(a: int, b: int) -> Out:
     """The converse of IX.1, tested by looking for a counterexample."""
-    hypothesis("the numbers are genuine", a > 1 and b > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1, guard=True)
     hypothesis("their product is square", is_square(a * b))
 
     def similar_planes(first: int, second: int) -> bool:
@@ -1322,7 +1327,7 @@ def prop_IX_2(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 10),),
 )
 def prop_IX_3(a: int) -> Out:
-    hypothesis("the number is genuine", a > 1)
+    hypothesis("the number is genuine", a > 1, guard=True)
     cube = a ** 3
     claim("a cube multiplied by itself makes a cube", "IX.3", is_cube(cube * cube))
     return Out(product=cube * cube)
@@ -1334,7 +1339,7 @@ def prop_IX_3(a: int) -> Out:
     sample=lambda rng: (rng.randint(2, 8), rng.randint(2, 8)),
 )
 def prop_IX_4(a: int, b: int) -> Out:
-    hypothesis("the numbers are genuine", a > 1 and b > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1, guard=True)
     claim("cube multiplied by cube makes a cube", "IX.4", is_cube(a ** 3 * b ** 3))
     return Out(product=a ** 3 * b ** 3)
 
@@ -1345,7 +1350,7 @@ def prop_IX_4(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 8), rng.randint(2, 8)),
 )
 def prop_IX_5(a: int, b: int) -> Out:
-    hypothesis("the numbers are genuine", a > 1 and b > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1, guard=True)
     cube, other = a ** 3, b ** 3
     hypothesis("the product is cube", is_cube(cube * other))
     claim("the multiplied number is cube", "IX.5", is_cube(other))
@@ -1362,7 +1367,7 @@ def prop_IX_5(a: int, b: int) -> Out:
     sample=lambda rng: (rng.randint(2, 8) ** 3,),
 )
 def prop_IX_6(a: int) -> Out:
-    hypothesis("the number is genuine", a > 1)
+    hypothesis("the number is genuine", a > 1, guard=True)
     hypothesis("its square is cube", is_cube(a * a))
     claim("the number itself is cube", "IX.6", is_cube(a))
     claim("and no number whose square is cube fails to be one", "IX.6",
@@ -1377,7 +1382,7 @@ def prop_IX_6(a: int) -> Out:
 )
 def prop_IX_7(a: int, b: int, other: int) -> Out:
     """A composite number, given as a product of two, multiplied by a third."""
-    hypothesis("the numbers are genuine", a > 1 and b > 1 and other > 1)
+    hypothesis("the numbers are genuine", a > 1 and b > 1 and other > 1, guard=True)
     composite = a * b
     claim("the number is composite", "Def.VII.13", not is_prime(composite))
     claim("its product with any number is solid, having three sides", "Def.VII.17",
@@ -1393,7 +1398,7 @@ def prop_IX_7(a: int, b: int, other: int) -> Out:
     "square, the fourth a cube, the seventh both -- because 2, 3 and 6 are.",
 )
 def prop_IX_8(ratio: int, count: int) -> Out:
-    hypothesis("the progression is genuine", ratio > 1 and count >= 7)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 7, guard=True)
     terms = [ratio ** k for k in range(count)]  # 1, r, r^2, ...
     claim("the terms are in continued proportion from a unit", "Def.VII.20",
           terms[0] == 1 and in_continued_proportion(terms))
@@ -1412,7 +1417,7 @@ def prop_IX_8(ratio: int, count: int) -> Out:
     sample=_from_a_unit,
 )
 def prop_IX_9(ratio: int, count: int) -> Out:
-    hypothesis("the progression is genuine", ratio > 1 and count >= 4)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 4, guard=True)
     squares = [(ratio * ratio) ** k for k in range(count)]
     claim("if the number after the unit is square, all the rest are square", "IX.8",
           is_square(squares[1]) and all(is_square(term) for term in squares[1:]))
@@ -1429,7 +1434,7 @@ def prop_IX_9(ratio: int, count: int) -> Out:
 )
 def prop_IX_10(ratio: int, count: int) -> Out:
     """The converse of IX.9, stated negatively."""
-    hypothesis("the progression is genuine", ratio > 1 and count >= 5)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 5, guard=True)
     hypothesis("the number after the unit is not square", not is_square(ratio))
     terms = [ratio ** k for k in range(count)]
     claim("then none is square except the third from the unit and the alternate ones",
@@ -1444,7 +1449,7 @@ def prop_IX_10(ratio: int, count: int) -> Out:
     sample=_from_a_unit,
 )
 def prop_IX_11(ratio: int, count: int) -> Out:
-    hypothesis("the progression is genuine", ratio > 1 and count >= 4)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 4, guard=True)
     terms = [ratio ** k for k in range(count)]
     claim("the less measures the greater", "IX.11",
           all(measures(terms[i], terms[j])
@@ -1461,7 +1466,7 @@ def prop_IX_11(ratio: int, count: int) -> Out:
     sample=_from_a_unit,
 )
 def prop_IX_12(ratio: int, count: int) -> Out:
-    hypothesis("the progression is genuine", ratio > 1 and count >= 4)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 4, guard=True)
     terms = [ratio ** k for k in range(count)]
     last_primes = sorted(set(prime_factors(terms[-1])))
     claim("every prime measuring the last measures the number next the unit also",
@@ -1479,7 +1484,7 @@ def prop_IX_12(ratio: int, count: int) -> Out:
 )
 def prop_IX_13(prime: int, count: int) -> Out:
     hypothesis("the number after the unit is prime", is_prime(prime))
-    hypothesis("the progression is genuine", count >= 4)
+    hypothesis("the progression is genuine", count >= 4, guard=True)
     terms = [prime ** k for k in range(count)]
     claim("the greatest is measured by no number outside the progression", "IX.12",
           all(measures(d, terms[-1]) == (d in terms)
@@ -1514,7 +1519,7 @@ def prop_IX_14(*primes: int) -> Out:
     sample=_progression,
 )
 def prop_IX_15(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
     terms = [q * q, p * q, p * p]
     hypothesis("the three are the least in their ratio", common_measure(terms) == 1)
     claim("any two added together are prime to the remaining one", "VII.28",
@@ -1543,8 +1548,8 @@ def prop_IX_16(a: int, b: int) -> Out:
     sample=_progression,
 )
 def prop_IX_17(p: int, q: int, count: int) -> Out:
-    hypothesis("the ratio is in least terms", coprime(p, q) and p > 1 and q > 1)
-    hypothesis("a genuine progression is asked for", count >= 3)
+    hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
+    hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the extremes are prime to one another", coprime(terms[0], terms[-1]))
     claim("the first does not measure the second", "VIII.6",
@@ -1563,7 +1568,7 @@ def prop_IX_17(p: int, q: int, count: int) -> Out:
     "a decision procedure, not a construction.",
 )
 def prop_IX_18(a: int, b: int) -> Out:
-    hypothesis("both are numbers", a > 1 and b > 1)
+    hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     possible = measures(a, b * b)
     claim("a third proportional exists exactly when the first measures the square "
           "of the second", "VII.19", possible == (b * b % a == 0))
@@ -1578,7 +1583,7 @@ def prop_IX_18(a: int, b: int) -> Out:
     sample=_three_numbers,
 )
 def prop_IX_19(a: int, b: int, c: int) -> Out:
-    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1)
+    hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     possible = measures(a, b * c)
     claim("a fourth proportional exists exactly when the first measures the "
           "product of the second and third", "VII.19", possible == (b * c % a == 0))
@@ -1646,7 +1651,7 @@ def _pair_by_parity(rng, first_even: bool, second_even: bool):
              sample=lambda rng: _pair_by_parity(rng, True, True))
 def prop_IX_24(a: int, b: int) -> Out:
     hypothesis("an even number has an even subtracted", measures(2, a) and measures(2, b))
-    hypothesis("the subtraction is a proper one", a > b)
+    hypothesis("the subtraction is a proper one", a > b, guard=True)
     claim("the remainder is even", "IX.21", measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -1656,7 +1661,7 @@ def prop_IX_24(a: int, b: int) -> Out:
 def prop_IX_25(a: int, b: int) -> Out:
     hypothesis("an even number has an odd subtracted",
                measures(2, a) and not measures(2, b))
-    hypothesis("the subtraction is a proper one", a > b)
+    hypothesis("the subtraction is a proper one", a > b, guard=True)
     claim("the remainder is odd", "IX.23", not measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -1666,7 +1671,7 @@ def prop_IX_25(a: int, b: int) -> Out:
 def prop_IX_26(a: int, b: int) -> Out:
     hypothesis("an odd number has an odd subtracted",
                not measures(2, a) and not measures(2, b))
-    hypothesis("the subtraction is a proper one", a > b)
+    hypothesis("the subtraction is a proper one", a > b, guard=True)
     claim("the remainder is even", "IX.22", measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -1676,7 +1681,7 @@ def prop_IX_26(a: int, b: int) -> Out:
 def prop_IX_27(a: int, b: int) -> Out:
     hypothesis("an odd number has an even subtracted",
                not measures(2, a) and measures(2, b))
-    hypothesis("the subtraction is a proper one", a > b)
+    hypothesis("the subtraction is a proper one", a > b, guard=True)
     claim("the remainder is odd", "IX.25", not measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -1727,7 +1732,7 @@ def prop_IX_31(odd: int, other: int) -> Out:
              note="'Even-times even only' means a power of two: divisible by two "
              "down to two itself and never by an odd number.")
 def prop_IX_32(power: int) -> Out:
-    hypothesis("a genuine doubling is asked for", power >= 2)
+    hypothesis("a genuine doubling is asked for", power >= 2, guard=True)
     number = 2 ** power
     claim("the number is reached by continual doubling from a dyad", "Def.VII.8",
           number == 2 ** power and in_continued_proportion([2 ** k for k in range(power + 1)]))
@@ -1767,7 +1772,7 @@ def prop_IX_34(power: int, odd: int) -> Out:
     "it as a proportion because he has no formula to state.",
 )
 def prop_IX_35(ratio: int, count: int) -> Out:
-    hypothesis("the progression is genuine", ratio > 1 and count >= 3)
+    hypothesis("the progression is genuine", ratio > 1 and count >= 3, guard=True)
     terms = [ratio ** k for k in range(count)]
     excess_of_second = terms[1] - terms[0]
     excess_of_last = terms[-1] - terms[0]

@@ -6,8 +6,8 @@
     "deficient parallelogram sits.",
 )
 def prop_VI_26(a: Point, b: Point, d: Point, part) -&gt; Out:
-    hypothesis("the parallelogram is genuine", not collinear(a, b, d))
-    hypothesis("the division is a proper one", sign(part) &gt; 0 and sign(1 - part) &gt; 0)
+    hypothesis("the parallelogram is genuine", not collinear(a, b, d), guard=True)
+    hypothesis("the division is a proper one", sign(part) &gt; 0 and sign(1 - part) &gt; 0, guard=True)
     whole = _parallelogram_on(a, b, d)
     outline(*whole)
     inner = _parallelogram_on(a, posit(_along(a, b, part), "E"),
@@ -20,4 +20,4 @@ def prop_VI_26(a: Point, b: Point, d: Point, part) -&gt; Out:
     claim("the far corner of the lesser lies on the diameter of the whole", "VI.24",
           on_line(inner[2], diameter))
     return Out()
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

@@ -233,8 +233,8 @@ def _six_proportional(rng):
 )
 def prop_V_1(e, f, times: int) -> Out:
     """AB and CD are the same multiple of E and F."""
-    hypothesis("the magnitudes are positive", sign(e) > 0 and sign(f) > 0)
-    hypothesis("the multiple is a genuine one", times >= 1)
+    hypothesis("the magnitudes are positive", sign(e) > 0 and sign(f) > 0, guard=True)
+    hypothesis("the multiple is a genuine one", times >= 1, guard=True)
     ab, cd = times * e, times * f
     claim("AB is that multiple of E, and CD of F", "Def.2",
           ab == times * e and cd == times * f)
@@ -250,7 +250,7 @@ def prop_V_1(e, f, times: int) -> Out:
 )
 def prop_V_2(b, d, first_times: int, second_times: int) -> Out:
     """A is `first_times` B as C is of D; E is `second_times` B as F is of D."""
-    hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0)
+    hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0, guard=True)
     a, c = first_times * b, first_times * d
     e, f = second_times * b, second_times * d
     claim("the sum of the first and fifth is a multiple of the second", "Def.2",
@@ -268,7 +268,7 @@ def prop_V_2(b, d, first_times: int, second_times: int) -> Out:
 def prop_V_3(b, d, times: int, again: int) -> Out:
     """A is `times` B as C is of D; then `again`-fold A and C are `times*again`
     fold B and D."""
-    hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0)
+    hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0, guard=True)
     a, c = times * b, times * d
     claim("the equimultiples taken are multiples of the original multiples", "Def.2",
           again * a == again * (times * b) and again * c == again * (times * d))
@@ -287,7 +287,7 @@ def prop_V_3(b, d, times: int, again: int) -> Out:
 def prop_V_4(a, b, c, d, of_first: int, of_second: int) -> Out:
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     first, third = of_first * a, of_first * c
     second, fourth = of_second * b, of_second * d
     claim("the equimultiples stand in the same ratio", "Def.5",
@@ -304,7 +304,7 @@ def prop_V_4(a, b, c, d, of_first: int, of_second: int) -> Out:
 )
 def prop_V_5(whole, part, times: int) -> Out:
     """AB is `times` CD, and the part taken away is the same multiple of a part."""
-    hypothesis("the magnitudes are positive", sign(whole) > 0 and sign(part) > 0)
+    hypothesis("the magnitudes are positive", sign(whole) > 0 and sign(part) > 0, guard=True)
     hypothesis("the part subtracted is less than the whole", sign(whole - part) > 0)
     ab, cd = times * whole, times * part
     claim("the remainder is the same multiple of the remainder", "C.N.3",
@@ -319,7 +319,7 @@ def prop_V_5(whole, part, times: int) -> Out:
 )
 def prop_V_6(x, y, times: int, taken: int) -> Out:
     """AB and CD are `times` E and F; `taken`-fold E and F are subtracted."""
-    hypothesis("the magnitudes are positive", sign(x) > 0 and sign(y) > 0)
+    hypothesis("the magnitudes are positive", sign(x) > 0 and sign(y) > 0, guard=True)
     hypothesis("less is taken away than there is", taken <= times)
     left, right = times * x - taken * x, times * y - taken * y
     remaining = times - taken
@@ -338,7 +338,7 @@ def prop_V_6(x, y, times: int, taken: int) -> Out:
 def prop_V_7(a, b, c) -> Out:
     """A and B are equal; C is the magnitude they are compared with."""
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c)))
+               all(sign(x) > 0 for x in (a, b, c)), guard=True)
     hypothesis("A and B are equal", a == b)
     claim("equal magnitudes have the same ratio to the same", "Def.5",
           separating_witness(a, c, b, c) is None)
@@ -355,7 +355,7 @@ def prop_V_7(a, b, c) -> Out:
 def prop_V_10(a, b, c) -> Out:
     """A and B both have a ratio to C."""
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c)))
+               all(sign(x) > 0 for x in (a, b, c)), guard=True)
     hypothesis("A and B are unequal", a != b)
     claim("that which has the greater ratio to the same is the greater", "Def.7",
           (ratio_cmp(a, c, b, c) > 0) == (sign(a - b) > 0))
@@ -373,7 +373,7 @@ def prop_V_10(a, b, c) -> Out:
 )
 def prop_V_12(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("and c : d = e : f", c * f == d * e)
     claim("so all three pairs stand in one ratio", "V.11",
@@ -390,7 +390,7 @@ def prop_V_12(a, b, c, d, e, f) -> Out:
 )
 def prop_V_13(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("c : d is greater than e : f", ratio_cmp(c, d, e, f) > 0)
     claim("therefore a : b is greater than e : f", "Def.7",
@@ -407,7 +407,7 @@ def prop_V_13(a, b, c, d, e, f) -> Out:
 )
 def prop_V_14(a, b, c, d) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     claim("as the first stands to the third, so the second stands to the fourth",
           "V.8", sign(a - c) == sign(b - d))
@@ -420,7 +420,7 @@ def prop_V_14(a, b, c, d) -> Out:
     sample=_two_magnitudes_and_a_multiple,
 )
 def prop_V_15(a, b, times: int) -> Out:
-    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     claim("parts have the same ratio as their equimultiples", "Def.5",
           separating_witness(a, b, times * a, times * b) is None)
     return Out()
@@ -436,7 +436,7 @@ def prop_V_15(a, b, times: int) -> Out:
 def prop_V_17(a, b, c, d) -> Out:
     """AB : BE = CD : DF, componendo; separando follows."""
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("componendo: (a+b) : b = (c+d) : d", (a + b) * d == b * (c + d))
     claim("separando, a : b = c : d", "Def.5",
           separating_witness(a, b, c, d) is None)
@@ -451,7 +451,7 @@ def prop_V_17(a, b, c, d) -> Out:
 )
 def prop_V_18(a, b, c, d) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("separando: a : b = c : d", a * d == b * c)
     claim("componendo, (a+b) : b = (c+d) : d", "Def.5",
           separating_witness(a + b, b, c + d, d) is None)
@@ -466,7 +466,7 @@ def prop_V_18(a, b, c, d) -> Out:
 def prop_V_19(a, b, c, d) -> Out:
     """The whole AB is to the whole CD as the part AE to the part CF."""
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("whole is to whole as part is to part", a * d == b * c)
     hypothesis("the parts are less than the wholes",
                sign(a - c) > 0 and sign(b - d) > 0)
@@ -489,7 +489,7 @@ def _two_triples_in_ratio(rng):
 )
 def prop_V_20(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = d : e", a * e == b * d)
     hypothesis("b : c = e : f", b * f == c * e)
     claim("as the first stands to the third, so the fourth stands to the sixth",
@@ -515,7 +515,7 @@ def _two_triples_perturbed(rng):
 )
 def prop_V_21(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = e : f", a * f == b * e)
     hypothesis("b : c = d : e", b * e == c * d)
     claim("as the first stands to the third, so the fourth stands to the sixth",
@@ -532,7 +532,7 @@ def prop_V_21(a, b, c, d, e, f) -> Out:
 )
 def prop_V_22(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = d : e", a * e == b * d)
     hypothesis("b : c = e : f", b * f == c * e)
     claim("ex aequali, a : c = d : f", "Def.5",
@@ -547,7 +547,7 @@ def prop_V_22(a, b, c, d, e, f) -> Out:
 )
 def prop_V_23(a, b, c, d, e, f) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e, f)))
+               all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = e : f", a * f == b * e)
     hypothesis("b : c = d : e", b * e == c * d)
     claim("ex aequali in perturbed proportion, a : c = d : f", "Def.5",
@@ -563,7 +563,7 @@ def prop_V_23(a, b, c, d, e, f) -> Out:
 def prop_V_24(a, b, c, d, e) -> Out:
     """A : B = C : D, and E : B = F : D; the antecedents add."""
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d, e)))
+               all(sign(x) > 0 for x in (a, b, c, d, e)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     f = e * d / b  # so that e : b = f : d
     claim("the fifth stands to the second as the sixth to the fourth", "Def.5",
@@ -589,7 +589,7 @@ def _four_proportional_ordered(rng):
 )
 def prop_V_25(a, b, c, d) -> Out:
     hypothesis("the magnitudes are positive",
-               all(sign(x) > 0 for x in (a, b, c, d)))
+               all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("A is the greatest and D the least",
                sign(a - b) > 0 and sign(a - c) > 0 and sign(b - d) > 0 and sign(c - d) > 0)
@@ -622,7 +622,7 @@ def prop_V_11(a, b, c, d, e, f) -> Out:
 def prop_V_16(a, b, c, d) -> Out:
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("the magnitudes are of the same kind and nonzero",
-               not is_zero(a) and not is_zero(b) and not is_zero(c) and not is_zero(d))
+               not is_zero(a) and not is_zero(b) and not is_zero(c) and not is_zero(d), guard=True)
     claim("alternately, a : c = b : d -- no equimultiples separate the alternated "
           "ratios either", "Def.5", separating_witness(a, c, b, d) is None)
     return Out()

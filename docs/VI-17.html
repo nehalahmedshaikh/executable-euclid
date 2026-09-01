@@ -11,7 +11,7 @@ def prop_VI_17(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -&gt;
         line(*pair)
     first, mean, last = length(a, b), length(c, d), length(e, f)
     hypothesis("the three lines are genuine magnitudes",
-               all(sign(x) &gt; 0 for x in (first, mean, last)))
+               all(sign(x) &gt; 0 for x in (first, mean, last)), guard=True)
     hypothesis("they are proportional", first * last == mean * mean)
 
     # The rectangle contained by the extremes, and the square on the mean, both
@@ -28,4 +28,4 @@ def prop_VI_17(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -&gt;
     claim("and conversely the equality makes the three proportional", "VI.16",
           (_area(*rectangle) == _area(*square)) == (first * last == mean * mean))
     return Out(rectangle=rectangle, square=square)
-</pre><footer><p>Every diagram here is the record of a construction that ran and checked out in exact arithmetic &mdash; not an illustration of one. It shows what the machine drew, on the coordinates it was given, with the apparatus of its helper constructions held back but still there. Euclid's own figures are composed; these are not. Cross-references are a different matter: about one in eight was recorded as a call, and the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. Nothing is paraphrased. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. About one cross-reference in eight was recorded as a call; the rest were written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>
