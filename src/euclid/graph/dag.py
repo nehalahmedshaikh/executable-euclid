@@ -12,12 +12,12 @@ marginal references.  The *check* on the step is independent of the citation, so
 a wrong name cannot smuggle a false statement through; but the edge itself is an
 authored claim about the proof, not an observation of it.
 
-The split is lopsided and should be stated rather than glossed: roughly one edge
-in eight is executed and the rest are cited, and every postulate, definition and
-common-notion edge is cited, because those are not callable objects.  So results
-read off this graph -- what rests on I.1, where Postulate 5 first appears, the
-minimal set behind I.47 -- report *Euclid's own cross-references, faithfully
-transcribed*.  Useful, and not a discovery; this module used to claim it was.
+Every postulate, definition and common-notion edge is cited, because those are
+not callable objects.  Where an edge was only cited, a result read off this graph
+-- what rests on I.1, where Postulate 5 first appears, the minimal set behind
+I.47 -- reports *Euclid's own cross-reference, faithfully transcribed*: useful,
+and not a discovery; this module used to claim it was.  How much of the graph is
+executed is measured, and the graph page states it.
 
 :attr:`Graph.executed` holds only what actually ran; :attr:`Graph.cited` holds
 the rest; :meth:`Graph.provenance` counts both.  :meth:`Graph.needs` and

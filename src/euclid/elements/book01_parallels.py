@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from fractions import Fraction
 
+from ..kernel.field import sign
 from ..plane.angles import RIGHT, STRAIGHT, angle_at, length
 from ..plane.construct import (
     GeometryError,
@@ -28,6 +29,7 @@ from ..plane.construct import (
 )
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
+    between,
     collinear,
     eq_angle,
     eq_area,
@@ -39,9 +41,18 @@ from ..plane.predicates import (
     polygon_area2,
     right_angle,
     same_side,
+    signed_area2,
 )
 from . import samples
-from .book01_foundations import prop_I_1, prop_I_3, prop_I_10, prop_I_11, prop_I_22, prop_I_23
+from .book01_foundations import (
+    prop_I_1,
+    prop_I_3,
+    prop_I_4,
+    prop_I_10,
+    prop_I_11,
+    prop_I_22,
+    prop_I_23,
+)
 from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
 
 # ---------------------------------------------------------------------------
@@ -205,6 +216,21 @@ def prop_I_31(a: Point, b: Point, c: Point) -> Out:
 def _parallel_through(point: Point, first: Point, second: Point) -> Line:
     """The line through ``point`` parallel to the line ``first``-``second``."""
     return prop_I_31(point, first, second).parallel
+
+
+def _square_outward(first: Point, second: Point, apex: Point):
+    """The square on ``first``-``second``, standing on the far side from ``apex``.
+
+    I.46 raises its square on whichever side its two arguments determine, so for
+    a figure that cares which side -- I.47's windmill does -- the order has to be
+    chosen. Swapping the arguments reflects the square, and the traversal is put
+    back so that the result always reads ``first, second, next to second, next
+    to first``.
+    """
+    if sign(signed_area2(first, second, apex)) < 0:
+        return prop_I_46(first, second).square
+    _, _, beside_first, beside_second = prop_I_46(second, first).square
+    return (first, second, beside_second, beside_first)
 
 
 # ---------------------------------------------------------------------------
@@ -694,21 +720,46 @@ def prop_I_47(a: Point, b: Point, c: Point) -> Out:
     hypothesis("the angle ABC is right", right_angle(a, b, c))
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
 
-    on_hypotenuse = prop_I_46(a, c).square
-    on_first = prop_I_46(b, a).square
-    on_second = prop_I_46(c, b).square
+    on_hypotenuse = _square_outward(a, c, b)
+    on_first = _square_outward(a, b, c)
+    on_second = _square_outward(c, b, a)
+    _, _, far_c, far_a = on_hypotenuse
 
-    claim("the squares are described on the three sides", "I.46",
+    claim("the squares are described on the three sides, each falling away from "
+          "the triangle", "I.46",
           _area(*on_hypotenuse) == len2(a, c)
-          and _area(*on_first) == len2(b, a)
+          and _area(*on_first) == len2(a, b)
           and _area(*on_second) == len2(c, b))
-    claim("the perpendicular from B divides the square on AC into two rectangles, "
-          "each double a triangle equal to half one of the smaller squares",
-          ["I.4", "I.41", "I.31"],
-          len2(a, c) == len2(a, b) + len2(b, c))
+
+    # Euclid draws the parallel through the right angle to a side of the square
+    # on the hypotenuse.  It is the perpendicular to AC, and it cuts that square
+    # into the two rectangles the proof is about.
+    divider = _parallel_through(b, a, far_a)
+    foot = posit(meet_one(divider, Line.through(a, c)), "L")
+    across = posit(meet_one(divider, Line.through(far_a, far_c)), "M")
+    claim("the parallel through B meets AC within it, and the far side beyond",
+          "I.31", between(a, foot, c) and between(far_a, across, far_c))
+
+    halves = []
+    for near, far, corner, square in ((a, c, far_a, on_first),
+                                      (c, a, far_c, on_second)):
+        outer, inner = square[3], square[2]
+        # The two triangles of the windmill: one on a side of the square on the
+        # hypotenuse, one on a side of the smaller square.
+        prop_I_4(near, b, corner, near, outer, far)
+        # Each is half of its own figure, being on the same base and between the
+        # same parallels.
+        prop_I_41(near, corner, across, foot, b)
+        prop_I_41(outer, near, b, inner, far)
+        halves.append(_area(near, corner, across, foot))
+
+    claim("each rectangle is double a triangle that is half one of the smaller "
+          "squares, so the two are equal", ["I.4", "I.41"],
+          halves[0] == _area(*on_first) and halves[1] == _area(*on_second))
     claim("therefore the square on AC equals the squares on AB and BC together", "C.N.2",
-          _area(*on_hypotenuse) == _area(*on_first) + _area(*on_second))
-    return Out(squares=(on_hypotenuse, on_first, on_second))
+          _area(*on_hypotenuse) == halves[0] + halves[1])
+    return Out(squares=(on_hypotenuse, on_first, on_second),
+               rectangles=(halves[0], halves[1]), foot=foot)
 
 
 @proposition(

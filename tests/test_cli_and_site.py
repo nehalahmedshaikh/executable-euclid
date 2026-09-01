@@ -497,13 +497,10 @@ def test_numbers_written_into_prose_match_their_source(site):
     assert COEFFICIENT == 2, "the Book X finding says coefficients up to 2"
     assert max(SQUAREFREE) == 11, "the Book X finding says squarefree up to 11"
     assert EPSILON == 1e-9, "the optimizer page says a tangency lost at 10^-9"
-
-    from euclid.graph.dag import build as build_graph
-
-    executed, cited = build_graph().provenance()
-    share = executed / (executed + cited)
-    assert 0.11 <= share <= 0.14, (
-        f"the footer says about one edge in eight; it is {share:.1%}")
+    # The footer used to spell the executed share as "one edge in eight". It is
+    # interpolated on the graph page and stated nowhere by hand, so there is no
+    # longer a sentence here for a moving number to falsify.
+    assert "in eight" not in everything
 
     # The compass-only result is stated in words on two pages and must track
     # what was actually enumerated.

@@ -93,15 +93,17 @@ tested exactly against the figure that was built. So a conclusion is confirmed
 true of the figure. Whether it *follows from the postulates by Euclid's rules of
 inference* is a separate question, and the machine is silent on it.
 
-**Dependencies are two different things, and only one is an observation.** 65
+**Dependencies are two different things, and only one is an observation.** 68
 edges are **executed** — one proposition calls another and the call is recorded
-as it happens. 403 are **cited** — a reference written by hand beside a step,
+as it happens. 400 are **cited** — a reference written by hand beside a step,
 following Heath's margins. A citation is checked for naming a proposition that
 exists and for not naming a later one, and that is all: `claim` records its
 warrant without consulting it, so a step could cite the wrong result and stay
-green. **14% of the graph is executed.** Nothing on the findings page rests on
-the rest: *"148 propositions depend on I.1"* is true, and it reads Euclid's own
-cross-references back.
+green. **15% of the graph is executed**, and the work of raising that is under
+way — a cited step becomes an executed one by calling the proposition it appeals
+to, which makes the appeal itself checkable. Nothing on the findings page rests
+on the rest: *"148 propositions depend on I.1"* is true, and it reads Euclid's
+own cross-references back.
 
 **The necessity analysis is empirical and partial.** A hypothesis that survives
 being broken is reported as a candidate, with the number of configurations behind
@@ -146,8 +148,10 @@ src/euclid/
   kernel/    exact arithmetic; degrees; which polygons are possible
   plane/     points, lines, circles; the postulates as operations;
              exact tests and exact angles; a record of what was drawn
-  elements/  the propositions, one module per book
+  elements/  the propositions, one module per book; arithmetic.py and
+             figures.py hold what more than one book needs
   verify/    running propositions on many figures; the assumptions table
+  measure/   the analyses behind the findings, and the file they are recorded in
   graph/     the map of what depends on what
   search/    the shortest-construction search and its instruction sets
   render/    diagrams from records, and the website

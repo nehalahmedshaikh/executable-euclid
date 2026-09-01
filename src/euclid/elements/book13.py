@@ -32,7 +32,7 @@ from ..plane.predicates import (
 )
 from . import samples
 from .book01_foundations import prop_I_10
-from .book02_04 import prop_IV_11, prop_IV_15
+from .book04 import prop_IV_11, prop_IV_15
 from .book06 import prop_VI_30
 from .book10 import classify, is_rational_in_square
 from .registry import THEOREM, Out, claim, hypothesis, proposition

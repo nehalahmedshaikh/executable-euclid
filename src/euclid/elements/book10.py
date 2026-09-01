@@ -53,7 +53,7 @@ from typing import Optional
 from ..kernel.field import Constructible, Surd, is_zero, sign, sqrt
 from ..kernel.minpoly import basis_expand, degree
 from .book05 import anthyphairesis
-from .book07_09 import gcd as gcd_int
+from .arithmetic import gcd as gcd_int
 from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
 
 __all__ = [

@@ -7,7 +7,8 @@ import pytest
 import euclid.elements  # noqa: F401
 from euclid.elements import all_propositions, run
 from euclid.elements.book05 import anthyphairesis, commensurable, separating_witness
-from euclid.elements.book07_09 import gcd, is_perfect, is_prime
+from euclid.elements.arithmetic import gcd, is_prime
+from euclid.elements.book09 import is_perfect
 from euclid.elements.book10 import (
     SPECIES,
     classify,

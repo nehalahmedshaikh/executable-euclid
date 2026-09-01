@@ -300,9 +300,9 @@ def test_the_findings_page_reports_only_measured_things():
     """
     import inspect
 
-    from euclid.render import site
+    from euclid.render import pages
 
-    source = inspect.getsource(site._findings_page)
+    source = inspect.getsource(pages._findings_page)
     body = source.split('body = [')[0]
     for forbidden in ("load_bearing", "tree_shake", "uses_parallel_postulate"):
         assert forbidden not in body, f"{forbidden} is a citation-derived finding"
@@ -311,13 +311,13 @@ def test_the_findings_page_reports_only_measured_things():
 def test_the_graph_page_no_longer_claims_there_is_no_index():
     """It said 'No list of cross-references is kept anywhere in this project'.
 
-    There is one: the ``cites`` annotations. 87% of the edges come from it.
+    There is one: the ``cites`` annotations, and most edges come from it.
     """
     import inspect
 
-    from euclid.render import site
+    from euclid.render import pages
 
-    source = inspect.getsource(site._graph_page)
+    source = inspect.getsource(pages._graph_page)
     assert "No list of cross-references is kept" not in source
     assert "executed" in source and "cited" in source.lower()
 
@@ -367,7 +367,7 @@ def test_only_an_exactly_enumerated_row_is_called_a_theorem():
     proof that nothing shorter exists, and the label has to track which one
     produced the answer.
     """
-    from euclid.render.site import _strength
+    from euclid.render.pages import _strength
 
     rows = {(r["problem"], r["isa"]): r for r in load_findings()["constructions"]}
     for row in rows.values():
