@@ -27,6 +27,7 @@ from ..elements.registry import Out, Proposition, all_propositions, run_sampled
 from ..kernel.field import Surd
 from ..kernel.minpoly import degree
 from ..plane.objects import Circle, Line, Point
+from ..solid.objects import Line3, Plane, Point3, Sphere
 
 __all__ = ["Depth", "algebraic_depth", "depth_profile", "first_appearances"]
 
@@ -47,6 +48,21 @@ def _magnitudes(value, seen: Optional[set] = None) -> Iterator:
         yield value.b
         yield value.c
     elif isinstance(value, Circle):
+        yield from _magnitudes(value.centre, seen)
+        yield value.r2
+    elif isinstance(value, Point3):
+        yield value.x
+        yield value.y
+        yield value.z
+    elif isinstance(value, Plane):
+        yield value.a
+        yield value.b
+        yield value.c
+        yield value.d
+    elif isinstance(value, Line3):
+        yield from _magnitudes(value.p, seen)
+        yield from _magnitudes(value.q, seen)
+    elif isinstance(value, Sphere):
         yield from _magnitudes(value.centre, seen)
         yield value.r2
     elif isinstance(value, (list, tuple, set, frozenset)):

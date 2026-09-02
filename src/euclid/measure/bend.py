@@ -27,6 +27,7 @@ from typing import Optional
 
 from ..kernel.field import Surd
 from ..plane.objects import Point
+from ..solid.objects import Point3
 
 __all__ = ["apply", "moves"]
 
@@ -46,10 +47,19 @@ def _jitter(value, rng, size: Fraction):
     if isinstance(value, Point):
         return Point(value.x + size * rng.choice([-1, 1]),
                      value.y + size * rng.choice([-1, 1, 0]))
+    if isinstance(value, Point3):
+        # A point in space needs its own case. Without one, every solid
+        # proposition is unbendable, the necessity analysis reports nothing for
+        # Books XI to XIII, and the coverage figure quietly changes meaning --
+        # which is exactly what happened to Book X before surds were bendable.
+        return Point3(value.x + size * rng.choice([-1, 1]),
+                      value.y + size * rng.choice([-1, 1, 0]),
+                      value.z + size * rng.choice([-1, 1, 0]))
     if isinstance(value, (list, tuple)):
         index = rng.randrange(len(value)) if value else 0
         moved = list(value)
-        if moved and (isinstance(moved[index], Point) or _is_magnitude(moved[index])):
+        if moved and (isinstance(moved[index], (Point, Point3))
+                      or _is_magnitude(moved[index])):
             moved[index] = _jitter(moved[index], rng, size)
             return type(value)(moved) if isinstance(value, tuple) else moved
     if isinstance(value, int) and not isinstance(value, bool):
@@ -83,6 +93,7 @@ def _stretched(point: Point, anchor: Point, factor: Fraction) -> Point:
 def moves(arguments: list) -> list:
     """Every perturbation worth trying on one configuration."""
     places = [i for i, value in enumerate(arguments) if isinstance(value, Point)]
+    solid = [i for i, value in enumerate(arguments) if isinstance(value, Point3)]
     plan = [("offset", i, None) for i in range(len(arguments))]
     for i, value in enumerate(arguments):
         # Scaling a magnitude changes its ratio to every other magnitude in the
@@ -95,6 +106,14 @@ def moves(arguments: list) -> list:
             if i != anchor:
                 plan.append(("turn", i, anchor))
                 plan.append(("stretch", i, anchor))
+    # A point in space can be slid along the ray from another, which keeps the
+    # direction and moves the distance. Turning it wants an axis as well as a
+    # centre, and the offset already moves the angle, so only the stretch is
+    # offered here.
+    for i in solid:
+        for anchor in solid:
+            if i != anchor:
+                plan.append(("stretch3", i, anchor))
     return plan
 
 
@@ -110,6 +129,15 @@ def apply(arguments: list, move, rng, size: Fraction) -> Optional[object]:
         factor = 1 + size / 4
         return value * factor
     point, pivot = arguments[index], arguments[anchor]
+    if kind == "stretch3":
+        if not (isinstance(point, Point3) and isinstance(pivot, Point3)):
+            return None
+        if point == pivot:
+            return None
+        factor = 1 + size / 4
+        return Point3(pivot.x + factor * (point.x - pivot.x),
+                      pivot.y + factor * (point.y - pivot.y),
+                      pivot.z + factor * (point.z - pivot.z))
     if not (isinstance(point, Point) and isinstance(pivot, Point)):
         return None
     if point == pivot:

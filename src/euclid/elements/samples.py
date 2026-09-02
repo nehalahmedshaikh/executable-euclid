@@ -421,3 +421,48 @@ def quadrilateral(rng) -> tuple[Point, Point, Point, Point]:
         move(Point(width - Fraction(rng.randint(0, 2), 2), height)),
         move(Point(Fraction(rng.randint(0, 2), 2), height)),
     )
+
+
+def rational_rotation3(rng) -> tuple:
+    """An exact rotation matrix of space, with rational entries.
+
+    The plane gets its exact rotations from the rational parametrisation of the
+    circle.  Space gets them from an integer quaternion: for ``q = (w, x, y, z)``
+    with norm ``n``, the usual conversion divides throughout by ``n`` and every
+    entry stays rational.  Nothing here is approximate, so a solid figure moved
+    by this frame is still exactly the figure it was.
+    """
+    while True:
+        w, x, y, z = (rng.randint(-3, 3) for _ in range(4))
+        norm = w * w + x * x + y * y + z * z
+        if norm:
+            break
+    n = Fraction(1, norm)
+    return (
+        (n * (w * w + x * x - y * y - z * z), n * 2 * (x * y - w * z), n * 2 * (x * z + w * y)),
+        (n * 2 * (x * y + w * z), n * (w * w - x * x + y * y - z * z), n * 2 * (y * z - w * x)),
+        (n * 2 * (x * z - w * y), n * 2 * (y * z + w * x), n * (w * w - x * x - y * y + z * z)),
+    )
+
+
+def frame3(rng, scaled: bool = True) -> Callable:
+    """A random similarity of space, exact in the rationals.
+
+    The analogue of :func:`frame`, and used for the same reason: a proposition
+    that only holds for the figure as the sampler happened to place it has not
+    been tested, so the figure is moved before it is checked.
+    """
+    from ..solid.objects import Point3
+
+    rows = rational_rotation3(rng)
+    scale = nonzero(rng, 1, 4) if scaled else Fraction(1)
+    shift = (scalar(rng), scalar(rng), scalar(rng))
+
+    def transform(point: "Point3") -> "Point3":
+        v = (point.x, point.y, point.z)
+        moved = tuple(sum(row[i] * v[i] for i in range(3)) for row in rows)
+        return Point3(scale * moved[0] + shift[0],
+                      scale * moved[1] + shift[1],
+                      scale * moved[2] + shift[2])
+
+    return transform

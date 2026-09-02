@@ -40,7 +40,7 @@ __all__ = ["Assumption", "Ledger", "audit", "audit_all", "case_assumptions"]
 
 @dataclass
 class Assumption:
-    kind: str  # "continuity" | "order" | "case"
+    kind: str  # "continuity" | "order" | "case" | "solid"
     detail: str
     occurrences: int = 1
 
@@ -61,6 +61,19 @@ class Ledger:
         return sum(item.occurrences for item in self.of_kind("continuity"))
 
     @property
+    def solid_debt(self) -> int:
+        """Moves no postulate licenses at all.
+
+        Distinct from continuity, which is a postulate stretched past what it
+        says. This is a construction the Elements never grants: Postulates 1 to
+        5 speak of the plane, and Book XI describes planes and spheres in
+        definitions and then argues from them. Every solid primitive is in this
+        count, which is what makes the count a measurement of the text rather
+        than of our encoding.
+        """
+        return sum(item.occurrences for item in self.of_kind("solid"))
+
+    @property
     def is_clean(self) -> bool:
         return not self.assumptions
 
@@ -73,6 +86,7 @@ class Ledger:
             "continuity": "existence not granted by any postulate",
             "order": "betweenness and side facts read off the diagram",
             "case": "behaviour that changes with the configuration",
+            "solid": "a construction in space that no postulate grants",
         }
         for kind, heading in headings.items():
             items = self.of_kind(kind)
@@ -138,6 +152,21 @@ def audit(ref: str, trials: int = 12, seed: int = 0) -> Ledger:
         ledger.assumptions.append(
             Assumption("continuity", f"a {kind} intersection is used, though {detail}", count)
         )
+
+    # --- moves no postulate licenses --------------------------------------
+    # A plane drawn through three points, a sphere described about a centre: in
+    # the plane every primitive names the postulate that grants it, and in space
+    # there is none to name. The empty tag is the signal.
+    per_trace = []
+    for trace in traces:
+        solid_tally: Counter = Counter()
+        for move in trace.moves:
+            if move.kind in ("plane", "sphere") and not move.postulate:
+                solid_tally[(move.kind, move.note)] += 1
+        per_trace.append(solid_tally)
+    for (kind, note), count in sorted(worst(per_trace).items()):
+        ledger.assumptions.append(
+            Assumption("solid", f"a {kind} is described, and {note}", count))
 
     # --- order -----------------------------------------------------------
     per_trace = []

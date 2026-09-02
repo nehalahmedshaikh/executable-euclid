@@ -64,6 +64,7 @@ from ..kernel.field import (
 )
 from ..plane.construct import GeometryError
 from ..plane.objects import Circle, Line, Point
+from ..solid.objects import Line3, Plane, Point3, Sphere
 
 __all__ = [
     "FieldVerdict",
@@ -96,6 +97,15 @@ def _is_rational(value, seen: Optional[set] = None) -> bool:
         return False
     if isinstance(value, Point):
         return _is_rational(value.x, seen) and _is_rational(value.y, seen)
+    if isinstance(value, Point3):
+        return all(_is_rational(part, seen) for part in (value.x, value.y, value.z))
+    if isinstance(value, Plane):
+        return all(_is_rational(part, seen)
+                   for part in (value.a, value.b, value.c, value.d))
+    if isinstance(value, Line3):
+        return _is_rational(value.p, seen) and _is_rational(value.q, seen)
+    if isinstance(value, Sphere):
+        return _is_rational(value.centre, seen) and _is_rational(value.r2, seen)
     if isinstance(value, Line):
         return all(_is_rational(c, seen) for c in (value.a, value.b, value.c))
     if isinstance(value, Circle):
@@ -112,11 +122,22 @@ def _blame(error: RootNotInField) -> tuple[str, str]:
         if "/kernel/" in where:
             continue
         site = f"{where.rsplit('/', 1)[-1]}:{frame.name}:{frame.lineno}"
-        if where.endswith("plane/angles.py"):
+        # Measuring a length is one act and crossing two circles is another,
+        # and the whole of this analysis is telling them apart. Space has its
+        # own pair of modules doing the same two jobs.
+        if where.endswith(("plane/angles.py", "solid/angles.py")):
             return MEASUREMENT, site
-        if where.endswith("plane/construct.py"):
+        if where.endswith(("plane/construct.py", "solid/construct.py")):
             return CONTINUITY, site
-        return MAGNITUDE, site
+        if "/elements/" in where:
+            # The proposition's own subject is irrational -- Book X asks for
+            # roots directly, and that is not a debt of the instrument.
+            return MAGNITUDE, site
+        raise AssertionError(
+            f"a root was asked for at {site}, which this analysis does not "
+            f"classify. Falling through to '{MAGNITUDE}' is how a whole module "
+            f"of square roots gets filed as somebody else's problem: give the "
+            f"frame a cause here instead.")
     return MAGNITUDE, "?"
 
 

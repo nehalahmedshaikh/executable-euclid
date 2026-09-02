@@ -100,11 +100,17 @@ class Pythagorean(FieldPolicy):
     """Hilbert's Pythagorean field: only the hypotenuse of a right triangle.
 
     Closed under ``x -> sqrt(1 + x^2)``, so a root is admitted when the caller
-    hands over ``(u, v)`` with ``r == u*u + v*v``, checked here exactly.
+    hands over components whose squares sum to ``r``, checked here exactly.
+
+    The witness may carry any number of components, because a distance in space
+    has three and is a hypotenuse all the same: ``sqrt(x^2 + y^2 + z^2)`` is
+    ``sqrt(sqrt(x^2 + y^2)^2 + z^2)``, an iterated hypotenuse and so inside the
+    field.  Requiring exactly two would have put every solid length outside it
+    and made the rung meaningless for Books XI to XIII.
 
     Sound at every depth, and incomplete on purpose: a radicand that happens to
-    be a sum of two squares but arrives without a witness is refused.  Deciding
-    that in general is a norm computation in a multiquadratic field, which is a
+    be a sum of squares but arrives without a witness is refused.  Deciding that
+    in general is a norm computation in a multiquadratic field, which is a
     computer algebra system and not this kernel.  Carrying the witness models
     the instrument instead -- a straightedge and a way to transfer a segment.
     """
@@ -112,10 +118,12 @@ class Pythagorean(FieldPolicy):
     name = "Q^pyth"
 
     def admits(self, tower, r, witness) -> bool:
-        if witness is None:
+        if not witness:
             return False
-        u, v = witness
-        return is_zero(u * u + v * v - r)
+        total = r - r  # zero of whatever field the radicand lives in
+        for component in witness:
+            total = total + component * component
+        return is_zero(total - r)
 
 
 class Tower:
