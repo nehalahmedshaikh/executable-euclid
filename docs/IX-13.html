@@ -8,6 +8,8 @@ def prop_IX_13(prime: int, count: int) -&gt; Out:
     hypothesis("the number after the unit is prime", is_prime(prime))
     hypothesis("the progression is genuine", count &gt;= 4, guard=True)
     terms = [prime ** k for k in range(count)]
+    because(prop_IX_12, prime, count) if prime &gt; 1 and count &gt;= 4 else None
+
     claim("the greatest is measured by no number outside the progression", "IX.12",
           all(measures(d, terms[-1]) == (d in terms)
               for d in range(1, terms[-1] + 1) if measures(d, terms[-1])))

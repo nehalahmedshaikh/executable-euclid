@@ -6,6 +6,8 @@ def prop_X_111(scale) -&gt; Out:
     binomial = scale + sqrt(2)
     apotome = scale - sqrt(2)
     hypothesis("the apotome is positive", sign(apotome) &gt; 0)
+    because(prop_X_36, scale, sqrt(2)) if not commensurable(scale, sqrt(2)) else None
+
     claim("one is a binomial and the other an apotome", "X.36",
           classify(binomial).family == "binomial"
           and classify(apotome).family == "apotome")

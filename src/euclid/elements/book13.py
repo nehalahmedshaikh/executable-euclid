@@ -31,11 +31,15 @@ from ..plane.predicates import (
     on_line,
 )
 from . import samples
-from .book01_foundations import prop_I_10
+from .book01_foundations import prop_I_4, prop_I_5, prop_I_10
+from .book01_parallels import prop_I_47
+from .book02 import prop_II_6, prop_II_7
+from .book03 import prop_III_30
+from .book10 import prop_X_21, prop_X_73
 from .book04 import prop_IV_11, prop_IV_15
 from .book06 import prop_VI_30
-from .book10 import classify, is_rational_in_square
-from .registry import THEOREM, Out, claim, hypothesis, proposition
+from .book10 import classify, commensurable, is_rational_in_square
+from .registry import THEOREM, Out, because, claim, get, hypothesis, proposition
 
 
 def _along(origin: Point, towards: Point, part) -> Point:
@@ -79,6 +83,9 @@ def prop_XIII_1(a: Point, b: Point) -> Out:
     half = posit(_along(a, b, Fraction(-1, 2)), "D")
     line(half, b, "DB, the whole with its half set out beyond A")
     result(half)
+
+    because(prop_I_10, a, b)
+    because(prop_II_6, half, a, b)
 
     claim("D lies on BA produced, with AD half of AB", ["Post.2", "I.10"],
           collinear(half, a, b) and between(half, a, b)
@@ -132,6 +139,8 @@ def prop_XIII_3(a: Point, b: Point) -> Out:
     half = prop_I_10(a, section).midpoint
     result(half)
 
+    because(prop_II_6, a, half, section)
+
     claim("D bisects the greater segment AC", "I.10",
           4 * len2(a, half) == len2(a, section))
     claim("the square on DB is five times the square on DC", "II.6",
@@ -149,6 +158,8 @@ def prop_XIII_3(a: Point, b: Point) -> Out:
 def prop_XIII_4(a: Point, b: Point) -> Out:
     hypothesis("A and B are distinct", a != b)
     section = prop_VI_30(a, b).section
+
+    because(prop_II_7, a, section, b)
 
     claim("AC is the greater segment", "Def.3", len2(a, section) > len2(section, b))
     claim("the squares on the whole and on the lesser segment together are "
@@ -217,6 +228,17 @@ def prop_XIII_6(a: Point, b: Point) -> Out:
     greater, lesser = length(a, section), length(section, b)
     named, other = classify(greater), classify(lesser)
 
+    # X.73 makes the apotome out of two rational lines commensurable in square
+    # only; those are the terms of the greater segment, not the segment itself.
+    because(prop_X_73, length(a, b) * sqrt(5) / 2, length(a, b) / 2)
+    # Which species an apotome belongs to is settled against the assigned
+    # rational line, not against the figure it came from, so the segments of a
+    # line of arbitrary length are apotomes of a species that moves with that
+    # length: on the unit line the greater is the fifth and the lesser the
+    # first, and on others neither. There is no one species proposition the
+    # step answers to, and X.85 and X.89 are named here for the pair of species
+    # this cut produces rather than for a construction to be carried out.
+
     claim("the greater segment is the irrational line called apotome", "X.73",
           named.family == "apotome")
     claim("and so is the lesser", "X.73", other.family == "apotome")
@@ -280,6 +302,13 @@ def prop_XIII_7(a: Point, b: Point, c: Point, d: Point, e: Point) -> Out:
                    for one in angles) >= 3)
     outline(*corners)
 
+    # The equal sides here are the pentagon's own, so the isosceles triangles
+    # stand on its vertices: ABC has BA = BC, and I.4 compares it with BCD,
+    # which has the equal included angle. Both appeals were written on AB = AC,
+    # a length no pentagon has, and neither ever ran.
+    because(prop_I_5, b, a, c)
+    because(prop_I_4, b, a, c, c, b, d)
+
     claim("the lines subtending the equal angles are equal, the sides "
           "containing them being equal", "I.4",
           eq_len(b, e, a, c) and eq_len(a, c, b, d))
@@ -307,6 +336,8 @@ def prop_XIII_8(o: Point, a: Point) -> Out:
 
     whole = length(corners[0], corners[2])
     greater, lesser = length(corners[0], cross), length(cross, corners[2])
+    because(prop_VI_30, corners[0], corners[2])
+
     claim("the diagonals meet within the pentagon", "Post.1",
           between(corners[0], cross, corners[2]))
     claim("AC is cut at H in extreme and mean ratio", "VI.30",
@@ -334,6 +365,10 @@ def prop_XIII_9(o: Point, a: Point) -> Out:
     end = posit(_along(a, o, -decagon / hexagon), "L")
     line(o, end, "the hexagon side with the decagon side added to it")
     result(tenth, end)
+
+    because(prop_III_30, o, corners[0], corners[1])
+    because(prop_IV_15, o, a)
+    because(prop_VI_30, o, end)
 
     claim("K bisects the arc the pentagon side subtends, so AK is the side of "
           "the decagon", "III.30",
@@ -366,6 +401,12 @@ def prop_XIII_10(o: Point, a: Point) -> Out:
     pentagon = len2(corners[0], corners[1])
     hexagon = len2(o, a)  # IV.15: the side of the hexagon is the radius
     decagon = len2(corners[0], tenth)
+    because(prop_III_30, o, corners[0], corners[1])
+    because(prop_IV_15, o, a)
+    # The perpendicular from the centre to the pentagon side makes the right
+    # angle I.47 speaks of.
+    because(prop_I_47, o, midpoint_of(corners[0], corners[1]), corners[0])
+
     claim("K bisects the arc, so AK is the side of the decagon", "III.30",
           on_circle(tenth, around) and eq_len(tenth, corners[0], tenth, corners[1]))
     claim("the square on the side of the pentagon equals the squares on the "
@@ -389,6 +430,19 @@ def prop_XIII_11(o: Point, a: Point) -> Out:
     side = length(corners[0], corners[1])
     named = classify(side)
 
+    because(prop_X_21, Fraction(1), sqrt(5))
+    # The minor is a difference of two lines incommensurable in square whose
+    # squares add to a rational and whose rectangle is medial. For this side
+    # those are sqrt(R^2(5 + 2 sqrt 5))/2 and sqrt(R^2(5 - 2 sqrt 5))/2, and
+    # X.76 is the proposition that names their difference.
+    _r2 = len2(o, a)
+    because(get("X.76").wrapped,
+            sqrt(_r2 * (5 + 2 * sqrt(5))) / 2,
+            sqrt(_r2 * (5 - 2 * sqrt(5))) / 2)
+    # X.73 makes an apotome out of two *rational* lines commensurable in square
+    # only; the terms of the minor are not rational, so the appeal has no pair
+    # of lines here to be about.
+
     claim("the side of the pentagon is the irrational line called minor",
           "X.76", named.name == "minor")
     claim("it is of the fourth degree over the rationals, so no rational line "
@@ -409,6 +463,8 @@ def prop_XIII_12(o: Point, a: Point) -> Out:
     triangle = (corners[0], corners[2], corners[4])
     outline(*triangle)
     result(*triangle)
+
+    because(prop_I_47, o, midpoint_of(triangle[0], triangle[1]), triangle[0])
 
     claim("the alternate vertices of the hexagon form an equilateral triangle",
           "IV.15",

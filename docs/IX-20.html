@@ -14,6 +14,12 @@ def prop_IX_20(given: list) -&gt; Out:
         product *= prime
     candidate = product + 1
 
+    # Euclid's step is about the number with the unit added, not the product:
+    # if it is not itself prime, VII.31 finds the prime that measures it. The
+    # appeal was written on the product, where it says nothing.
+    if candidate &gt; 3 and not is_prime(candidate):
+        because(prop_VII_31, candidate)
+
     claim("the product of the given primes, with a unit added, is measured by no "
           "prime in the list", "VII.31", all(candidate % p != 0 for p in given))
     fresh = prime_factors(candidate)[0]

@@ -119,7 +119,16 @@ def warm_up(seed: int = 0) -> None:
 
     Calls and citations are recorded as they happen, so nothing knows what
     depends on what until the code has actually run.
+
+    What each proposition called is cleared first.  ``calls`` accumulates for
+    the life of the process, so a proposition run earlier by something else --
+    another test, a measurement, a site build -- left its edges behind and the
+    graph reported them too.  The corpus then had 457 executed edges from a
+    fresh interpreter and 458 from inside the suite, and a number that depends
+    on what happened to run before it is not a measurement of the corpus.
     """
+    for entry in all_propositions():
+        entry.calls.clear()
     for entry in all_propositions():
         if entry.sample is None:
             continue

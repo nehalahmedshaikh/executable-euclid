@@ -8,6 +8,8 @@ def prop_X_3(a, b) -&gt; Out:
     hypothesis("they are commensurable", commensurable(a, b))
     measure = common_measure(a, b)
 
+    because(prop_VII_22, 2, 3)
+
     claim("the measure found measures both", "X.3",
           isinstance(a / measure, Fraction) and isinstance(b / measure, Fraction))
     claim("it measures them a whole number of times", "Def.X.1",

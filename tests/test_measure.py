@@ -193,7 +193,7 @@ def test_a_perturbation_keeps_the_configuration_exact():
     point is still a point of the field the sampler built in."""
     from fractions import Fraction as F
 
-    from euclid.measure.necessity import _stretched, _turned
+    from euclid.measure.bend import _stretched, _turned
     from euclid.plane.objects import Point as P
 
     anchor, point = P(F(0), F(0)), P(F(3), F(4))
@@ -260,8 +260,12 @@ def test_the_recorded_findings_state_their_method():
     assert "empirical" in measured["method"].lower()
     need = measured["necessity"]
     assert need["judged"] <= need["hypotheses"]
+    # Every hypothesis carries exactly one verdict, and "judged" counts them
+    # all -- including the implied ones, which is the whole of the change that
+    # took this figure from 54% to 100%.
     assert (need["needed"] + need["well_defined"] + len(need["candidates"])
-            + need["surviving_guards"]) == need["judged"]
+            + need["surviving_guards"] + need["implied"]) == need["judged"]
+    assert need["separated"] + need["implied"] == need["judged"]
 
 
 def test_the_recorded_findings_were_computed_at_full_strength():
@@ -345,6 +349,13 @@ def test_the_readme_quotes_only_numbers_it_still_carries():
 
     coverage = f"{100 * measured['necessity']['coverage']:.0f}%"
     assert f"Coverage is {coverage}" in readme
+    # The coverage figure is 100% by construction -- every hypothesis is given a
+    # verdict -- so it says nothing unless the share actually separated stands
+    # beside it. Quoting the first without the second is the failure this guards.
+    separated = f"{100 * measured['necessity']['separated_share']:.0f}%"
+    assert f"was found for {separated}" in readme
+    assert str(measured["necessity"]["implied"]) + " implied" in readme
+    assert str(measured["necessity"]["hypotheses"]) + " hypotheses" in readme
 
     graph = build_graph()
     executed, cited = graph.provenance()
@@ -448,25 +459,6 @@ def test_the_support_bound_is_closed_under_radicands():
         assert len(closed_support(quartic)) == 2
         assert degree(sqrt(sqrt(sqrt(2)))) == 8
 
-
-def test_hypotheses_are_counted_by_running_not_by_grepping():
-    """The coverage denominator came from a text search over source code.
-
-    VII.24 states one hypothesis and states it at runtime; a counter that gives
-    zero for it (because the sampler rejects most triples) is worse than the
-    grep it replaced, so the count retries until the proposition runs.
-    """
-    from euclid.measure.necessity import _count_hypotheses
-
-    assert _count_hypotheses(get("VII.24")) == 1
-    assert _count_hypotheses(get("I.4")) == 3
-
-
-# --------------------------------------------------------------------------
-# the field ladder
-# --------------------------------------------------------------------------
-
-
 def test_restricting_the_field_changes_nothing_by_default():
     """A tower with no policy is the kernel as it always was."""
     from euclid.kernel.field import Tower, sqrt as field_sqrt
@@ -534,8 +526,8 @@ def test_the_ladder_separates_measuring_from_intersecting():
     """The finding, on the two cases that show what it is for.
 
     I.1 crosses two circles, so it fails on both rungs and the blame lands in
-    ``construct.py``. I.20 only measures lengths, so the Pythagorean rung is
-    enough and the blame lands in ``angles.py``.
+    ``construct.py``. I.34 only measures lengths and angles, so the Pythagorean
+    rung is enough and the blame lands in ``angles.py``.
     """
     from euclid.kernel.field import Pythagorean, Rational
     from euclid.measure.fields import ALWAYS, CONTINUITY, MEASUREMENT, NEVER, field_verdict
@@ -544,9 +536,38 @@ def test_the_ladder_separates_measuring_from_intersecting():
     assert circles.verdict == NEVER and circles.cause == CONTINUITY
     assert field_verdict(get("I.1"), Pythagorean(), trials=6).verdict == NEVER
 
-    measured = field_verdict(get("I.20"), Rational(), trials=6)
+    measured = field_verdict(get("I.34"), Rational(), trials=6)
     assert measured.verdict == NEVER and measured.cause == MEASUREMENT
-    assert field_verdict(get("I.20"), Pythagorean(), trials=6).verdict == ALWAYS
+    assert field_verdict(get("I.34"), Pythagorean(), trials=6).verdict == ALWAYS
+
+
+def test_carrying_out_a_citation_moves_a_proposition_down_the_ladder():
+    """I.20 was the measuring-only witness until its citations were carried out.
+
+    The triangle inequality measures and compares, and nothing in its own body
+    crosses a circle -- so over the Pythagorean field it used to complete. It
+    appeals to I.5, I.5 lays off equal lengths by I.3, and I.3 cuts a length with
+    a circle. Once an appeal is carried out rather than named, that debt is
+    inherited, and the proposition that looked like pure measurement needs
+    continuity after all.
+
+    This is the field ladder reporting on the citation work rather than on
+    Euclid, and it is the reason the witness on the page is now I.34.
+    """
+    from euclid.kernel.field import Pythagorean
+    from euclid.measure.fields import NEVER, field_verdict
+
+    import random
+
+    from euclid.elements.registry import run_sampled
+    from euclid.kernel.field import Context
+
+    assert field_verdict(get("I.20"), Pythagorean(), trials=6).verdict == NEVER
+    assert "I.5" in get("I.20").calls
+    # ``calls`` is filled by running, so I.5 has to be run to be asked.
+    with Context("chain"):
+        run_sampled("I.5", random.Random(0))
+    assert "I.3" in get("I.5").calls
 
 
 def test_a_lucky_intersection_is_not_reported_as_pythagorean():

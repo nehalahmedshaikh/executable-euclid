@@ -8,6 +8,8 @@ def prop_VIII_27(a: int, b: int, c: int, scale: int) -&gt; Out:
     hypothesis("the sides are genuine numbers", all(n &gt; 1 for n in (a, b, c, scale)), guard=True)
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
+    because(prop_VIII_19, a, b, c, scale)
+
     claim("similar solid numbers have the ratio of a cube to a cube", "VIII.19",
           first * scale ** 3 == second and is_cube(scale ** 3))
     return Out(ratio=(1, scale ** 3))

@@ -9,6 +9,8 @@ def prop_V_25(a, b, c, d) -&gt; Out:
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("A is the greatest and D the least",
                sign(a - b) &gt; 0 and sign(a - c) &gt; 0 and sign(b - d) &gt; 0 and sign(c - d) &gt; 0)
+    because(prop_V_19, a, b, c, d)
+
     claim("the greatest and the least together exceed the other two", "V.19",
           sign((a + d) - (b + c)) &gt; 0)
     return Out()

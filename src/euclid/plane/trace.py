@@ -25,6 +25,7 @@ before.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -37,6 +38,7 @@ __all__ = [
     "broadcast_intersection",
     "broadcast_move",
     "current_trace",
+    "drawn_apart",
     "push_trace",
     "pop_trace",
     "record_predicate",
@@ -168,8 +170,45 @@ def current_trace() -> Optional[Trace]:
     return _STACK[-1] if _STACK else None
 
 
+# Where the innermost appeal began: the depth its own trace sits at.  Moves fan
+# out to that trace and to anything it opens beneath it, and no further.
+_APPEAL_FLOOR: list[int] = []
+
+
+@contextmanager
+def drawn_apart():
+    """Keep what an appealed proposition draws out of the caller's figure.
+
+    A figure-level move fans out to every enclosing trace, because a caller's
+    diagram really does contain the lines its helpers drew.  A proposition
+    carried out to check an appeal is different: II.13 appeals to I.47 twice, and
+    fanning those out put both windmills into II.13's diagram -- twenty-one
+    figures across the corpus became too crowded to read, and none of them are
+    crowded in Euclid.
+
+    The appeal still gets its own figure whole.  What it draws through helpers of
+    its own belongs to it, and only the caller is spared: I.38 reached through an
+    appeal must still hold the parallel it draws by I.31, because that parallel
+    is the figure I.38 is about.
+
+    Intersections fan out regardless.  Those are the continuity debt, and a step
+    that carries out a proposition crossing two circles has incurred it however
+    the figure is drawn; that inheritance is the whole finding about I.20.  So
+    the appeal lends the caller its debt without its lines.
+    """
+    _APPEAL_FLOOR.append(len(_STACK))
+    try:
+        yield
+    finally:
+        _APPEAL_FLOOR.pop()
+
+
+def _holders() -> list[Trace]:
+    return _STACK[_APPEAL_FLOOR[-1]:] if _APPEAL_FLOOR else _STACK
+
+
 def broadcast_move(move: Move) -> Move:
-    for trace in _STACK:
+    for trace in _holders():
         trace.moves.append(move)
     return move
 
@@ -178,6 +217,24 @@ def broadcast_intersection(event: IntersectionEvent) -> IntersectionEvent:
     for trace in _STACK:
         trace.intersections.append(event)
     return event
+
+
+def replay_trace(trace: Trace) -> None:
+    """Attach a sub-trace that was computed earlier in this run.
+
+    A proposition carried out twice on the same points draws the same figure,
+    so the second time it is not carried out again -- the record of the first is
+    hung here instead.  The moves fan out exactly as they did then, which is
+    what keeps the caller's diagram whole; skipping that would leave a figure
+    missing the very lines its argument is about.  Inside an appeal they fan out
+    exactly as far, which is to say no further than the appeal itself.
+    """
+    if _STACK:
+        _STACK[-1].children.append(trace)
+    for holder in _holders():
+        holder.moves.extend(trace.moves)
+    for holder in _STACK:
+        holder.intersections.extend(trace.intersections)
 
 
 def record_result(*objects: Any) -> None:

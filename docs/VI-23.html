@@ -14,6 +14,9 @@ def prop_VI_23(a: Point, b: Point, d: Point, p: Point, q: Point, s: Point) -&gt;
     outline(*first)
     outline(*second)
 
+    # VI.1 compares figures on one straight line, and these parallelograms share
+    # no such line until one is carried over to meet the other. See VI.14.
+
     claim("the ratio of the parallelograms is that of the sides compounded",
           ["VI.1", "V.Def.5"],
           _area(*first) * (length(p, q) * length(p, s))

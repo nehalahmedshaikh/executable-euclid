@@ -8,6 +8,8 @@ def prop_VIII_8(p: int, q: int, count: int) -&gt; Out:
     hypothesis("a genuine progression is asked for", count &gt;= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     scaled = [term * 3 for term in terms]
+    because(prop_VII_18, p, q, count)
+
     claim("as many fall between the scaled pair as between the original", "VIII.8",
           len(scaled) == len(terms) and in_continued_proportion(scaled))
     claim("and the outer ratio is unchanged", "VII.18",

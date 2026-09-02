@@ -7,6 +7,8 @@ def prop_VII_38(part: int, whole: int) -&gt; Out:
     """The converse of VII.37."""
     hypothesis("the second has a part named after the first",
                measures(part, whole) and part &gt; 1)
+    because(prop_VII_37, part, whole) if measures(part, whole) and part &gt; 1 else None
+
     claim("then it is measured by the number of that name", "Def.VII.3",
           measures(part, whole))
     claim("and the quotient is the part itself", "VII.37",

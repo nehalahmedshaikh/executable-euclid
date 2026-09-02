@@ -6,6 +6,8 @@
 def prop_IX_9(ratio: int, count: int) -&gt; Out:
     hypothesis("the progression is genuine", ratio &gt; 1 and count &gt;= 4, guard=True)
     squares = [(ratio * ratio) ** k for k in range(count)]
+    because(prop_IX_8, ratio, max(count, 7))
+
     claim("if the number after the unit is square, all the rest are square", "IX.8",
           is_square(squares[1]) and all(is_square(term) for term in squares[1:]))
     cubes = [(ratio ** 3) ** k for k in range(count)]

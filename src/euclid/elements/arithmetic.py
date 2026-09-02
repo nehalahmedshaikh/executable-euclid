@@ -143,7 +143,13 @@ def progression(rng):
 
 
 def similar_planes(rng):
-    """Two plane numbers whose sides are proportional."""
+    """Two plane numbers whose sides are proportional.
+
+    All four sides are handed over.  Giving two and a scale, and letting the
+    proposition multiply, leaves it checking that ``a * (b * scale)`` equals
+    ``b * (a * scale)`` -- which is commutativity, and true whatever the sides
+    are, so it says nothing about their being proportional.
+    """
     a, b = rng.randint(2, 9), rng.randint(2, 9)
     scale = rng.randint(2, 5)
-    return a, b, scale
+    return a, b, a * scale, b * scale

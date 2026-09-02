@@ -1,16 +1,17 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.6 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 6</p><h1>X.6</h1><blockquote>If two magnitudes have to one another the ratio which a number has to a number, the magnitudes will be commensurable.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the magnitude is positive<span class="cite">given</span></li><li class="hyp">the numbers are genuine<span class="cite">given</span></li><li class="">the two stand in the ratio of the given numbers<span class="cite">by Def.X.1</span></li><li class="">so they are commensurable<span class="cite">by <a href="X-6.html">X.6</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> Def.X.1</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.6 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 6</p><h1>X.6</h1><blockquote>If two magnitudes have to one another the ratio which a number has to a number, the magnitudes will be commensurable.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the magnitudes are positive<span class="cite">given</span></li><li class="hyp">the numbers are genuine<span class="cite">given</span></li><li class="hyp">the two stand in the ratio of the given numbers<span class="cite">given</span></li><li class="">so they are commensurable<span class="cite">by <a href="X-6.html">X.6</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
     "X.6",
     THEOREM,
-    sample=lambda rng: (_magnitude(rng), rng.randint(1, 8), rng.randint(1, 8)),
+    sample=_in_the_ratio_of_two_numbers,
 )
-def prop_X_6(base, numerator: int, denominator: int) -&gt; Out:
+def prop_X_6(a, b, numerator: int, denominator: int) -&gt; Out:
     """The converse of X.5."""
-    hypothesis("the magnitude is positive", sign(base) &gt; 0)
+    hypothesis("the magnitudes are positive", sign(a) &gt; 0 and sign(b) &gt; 0, guard=True)
     hypothesis("the numbers are genuine", numerator &gt; 0 and denominator &gt; 0, guard=True)
-    a = base * numerator
-    b = base * denominator
-    claim("the two stand in the ratio of the given numbers", "Def.X.1",
-          a * denominator == b * numerator)
+    # Both magnitudes are given. Built as multiples of one base, the ratio below
+    # came out as commutativity and held whatever the numbers were, so the
+    # hypothesis of the proposition was never tested against anything.
+    hypothesis("the two stand in the ratio of the given numbers",
+               a * denominator == b * numerator)
     claim("so they are commensurable", "X.6", commensurable(a, b))
-    return Out(measure=base)
+    return Out(measure=a / numerator)
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

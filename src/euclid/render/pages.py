@@ -375,14 +375,14 @@ def _findings_page(graph, stats, search_rows) -> str:
                 f'stops in <span class="mono">{_esc(blame["I.1"]["site"])}</span> asking '
                 f'for <span class="mono">sqrt({_esc(blame["I.1"]["radicand"])})</span>, '
                 "and no rung short of the full constructibles gives it. "
-                "<strong>I.20</strong>, the triangle inequality, stops in "
-                f'<span class="mono">{_esc(blame["I.20"]["site"])}</span> asking for '
-                f'<span class="mono">sqrt({_esc(blame["I.20"]["radicand"])})</span> '
+                "<strong>I.34</strong>, on the opposite sides of a parallelogram, "
+                f'stops in <span class="mono">{_esc(blame["I.34"]["site"])}</span> asking '
+                f'for <span class="mono">sqrt({_esc(blame["I.34"]["radicand"])})</span> '
                 "&mdash; and completes over the Pythagorean field, because it only ever "
                 "measures. It is true in the rational plane, and it appears to fail there "
                 "only because our encoding builds a root where squared lengths would "
                 "do.</p>"
-                if "I.1" in blame and "I.20" in blame else ""
+                if "I.1" in blame and "I.34" in blame else ""
             )
             + f"<p>{len(lucky)} propositions ({_esc(', '.join(sorted(lucky)))}) complete "
             "over the Pythagorean field while the ledger records them crossing a circle. "

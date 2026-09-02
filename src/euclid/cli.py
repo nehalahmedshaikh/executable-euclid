@@ -235,8 +235,9 @@ def cmd_measure(args) -> int:
         print(f"wrote {FINDINGS_PATH.name}: {payload['corpus']} propositions measured")
         return 0
 
-    if not (args.depth or args.needless or args.fields):
-        print("choose --depth, --needless, --fields or --write", file=sys.stderr)
+    if not (args.depth or args.needless or args.fields or args.unfalsified):
+        print("choose --depth, --needless, --fields, --unfalsified or --write",
+              file=sys.stderr)
         return 1
 
     if args.depth:
@@ -283,6 +284,18 @@ def cmd_measure(args) -> int:
         print("  reading of a candidate is that the claims are too weak to notice.\n")
         for item in sorted(report.candidates, key=lambda x: -x.broken)[:20]:
             print(f"    {item.ref:<8} x{item.broken:<3} {item.text}")
+
+    if args.unfalsified:
+        from .measure.mutation import mutation_report
+
+        report = mutation_report(trials=args.trials if args.trials is not None else 16)
+        print("\nClaims, with the figure beneath them bent\n")
+        print(report.summary())
+        print("\n  An unfalsified claim is one no bend made false. That can mean it")
+        print("  asserts nothing, or that the bends never reached what it is about,")
+        print("  or that it is genuinely insensitive to the given that moved.\n")
+        for item in sorted(report.unfalsified, key=lambda x: (x.ref, x.text))[:40]:
+            print(f"    {item.ref:<9} {item.text[:66]}")
     return 0
 
 
@@ -385,6 +398,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="hypotheses the conclusions turn out not to need")
     p.add_argument("--fields", action="store_true",
                    help="which propositions survive a smaller number field")
+    p.add_argument("--unfalsified", action="store_true",
+                   help="claims no bend of the figure beneath them made false")
     p.add_argument("--write", action="store_true",
                    help="recompute and record findings.json, which the site reads")
     p.add_argument("--trials", type=int, default=None,

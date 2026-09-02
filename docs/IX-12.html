@@ -7,6 +7,12 @@ def prop_IX_12(ratio: int, count: int) -&gt; Out:
     hypothesis("the progression is genuine", ratio &gt; 1 and count &gt;= 4, guard=True)
     terms = [ratio ** k for k in range(count)]
     last_primes = sorted(set(prime_factors(terms[-1])))
+    # The last is the second taken as often as the progression is long, so a
+    # prime measuring it measures a product of the second with the rest, and
+    # VII.30 puts it into one of the two.
+    for _p in last_primes:
+        because(prop_VII_30, _p, terms[1], terms[-1] // terms[1])
+
     claim("every prime measuring the last measures the number next the unit also",
           "IX.12", all(measures(p, terms[1]) for p in last_primes))
     claim("and they are the same primes", "VII.30",

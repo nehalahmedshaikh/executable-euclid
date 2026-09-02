@@ -10,6 +10,8 @@ def prop_X_10(assigned) -&gt; Out:
     in_length_only = assigned * sqrt(2)
     in_square_also = assigned * sqrt(sqrt(2))
 
+    because(prop_X_9, assigned, assigned * 2)
+
     claim("the first is incommensurable in length with the assigned line", "X.9",
           not commensurable(in_length_only, assigned))
     claim("but commensurable with it in square", "X.9",

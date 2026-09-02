@@ -7,6 +7,8 @@ def prop_X_22(medial, rational) -&gt; Out:
     hypothesis("the first is medial", is_medial(medial))
     hypothesis("the second is rational", is_rational_line(rational) and sign(rational) &gt; 0)
     breadth = (medial * medial) / rational
+    because(prop_X_20, rational, rational) if is_rational_line(rational) else None
+
     claim("the breadth produced is rational in square", "X.20",
           is_rational_in_square(breadth))
     claim("but incommensurable in length with the line applied to", "X.22",

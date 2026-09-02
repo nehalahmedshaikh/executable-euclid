@@ -7,6 +7,8 @@ def prop_IX_15(p: int, q: int, count: int) -&gt; Out:
     hypothesis("the ratio is a genuine one", p &gt; 1 and q &gt; 1, guard=True)
     terms = [q * q, p * q, p * p]
     hypothesis("the three are the least in their ratio", common_measure(terms) == 1)
+    because(prop_VII_28, p, q) if coprime(p, q) else None
+
     claim("any two added together are prime to the remaining one", "VII.28",
           coprime(terms[0] + terms[1], terms[2])
           and coprime(terms[1] + terms[2], terms[0])

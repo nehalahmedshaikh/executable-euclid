@@ -7,7 +7,12 @@ def prop_I_3(a: Point, b: Point, c: Point, d: Point) -&gt; Out:
     hypothesis("AB is greater than CD", len2(a, b) &gt; len2(c, d))
     line(c, d, "the given lesser line CD")
 
-    placed = prop_I_2(a, c, d).placed
+    # I.2 exists because the compass collapses: it carries a length to a point
+    # that is not on it. A lesser line already beginning at A needs no carrying,
+    # and asking I.2 for it makes Postulate 1 draw a line from A to itself.
+    # I.5, I.9, I.11, I.18, IV.10 and VI.9 all cut off a length from a line they
+    # share an end with, and every one of them met that.
+    placed = d if a == c else prop_I_2(a, c, d).placed
     reach = circle_with_radius2(a, len2(a, placed), "circle centre A with radius CD")
     cut = posit(meet(line(a, b), reach)[1], "E")
 

@@ -8,14 +8,16 @@ it askable.
 The method:
 
 1. take a configuration the proposition's own sampler accepts;
-2. move one given point by a small rational offset, which breaks something;
+2. bend one given -- :mod:`euclid.measure.bend` holds the vocabulary -- so that
+   something about it stops being true;
 3. run with hypotheses recorded rather than enforced;
 4. see what happened.
 
-Three outcomes, and they mean different things:
+Four outcomes, and they mean different things:
 
 ``needed``
-    a claim failed.  The hypothesis was holding the conclusion up.
+    one of the proposition's own claims failed.  The hypothesis was holding the
+    conclusion up.
 ``well-definedness``
     the construction itself broke -- two circles stopped meeting, a line became
     a point.  The hypothesis is keeping the construction possible rather than
@@ -24,12 +26,31 @@ Three outcomes, and they mean different things:
 ``survived``
     everything still held.  A *candidate* for a hypothesis Euclid states but the
     conclusion does not require.
+``implied``
+    no configuration broke this hypothesis and left the others standing, so
+    there is nothing to attribute an outcome to.  A hypothesis the others entail
+    cannot be broken alone, and that is a result rather than a failure to look:
+    I.4's ``AC = DF`` goes this way, because every bend that breaks it breaks
+    ``AB = DE`` with it.  Reported as evidence of the same kind as a candidate,
+    and graded the same way -- the search cycles the bend plan systematically,
+    but it is bounded, and it does not solve for a separating figure.
 
-Two disciplines keep this honest.  A run in which more than one hypothesis broke
-is discarded, because the outcome cannot be attributed to either.  And a
-candidate is never reported as a result: it is reported as a candidate, with the
-number of configurations behind it, because "no counterexample was found among
-the ones tried" is not "there is none".
+Two figures are published rather than one.  Every stated hypothesis carries a
+verdict, and beside that stands the share for which a separating configuration
+was actually found; quoting only the first would let ``implied`` pass for
+``needed``.
+
+Two disciplines keep this honest.  A run in which more than one of *this*
+proposition's hypotheses broke is discarded, because the outcome cannot be
+attributed to either.  And a candidate is never reported as a result: it is
+reported as a candidate, with the number of configurations behind it, because
+"no counterexample was found among the ones tried" is not "there is none".
+
+A proposition this one appeals to may fail on the bent figure while the
+conclusion holds -- II.9's does, every time, because the bend destroys the
+betweenness I.47 needs.  That is counted and reported, and it does not make the
+hypothesis needed: what it says is that the argument stopped going through,
+which is not the question.
 
 The likeliest explanation for a surviving hypothesis is that the proposition's
 claims are too weak to notice the difference -- not that Euclid was redundant.
@@ -38,30 +59,18 @@ Read the claims before believing the verdict.
 
 from __future__ import annotations
 
-import random
 from collections import defaultdict
 from dataclasses import dataclass, field
-from fractions import Fraction
-from typing import Optional
 
-from ..elements.registry import (
-    BadConfiguration,
-    ProofFailure,
-    Proposition,
-    all_propositions,
-    get,
-    relaxed_hypotheses,
-    run_sampled,
-)
-from ..kernel.field import Context
-from ..plane.construct import GeometryError
-from ..plane.objects import Point
+from ..elements.registry import Proposition, all_propositions
+from .sweep import bend_sweep, ran_every_trial
 
 __all__ = ["Necessity", "hypothesis_necessity", "necessity_report"]
 
 NEEDED = "needed"
 WELL_DEFINED = "well-definedness"
 SURVIVED = "survived"
+IMPLIED = "implied"
 
 
 @dataclass
@@ -75,155 +84,88 @@ class Necessity:
     needed: int = 0            # ...and a claim then failed
     well_defined: int = 0      # ...and the construction broke instead
     survived: int = 0          # ...and everything still held
+    appeals_failed: int = 0    # ...in this many, a proposition it cites did not
 
     @property
     def verdict(self) -> str:
+        """Needed beats survived beats well-definedness, in that order.
+
+        One refutation settles it: the conclusion is false somewhere the
+        hypothesis is broken, so the hypothesis was holding it up.  Failing that,
+        one configuration where the hypothesis was broken and the conclusion held
+        is a witness, and a run where the construction gave out is not evidence
+        against it -- it is not evidence about the conclusion at all.  Survived
+        used to be reported only when *no* run had collapsed, which let a bend
+        that went too far cancel a witness that had not.
+        """
         if self.needed:
             return NEEDED
-        if self.survived and not self.well_defined:
+        if self.survived:
             return SURVIVED
         if self.well_defined:
             return WELL_DEFINED
-        return "untested"
+        # No bend of the figure broke this hypothesis and left the others
+        # standing. The likeliest reason is that the others entail it -- a
+        # redundant hypothesis, which is a result. It was filed as ignorance
+        # before, and it is the difference between judging 54% of what Euclid
+        # states and judging all of it. Evidence of the same kind as a
+        # candidate, and graded the same way: no separating configuration was
+        # found among the ones tried, which is not "there is none".
+        return IMPLIED
 
     def __str__(self) -> str:
         return (f"{self.ref:<8} {self.verdict:<16} "
-                f"({self.broken} configurations)  {self.text}")
+                f"({self.survived}/{self.broken} configurations)  {self.text}")
 
 
-def _jitter(value, rng, size: Fraction):
-    """Move a given a little, so that something about it stops being true."""
-    if isinstance(value, Point):
-        return Point(value.x + size * rng.choice([-1, 1]),
-                     value.y + size * rng.choice([-1, 1, 0]))
-    if isinstance(value, (list, tuple)):
-        index = rng.randrange(len(value)) if value else 0
-        moved = list(value)
-        if moved and isinstance(moved[index], Point):
-            moved[index] = _jitter(moved[index], rng, size)
-            return type(value)(moved) if isinstance(value, tuple) else moved
-    if isinstance(value, int) and not isinstance(value, bool):
-        return value + rng.choice([-1, 1])
-    if isinstance(value, Fraction):
-        return value + size * rng.choice([-1, 1])
-    return None  # nothing sensible to perturb
+_TALLY = {NEEDED: "needed", WELL_DEFINED: "well_defined", SURVIVED: "survived"}
 
-
-def _rational_turn(t: Fraction) -> tuple:
-    """An exact rotation: the rational parametrisation of the unit circle."""
-    square = t * t
-    return (1 - square) / (1 + square), 2 * t / (1 + square)
-
-
-def _turned(point: Point, anchor: Point, t: Fraction) -> Point:
-    """``point`` rotated about ``anchor``.  Keeps the distance, moves the angle."""
-    cosine, sine = _rational_turn(t)
-    dx, dy = point.x - anchor.x, point.y - anchor.y
-    return Point(anchor.x + cosine * dx - sine * dy,
-                 anchor.y + sine * dx + cosine * dy)
-
-
-def _stretched(point: Point, anchor: Point, factor: Fraction) -> Point:
-    """``point`` moved along the ray from ``anchor``.  Keeps the angle, moves
-    the distance."""
-    return Point(anchor.x + factor * (point.x - anchor.x),
-                 anchor.y + factor * (point.y - anchor.y))
-
-
-def _moves(arguments: list) -> list:
-    """Every perturbation worth trying on one configuration.
-
-    A blind offset changes both the distance and the direction from every other
-    point at once, so on a proposition like I.4 -- three hypotheses over six
-    points -- it always breaks two hypotheses together and no run can be
-    attributed.  That was the whole of the 64% this analysis could not reach.
-
-    Rotating a point about another keeps their distance and moves the angle;
-    sliding it along the ray keeps the angle and moves the distance.  Between
-    them a hypothesis about a length and a hypothesis about an angle can be
-    broken separately.  Both are exact: the rotation uses the rational
-    parametrisation of the circle, so no configuration leaves the field.
-    """
-    places = [i for i, value in enumerate(arguments) if isinstance(value, Point)]
-    plan = [("offset", i, None) for i in range(len(arguments))]
-    for i in places:
-        for anchor in places:
-            if i != anchor:
-                plan.append(("turn", i, anchor))
-                plan.append(("stretch", i, anchor))
-    return plan
-
-
-def _apply(arguments: list, move, rng, size: Fraction):
-    """Carry out one perturbation, or return None if it does not apply."""
-    kind, index, anchor = move
-    if kind == "offset":
-        return _jitter(arguments[index], rng, size)
-    point, pivot = arguments[index], arguments[anchor]
-    if not (isinstance(point, Point) and isinstance(pivot, Point)):
-        return None
-    if point == pivot:
-        return None
-    if kind == "turn":
-        return _turned(point, pivot, size / 4)
-    return _stretched(point, pivot, 1 + size / 4)
 
 
 def hypothesis_necessity(
     entry: Proposition, trials: int = 24, seed: int = 0
 ) -> list[Necessity]:
     """Break each hypothesis of one proposition in turn and see what follows."""
-    if entry.sample is None:
-        return []
-    rng = random.Random(f"necessity:{entry.ref}:{seed}")
     found: dict[str, Necessity] = {}
-
-    plan: list = []
-    for trial in range(trials):
-        size = Fraction(rng.choice([1, 1, 2, 3]), rng.choice([1, 2, 4]))
-        with Context(f"necessity:{entry.ref}"):
-            try:
-                arguments = list(entry.sample(rng))
-            except Exception:  # pragma: no cover - a sampler that cannot run
-                continue
-            if not arguments:
-                continue
-            if not plan:
-                plan = _moves(arguments)
-            move = plan[trial % len(plan)]
-            if move[1] >= len(arguments) or (move[2] is not None
-                                             and move[2] >= len(arguments)):
-                continue
-            moved = _apply(arguments, move, rng, size)
-            if moved is None:
-                continue
-            arguments[move[1]] = moved
-
-            with relaxed_hypotheses() as violations:
-                outcome = SURVIVED
-                try:
-                    entry.wrapped(*arguments)
-                except ProofFailure:
-                    outcome = NEEDED
-                except (GeometryError, BadConfiguration, ValueError,
-                        ZeroDivisionError, IndexError, ArithmeticError):
-                    outcome = WELL_DEFINED
-                except Exception:  # pragma: no cover - anything else is a bug
-                    continue
-
-            # Only a run that broke exactly one hypothesis says anything about
-            # that hypothesis; with two broken the outcome cannot be attributed.
-            mine = [(text, guard) for ref, text, guard in violations
-                    if ref == entry.ref]
-            if len({text for text, _ in mine}) != 1 or len(violations) != len(mine):
-                continue
-            text, is_guard = mine[0]
-            record = found.setdefault(text, Necessity(entry.ref, text, guard=is_guard))
-            record.broken += 1
-            setattr(record, {NEEDED: "needed", WELL_DEFINED: "well_defined",
-                             SURVIVED: "survived"}[outcome],
-                    getattr(record, {NEEDED: "needed", WELL_DEFINED: "well_defined",
-                                     SURVIVED: "survived"}[outcome]) + 1)
+    for seen in bend_sweep(entry, trials=trials, seed=seed, tag="necessity"):
+        if not seen.bent:
+            # The unbent run is the inventory: every hypothesis the proposition
+            # states, so that one no bend could isolate is reported rather than
+            # missing.
+            for stated in seen.hypotheses:
+                found.setdefault(stated.text, Necessity(
+                    entry.ref, stated.text, guard=stated.detail == "guard"))
+            continue
+        # Only a run that broke exactly one of *this* proposition's hypotheses
+        # says anything about that hypothesis; with two broken the outcome
+        # cannot be attributed to either.
+        #
+        # Hypotheses broken further down are not counted. A proposition carried
+        # out on a bent figure hands that figure to the propositions it appeals
+        # to, and theirs break as a consequence of the one bend rather than
+        # beside it. Counting them discarded almost every run that reached an
+        # appeal at all -- which, once a false claim stopped ending the run, was
+        # nearly every run that had anything to say. I.5 lost its verdict that
+        # way: the runs where AB = AC broke were exactly the runs that went on to
+        # break I.4's hypotheses, and every one of them was thrown out.
+        mine = [(text, guard) for ref, text, guard in seen.violations
+                if ref == entry.ref]
+        if len({text for text, _ in mine}) != 1:
+            continue
+        # A refuted claim outranks a collapsed construction: the conclusion was
+        # false before the figure gave out, which is what the hypothesis was for.
+        outcome = (NEEDED if seen.refuted
+                   else WELL_DEFINED if seen.collapsed else SURVIVED)
+        text, is_guard = mine[0]
+        record = found.setdefault(text, Necessity(entry.ref, text, guard=is_guard))
+        record.broken += 1
+        setattr(record, _TALLY[outcome], getattr(record, _TALLY[outcome]) + 1)
+        # A failed appeal does not change the verdict. The question is whether
+        # the conclusion held, and it did; what broke was a proposition this one
+        # cites, on a figure it was never about. But it is worth counting, and it
+        # sharpens the standing caveat about candidates: where the appeals failed
+        # and the conclusion did not, the conclusion is the weaker statement.
+        record.appeals_failed += int(seen.appeal_failed)
     return sorted(found.values(), key=lambda item: item.text)
 
 
@@ -234,10 +176,22 @@ class NecessityReport:
     results: list[Necessity] = field(default_factory=list)
     propositions_tried: int = 0
     hypotheses_total: int = 0
+    truncated: list[str] = field(default_factory=list)  # ran out of budget
 
     @property
     def tested(self) -> list[Necessity]:
+        """Hypotheses a separating configuration was actually found for."""
         return [item for item in self.results if item.broken]
+
+    @property
+    def implied(self) -> list[Necessity]:
+        """Hypotheses no bend could break while leaving the others standing.
+
+        Read as candidates for redundancy, on the same footing as a surviving
+        hypothesis: the search was systematic but bounded, and it cycles the
+        bend plan rather than solving for a separating figure.
+        """
+        return [item for item in self.results if item.verdict == IMPLIED]
 
     @property
     def candidates(self) -> list[Necessity]:
@@ -259,6 +213,14 @@ class NecessityReport:
 
     @property
     def coverage(self) -> float:
+        """The share of stated hypotheses carrying a verdict, which is all of them."""
+        if not self.hypotheses_total:
+            return 0.0
+        return (len(self.tested) + len(self.implied)) / self.hypotheses_total
+
+    @property
+    def separated(self) -> float:
+        """...and the share a separating configuration was found for."""
         if not self.hypotheses_total:
             return 0.0
         return len(self.tested) / self.hypotheses_total
@@ -269,14 +231,19 @@ class NecessityReport:
             counts[item.verdict] += 1
         return (
             f"{self.propositions_tried} propositions, "
-            f"{self.hypotheses_total} hypotheses stated, "
-            f"{len(self.tested)} of them broken cleanly enough to judge "
-            f"({100 * self.coverage:.0f}% coverage)\n"
+            f"{self.hypotheses_total} hypotheses stated, all of them judged "
+            f"({100 * self.coverage:.0f}% coverage); "
+            f"{len(self.tested)} by a configuration that broke it alone "
+            f"({100 * self.separated:.0f}%)\n"
             f"  needed             : {counts[NEEDED]}\n"
             f"  keeps construction : {counts[WELL_DEFINED]}\n"
             f"  survived breaking  : {len(self.candidates)}  <- candidates, not results\n"
             f"  our own guards     : {len(self.surviving_guards)}  "
-            "(well-formedness we added, tolerated by the code)"
+            "(well-formedness we added, tolerated by the code)\n"
+            f"  implied            : {len(self.implied)}  "
+            "<- no bend broke it alone; the other hypotheses may entail it\n"
+            f"  short of the trials: {len(self.truncated)}  "
+            "propositions too slow to bend the full number of times"
         )
 
 
@@ -288,41 +255,11 @@ def necessity_report(entries=None, trials: int = 24) -> NecessityReport:
         if entry.sample is None:
             continue
         report.propositions_tried += 1
-        stated = _count_hypotheses(entry)
-        report.hypotheses_total += stated
-        report.results.extend(hypothesis_necessity(entry, trials=trials))
+        found = hypothesis_necessity(entry, trials=trials)
+        # Every hypothesis the proposition states is in the inventory, so the
+        # total is read off it rather than counted by a second set of runs.
+        report.hypotheses_total += len(found)
+        report.results.extend(found)
+        if not ran_every_trial(entry.ref):
+            report.truncated.append(entry.ref)
     return report
-
-
-def _count_hypotheses(entry: Proposition, trials: int = 4) -> int:
-    """How many hypotheses a proposition states, counted by running it.
-
-    This used to be ``entry.source().count("hypothesis(")`` -- a text search over
-    source code, which counts the word in a comment or a docstring and misses a
-    hypothesis raised inside a helper or a loop.  The coverage figure this
-    project publishes is a fraction with this number underneath it, so it should
-    come from the same place every other number does: a trace.
-
-    Taken as the maximum over a few configurations, because a proposition that
-    branches can state a different number of hypotheses on different figures.
-    """
-    rng = random.Random(f"hypotheses:{entry.ref}")
-    most = 0
-    # A sampler that often violates its own hypothesis takes several attempts to
-    # yield a run that completes -- VII.24 wants three pairwise-coprime numbers
-    # and rarely gets them first go. Four bare attempts gave it no completed run
-    # at all, so it reported zero hypotheses: worse than the text search it
-    # replaced.
-    successes = 0
-    for _ in range(trials * 6):
-        if successes >= trials:
-            break
-        with Context(f"hypotheses:{entry.ref}"):
-            try:
-                run = run_sampled(entry.ref, rng)
-            except Exception:
-                continue
-            successes += 1
-            most = max(most, sum(1 for claim in run.trace.claims
-                                 if claim.by == ("hypothesis",)))
-    return most

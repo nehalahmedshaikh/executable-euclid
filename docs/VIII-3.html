@@ -8,6 +8,9 @@ def prop_VIII_3(p: int, q: int, count: int) -&gt; Out:
     hypothesis("a genuine progression is asked for", count &gt;= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("they are the least of their ratio", common_measure(terms) == 1)
+    because(prop_VII_21, p, q) if coprime(p, q) else None
+    because(prop_VII_27, p, q) if coprime(p, q) else None
+
     claim("the extremes are prime to one another", "VII.27",
           coprime(terms[0], terms[-1]))
     claim("and every measure of all of them is a unit", "VII.21",

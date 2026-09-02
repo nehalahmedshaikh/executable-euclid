@@ -23,6 +23,7 @@ from typing import Optional
 from ..elements.registry import all_propositions
 from .depth import ceilings, depth_profile, first_appearances
 from .gaps import named_count, taxonomy_gaps
+from .mutation import mutation_report
 from .necessity import necessity_report
 
 __all__ = ["FINDINGS_PATH", "RECORDED_TRIALS", "load_findings", "write_findings"]
@@ -50,6 +51,7 @@ def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -
     path = path or FINDINGS_PATH
     profile = depth_profile()
     report = necessity_report(trials=trials)
+    claims = mutation_report(trials=trials)
     gaps = taxonomy_gaps(limit=6)
     named, unnamed = named_count()
 
@@ -57,8 +59,8 @@ def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -
         "corpus": len(all_propositions()),
         "method": (
             "Every number here was computed by running the corpus. Depth is exact. "
-            "The necessity figures are empirical: a hypothesis is broken by moving "
-            "one given, and what survives is a candidate, not a theorem."
+            "The necessity and mutation figures are empirical: one given is bent, and "
+            "what survives the bending is a candidate, not a theorem."
         ),
         "depth": {
             "ceilings": ceilings(profile),
@@ -73,14 +75,30 @@ def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -
             "trials": trials,
             "propositions": report.propositions_tried,
             "hypotheses": report.hypotheses_total,
-            "judged": len(report.tested),
+            "judged": len(report.tested) + len(report.implied),
+            "separated": len(report.tested),
             "coverage": round(report.coverage, 4),
+            "separated_share": round(report.separated, 4),
+            "implied": len(report.implied),
             "needed": sum(1 for i in report.tested if i.verdict == "needed"),
             "well_defined": sum(1 for i in report.tested if i.verdict == "well-definedness"),
             "surviving_guards": len(report.surviving_guards),
+            "truncated": sorted(report.truncated),
             "candidates": [
                 {"ref": i.ref, "text": i.text, "configurations": i.broken}
                 for i in sorted(report.candidates, key=lambda x: -x.broken)
+            ],
+        },
+        "mutation": {
+            "trials": trials,
+            "propositions": claims.propositions_tried,
+            "claims": claims.claims_total,
+            "live": len(claims.live),
+            "coverage": round(claims.coverage, 4),
+            "unreached": len(claims.unreached),
+            "unfalsified": [
+                {"ref": i.ref, "text": i.text, "by": list(i.by), "bends": i.reached}
+                for i in sorted(claims.unfalsified, key=lambda x: (x.ref, x.text))
             ],
         },
         "constructions": _constructions(),
@@ -117,7 +135,13 @@ def _fields() -> dict:
             {"ref": ref, "cause": found["rational"][ref].cause,
              "site": found["rational"][ref].site,
              "radicand": found["rational"][ref].radicand}
-            for ref in ("I.1", "I.20")
+            # I.1 needs a circle to meet a circle; I.34 only ever measures, so
+            # the Pythagorean rung carries it. I.20 used to be the second
+            # witness, and stopped being one when citations began to be carried
+            # out: it appeals to I.3, I.3 cuts a length with a circle, and the
+            # triangle inequality inherited the continuity debt of the step that
+            # lays the length off.
+            for ref in ("I.1", "I.34")
             if ref in found["rational"] and found["rational"][ref].cause
         ],
     }

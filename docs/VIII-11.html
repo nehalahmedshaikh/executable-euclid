@@ -9,6 +9,8 @@ def prop_VIII_11(a: int, b: int) -&gt; Out:
     hypothesis("the sides are genuine numbers", a &gt; 1 and b &gt; 1, guard=True)
     first, second = a * a, b * b
     mean = a * b
+    because(prop_VIII_8, a, b, 3)
+
     claim("the number found is a mean proportional", "VIII.11",
           first * second == mean * mean)
     claim("and it is the only one", "VIII.8",

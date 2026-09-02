@@ -11,6 +11,11 @@ def prop_X_31(radicand: int) -&gt; Out:
     hypothesis("the two are medial", is_medial(a) and is_medial(b))
     excess = sqrt(a * a - b * b)
 
+    because(prop_X_29, 2, 1)
+
+    # X.25 wants two medials commensurable in square only; these two stand in
+    # the ratio 5 to 4 and so are commensurable in length.
+
     claim("the rectangle they contain is medial or rational", "X.25",
           is_medial_area(a * b) or is_rational_area(a * b))
     claim("and the excess is commensurable with the greater", "X.29",

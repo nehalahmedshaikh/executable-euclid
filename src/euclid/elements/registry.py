@@ -15,8 +15,9 @@ Running it does four things at once:
    *citations* it gives are written by hand beside each step, following Heath's
    marginal references; the check on the step never consults them, so a wrong
    one cannot let a false statement through, but the edge is authored rather
-   than observed.  About one edge in eight is executed.  See ``graph/dag.py``,
-   which says so on every page that reads the graph.
+   than observed.  A citation becomes an observation when the step carries the
+   named proposition out on its own points, which is what :func:`because` does.
+   See ``graph/dag.py``, which reports the proportion on every page.
 4. **Records a trace**, which the renderer and the assumption ledger consume.
 
 What the machine verifies is precisely this: *the conclusion holds, exactly, of
@@ -38,7 +39,17 @@ from typing import Any, Callable, Optional
 
 from ..kernel.field import Context, Surd, active_context
 from ..plane.objects import Point
-from ..plane.trace import Claim, Move, Trace, broadcast_move, current_trace, pop_trace, push_trace
+from ..plane.trace import (
+    Claim,
+    Move,
+    Trace,
+    broadcast_move,
+    current_trace,
+    drawn_apart,
+    pop_trace,
+    push_trace,
+    replay_trace,
+)
 
 __all__ = [
     "BOOK_TITLES",
@@ -52,6 +63,7 @@ __all__ = [
     "Run",
     "THEOREM",
     "all_propositions",
+    "because",
     "claim",
     "get",
     "hypothesis",
@@ -60,6 +72,7 @@ __all__ = [
     "relaxed_hypotheses",
     "run",
     "run_sampled",
+    "surveyed_claims",
 ]
 
 CONSTRUCTION = "construction"
@@ -195,6 +208,79 @@ class Run:
 _REGISTRY: dict[str, Proposition] = {}
 _CALL_STACK: list[Proposition] = []
 
+# What has already been carried out in the run now in progress.  Emptied the
+# moment the outermost proposition returns, so nothing crosses between runs or
+# between the algebraic towers two runs work in.
+_CARRIED_OUT: dict = {}
+
+
+def _frozen(value):
+    """A hashable stand-in for an argument, or a raise if there is none."""
+    if isinstance(value, (list, tuple)):
+        return tuple(_frozen(item) for item in value)
+    hash(value)
+    return value
+
+
+def _key(ref: str, args: tuple, kwargs: dict):
+    try:
+        return (ref, _frozen(args),
+                tuple(sorted((name, _frozen(v)) for name, v in kwargs.items())))
+    except TypeError:
+        return None
+
+
+# How deep inside an appeal we are.  One level is the whole of it: see because().
+_APPEALING = 0
+
+
+def because(wrapped: Callable, *args, **kwargs) -> Optional["Out"]:
+    """Carry out the proposition a step appeals to, on the step's own points.
+
+    This is what turns a citation from a name into a check.  The named
+    proposition is run where the step invokes it, so its hypotheses must hold
+    of that figure and its conclusions are tested against it; a step citing a
+    result that does not apply now fails instead of passing.
+
+    Its own appeals are not followed.  Each proposition is certified in its own
+    right, so following them proves nothing further -- and it is not affordable:
+    II.13 appeals to I.47 twice, and chasing every appeal beneath those turned
+    one run into a thousand nested constructions that re-derived Book I from
+    I.1.  The edge is recorded either way, because the appeal was made.
+
+    What the appeal draws stays out of the caller's figure.  Checking a citation
+    is not the same as building the diagram, and letting the two coincide put
+    I.47's two windmills inside II.13 and left twenty-one figures too crowded to
+    read.  The continuity it needed is still inherited: see
+    :func:`euclid.plane.trace.drawn_apart`.
+    """
+    global _APPEALING
+    entry = getattr(wrapped, "proposition", None)
+    if entry is not None and _CALL_STACK:
+        _CALL_STACK[-1].calls.add(entry.ref)
+    if _APPEALING:
+        return None
+    _APPEALING += 1
+    try:
+        with drawn_apart():
+            return wrapped(*args, **kwargs)
+    finally:
+        _APPEALING -= 1
+
+
+def _recall(ref: str, args: tuple, kwargs: dict) -> Optional["Out"]:
+    key = _key(ref, args, kwargs)
+    return _CARRIED_OUT.get(key) if key is not None else None
+
+
+def _remember(ref: str, args: tuple, kwargs: dict, result: "Out") -> None:
+    if not _CALL_STACK:
+        _CARRIED_OUT.clear()
+        return
+    key = _key(ref, args, kwargs)
+    if key is not None:
+        _CARRIED_OUT[key] = result
+
 
 def reference_kind(ref: str) -> str:
     """Classify a citation: a proposition, or one of Euclid's first principles.
@@ -273,6 +359,17 @@ def proposition(
         def wrapper(*args, **kwargs) -> Out:
             if _CALL_STACK:
                 _CALL_STACK[-1].calls.add(ref)
+                # A step that appeals to a proposition carries it out, and the
+                # same proposition is often appealed to twice over the same
+                # points: I.34 is reached from both I.35 and I.41, and I.47
+                # builds three squares that each descend through I.46, I.11,
+                # I.10, I.9 to I.1. Carrying it out once and remembering the
+                # answer is what keeps that affordable -- the second run is
+                # deterministic, so it can only produce the record already held.
+                remembered = _recall(ref, args, kwargs)
+                if remembered is not None:
+                    replay_trace(remembered.trace)
+                    return remembered
             trace = push_trace(Trace(proposition=ref))
             _CALL_STACK.append(entry)
             try:
@@ -294,6 +391,7 @@ def proposition(
                 raise TypeError(f"{ref} must return an Out(...), got {type(result).__name__}")
             result.trace = trace
             result.proposition = ref
+            _remember(ref, args, kwargs, result)
             return result
 
         wrapper.__name__ = function.__name__
@@ -317,6 +415,12 @@ def claim(text: str, by: Any, holds: bool, detail: str = "") -> bool:
         trace.add_claim(Claim(text, citations, holds, detail))
     if not holds:
         owner = _CALL_STACK[-1].ref if _CALL_STACK else "?"
+        if _SURVEYED:
+            # Someone is asking which claims a bent figure breaks, and stopping
+            # at the first would leave every later claim unjudged. See
+            # measure.mutation.
+            _SURVEYED[-1].append((owner, text))
+            return False
         raise ProofFailure(f"{owner}: claim failed -- {text} (cited: {', '.join(citations)})")
     return holds
 
@@ -339,7 +443,11 @@ def hypothesis(text: str, holds: bool, guard: bool = False) -> bool:
     trace = current_trace()
     owner = _CALL_STACK[-1].ref if _CALL_STACK else "?"
     if trace is not None:
-        trace.add_claim(Claim(text, ("hypothesis",), holds))
+        # The guard flag rides on the detail so that a reader of the trace can
+        # tell Euclid's conditions from our own well-formedness, which is what
+        # measure.necessity reports apart.
+        trace.add_claim(Claim(text, ("hypothesis",), holds,
+                              detail="guard" if guard else ""))
     if not holds:
         if _RELAXED:
             # Someone is asking what happens *without* this hypothesis, so note
@@ -373,6 +481,34 @@ def relaxed_hypotheses():
         yield collected
     finally:
         _RELAXED.pop()
+
+
+# When non-empty, a false claim is recorded rather than raised. Only
+# measure.mutation pushes onto this.
+_SURVEYED: list[list[tuple[str, str]]] = []
+
+
+@contextmanager
+def surveyed_claims():
+    """Run without abandoning the proof at the first false claim.
+
+    A proposition is written to stop the moment a step fails, which is right for
+    a proof and wrong for a survey: it means one run judges one claim and every
+    later one goes unexamined.  Under this, a false claim is noted and the
+    proposition carries on with the value it computed, so a single run says
+    something about all of them.
+
+    The proposition is then being run on a figure it does not hold for, and the
+    values it goes on to compute are meaningless; nothing here should be read as
+    a proof of anything.  What comes back is the list of ``(ref, text)`` claims
+    that came out false.
+    """
+    collected: list[tuple[str, str]] = []
+    _SURVEYED.append(collected)
+    try:
+        yield collected
+    finally:
+        _SURVEYED.pop()
 
 
 class BadConfiguration(ValueError):

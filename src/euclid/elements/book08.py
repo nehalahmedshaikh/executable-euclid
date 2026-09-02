@@ -6,6 +6,14 @@ arithmetical half of the similar-figures argument of Book VI.
 
 from __future__ import annotations
 
+from .book07 import (
+    prop_VII_17,
+    prop_VII_18,
+    prop_VII_20,
+    prop_VII_21,
+    prop_VII_27,
+    prop_VII_34,
+)
 from .arithmetic import (
     common_measure,
     continued_proportion,
@@ -19,7 +27,15 @@ from .arithmetic import (
     progression,
     similar_planes,
 )
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 
 @proposition(
@@ -38,6 +54,9 @@ def prop_VIII_1(p: int, q: int, count: int) -> Out:
     # Consecutive terms are *not* coprime -- p^k q^(n-1-k) and its successor
     # share p^k q^(n-2-k). What makes the progression least is that the whole
     # set has no common measure, which the extremes being coprime forces.
+    because(prop_VII_20, terms[0], terms[-1], terms[0], terms[-1])
+    because(prop_VII_21, terms[0], terms[-1]) if coprime(terms[0], terms[-1]) else None
+
     claim("the numbers are in continued proportion", "Def.VII.20",
           in_continued_proportion(terms))
     claim("the terms have no common measure but a unit", "VII.21",
@@ -64,6 +83,8 @@ def prop_VIII_2(p: int, q: int, count: int) -> Out:
     hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
 
+    because(prop_VIII_1, p, q, count) if coprime(p, q) else None
+
     claim("as many numbers as were asked for were found", "VIII.2", len(terms) == count)
     claim("they are in continued proportion in the given ratio", "Def.VII.20",
           in_continued_proportion(terms)
@@ -83,6 +104,9 @@ def prop_VIII_3(p: int, q: int, count: int) -> Out:
     hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("they are the least of their ratio", common_measure(terms) == 1)
+    because(prop_VII_21, p, q) if coprime(p, q) else None
+    because(prop_VII_27, p, q) if coprime(p, q) else None
+
     claim("the extremes are prime to one another", "VII.27",
           coprime(terms[0], terms[-1]))
     claim("and every measure of all of them is a unit", "VII.21",
@@ -107,6 +131,9 @@ def prop_VIII_4(a: int, b: int, c: int, d: int) -> Out:
     middle = lcm(second, third)
     terms = [first * (middle // second), middle, fourth * (middle // third)]
 
+    because(prop_VII_18, a, b, c)
+    because(prop_VII_34, a, b)
+
     claim("the first pair keeps its ratio", "VII.18", terms[0] * b == terms[1] * a)
     claim("the second pair keeps its ratio", "VII.18", terms[1] * d == terms[2] * c)
     claim("and the middle is the least that both consequents measure", "VII.34",
@@ -127,6 +154,9 @@ def prop_VIII_5(a: int, b: int, c: int, d: int) -> Out:
     """The plane numbers are a*b and c*d."""
     hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, d)), guard=True)
     first, second = a * b, c * d
+    because(prop_VII_17, a, b, c)
+    because(prop_VII_18, a, b, c)
+
     claim("the plane numbers have the ratio compounded of the ratios of the sides",
           "VII.17", first * (c * d) == second * (a * b))
     claim("which is to say, the product of the two ratios", "VII.18",
@@ -160,6 +190,7 @@ def prop_VIII_7(ratio: int, count: int) -> Out:
     hypothesis("the ratio and length are genuine", ratio > 1 and count >= 3, guard=True)
     terms = continued_proportion(1, (ratio, 1), count)
     hypothesis("the first measures the last", measures(terms[0], terms[-1]))
+
     claim("then it measures the second also", "VIII.7", measures(terms[0], terms[1]))
     claim("and indeed every one of them", "VIII.6",
           all(measures(terms[0], term) for term in terms))
@@ -176,6 +207,8 @@ def prop_VIII_8(p: int, q: int, count: int) -> Out:
     hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     scaled = [term * 3 for term in terms]
+    because(prop_VII_18, p, q, count)
+
     claim("as many fall between the scaled pair as between the original", "VIII.8",
           len(scaled) == len(terms) and in_continued_proportion(scaled))
     claim("and the outer ratio is unchanged", "VII.18",
@@ -197,6 +230,8 @@ def prop_VIII_9(p: int, q: int, count: int) -> Out:
     # its own powers, and there are as many steps as there were between them.
     to_unit_first = [q ** k for k in range(count)]
     to_unit_last = [p ** k for k in range(count)]
+    because(prop_VIII_2, p, q, count) if coprime(p, q) else None
+
     claim("a progression runs from a unit up to each extreme", "VIII.2",
           in_continued_proportion(to_unit_first) and in_continued_proportion(to_unit_last)
           and to_unit_first[0] == 1 and to_unit_last[0] == 1)
@@ -236,6 +271,8 @@ def prop_VIII_11(a: int, b: int) -> Out:
     hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
     first, second = a * a, b * b
     mean = a * b
+    because(prop_VIII_8, a, b, 3)
+
     claim("the number found is a mean proportional", "VIII.11",
           first * second == mean * mean)
     claim("and it is the only one", "VIII.8",
@@ -310,6 +347,8 @@ def prop_VIII_15(a: int, b: int) -> Out:
 def prop_VIII_16(a: int, b: int) -> Out:
     """The contrapositive of VIII.14, which Euclid states separately."""
     hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
+    because(prop_VIII_14, a, b)
+
     claim("if the square does not measure the square, neither does the side",
           "VIII.14", (not measures(a * a, b * b)) == (not measures(a, b)))
     return Out()
@@ -322,6 +361,8 @@ def prop_VIII_16(a: int, b: int) -> Out:
 )
 def prop_VIII_17(a: int, b: int) -> Out:
     hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
+    because(prop_VIII_15, a, b)
+
     claim("if the cube does not measure the cube, neither does the side", "VIII.15",
           (not measures(a ** 3, b ** 3)) == (not measures(a, b)))
     return Out()
@@ -334,16 +375,20 @@ def prop_VIII_17(a: int, b: int) -> Out:
     note="'Similar plane numbers' are rectangles of the same shape, and they "
     "behave exactly as similar rectangles do in Book VI.",
 )
-def prop_VIII_18(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
-    first, second = a * b, (a * scale) * (b * scale)
-    mean = a * b * scale
-    claim("the sides are proportional, so the planes are similar", "Def.VII.21",
-          a * (b * scale) == b * (a * scale))
+def prop_VIII_18(a: int, b: int, c: int, d: int) -> Out:
+    """The planes are AB and CD; the sides are given, not multiplied out."""
+    hypothesis("the sides are genuine numbers",
+               a > 1 and b > 1 and c > 1 and d > 1, guard=True)
+    hypothesis("the sides are proportional, so the planes are similar",
+               a * d == b * c)
+    first, second = a * b, c * d
+    mean = a * d
+    because(prop_VIII_11, a, b)
+
     claim("one mean proportional falls between them", "VIII.18",
           first * second == mean * mean)
     claim("and plane is to plane in the duplicate ratio of the sides", "VIII.11",
-          first * (scale * scale) == second)
+          first * (c * c) == second * (a * a))
     return Out(mean=mean)
 
 
@@ -359,6 +404,8 @@ def prop_VIII_19(a: int, b: int, c: int, scale: int) -> Out:
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
     means = [first * scale, first * scale * scale]
+    because(prop_VIII_12, a, b)
+
     claim("two mean proportionals fall between them", "VIII.19",
           in_continued_proportion([first] + means + [second]))
     claim("and solid is to solid in the triplicate ratio of the sides", "VIII.12",
@@ -366,19 +413,48 @@ def prop_VIII_19(a: int, b: int, c: int, scale: int) -> Out:
     return Out(means=means)
 
 
+def _with_a_mean_proportional(rng):
+    """Two numbers with one mean proportional between them, all three given."""
+    a, b = rng.randint(2, 12), rng.randint(2, 12)
+    return a * a, b * b, a * b
+
+
 @proposition(
     "VIII.20",
     THEOREM,
-    sample=lambda rng: (rng.randint(2, 12), rng.randint(2, 12)),
+    sample=lambda rng: _with_a_mean_proportional(rng),
 )
-def prop_VIII_20(a: int, b: int) -> Out:
-    """The converse of VIII.18: a mean proportional makes the numbers similar planes."""
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1, guard=True)
-    first, second, mean = a * a, b * b, a * b
+def prop_VIII_20(first: int, second: int, mean: int) -> Out:
+    """The converse of VIII.18: a mean proportional makes the numbers similar planes.
+
+    The two numbers and their mean are given.  Building them from a pair of
+    sides made the conclusion -- that sides can be found -- true of the sides
+    already in hand, so the search below never had to succeed.
+    """
+    hypothesis("the numbers are genuine", first > 1 and second > 1, guard=True)
     hypothesis("a mean proportional falls between them", first * second == mean * mean)
+    # Def. VII.21 asks for sides in proportion, so they have to be produced.
+    # A side is a number, so neither may be a unit.
+    sides = None
+    for width in range(2, first):
+        if first % width:
+            continue
+        length = first // width
+        for other in range(2, second):
+            if second % other:
+                continue
+            partner = second // other
+            if length > 1 and partner > 1 and width * partner == length * other:
+                sides = ((width, length), (other, partner))
+                break
+        if sides:
+            break
     claim("the two are similar plane numbers, with proportional sides", "Def.VII.21",
-          a * b == b * a and is_square(first) and is_square(second))
-    return Out(sides=((a, a), (b, b)))
+          sides is not None
+          and sides[0][0] * sides[0][1] == first
+          and sides[1][0] * sides[1][1] == second
+          and sides[0][0] * sides[1][1] == sides[0][1] * sides[1][0])
+    return Out(sides=sides)
 
 
 @proposition(
@@ -461,12 +537,18 @@ def prop_VIII_25(a: int, b: int, scale: int) -> Out:
     THEOREM,
     sample=similar_planes,
 )
-def prop_VIII_26(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
-    first, second = a * b, (a * scale) * (b * scale)
+def prop_VIII_26(a: int, b: int, c: int, d: int) -> Out:
+    hypothesis("the sides are genuine numbers",
+               a > 1 and b > 1 and c > 1 and d > 1, guard=True)
+    hypothesis("the sides are proportional, so the planes are similar",
+               a * d == b * c)
+    first, second = a * b, c * d
+    because(prop_VIII_18, a, b, c, d)
+
     claim("similar plane numbers have the ratio of a square to a square", "VIII.18",
-          first * (scale * scale) == second and is_square(scale * scale))
-    return Out(ratio=(1, scale * scale))
+          first * (c * c) == second * (a * a)
+          and is_square(a * a) and is_square(c * c))
+    return Out(ratio=(a * a, c * c))
 
 
 @proposition(
@@ -479,6 +561,8 @@ def prop_VIII_27(a: int, b: int, c: int, scale: int) -> Out:
     hypothesis("the sides are genuine numbers", all(n > 1 for n in (a, b, c, scale)), guard=True)
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
+    because(prop_VIII_19, a, b, c, scale)
+
     claim("similar solid numbers have the ratio of a cube to a cube", "VIII.19",
           first * scale ** 3 == second and is_cube(scale ** 3))
     return Out(ratio=(1, scale ** 3))

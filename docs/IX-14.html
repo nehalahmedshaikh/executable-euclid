@@ -10,6 +10,10 @@ def prop_IX_14(*primes: int) -&gt; Out:
     least = 1
     for prime in primes:
         least *= prime
+    because(prop_VII_36, 2, 3, 5)
+    for _p in primes:
+        because(prop_VII_30, _p, primes[0], least // primes[0])
+
     claim("the number found is the least measured by them all", "VII.36",
           all(measures(p, least) for p in primes)
           and not any(all(measures(p, m) for p in primes) for m in range(1, least)))

@@ -8,6 +8,12 @@ def prop_VII_14(a: int, b: int, c: int, scale: int) -&gt; Out:
     """Three numbers and three more, in the same ratio two and two."""
     hypothesis("the numbers are genuine", a &gt; 1 and b &gt; 1 and c &gt; 1 and scale &gt; 1, guard=True)
     d, e, f = a * scale, b * scale, c * scale
+    # A : B as D : E, so VII.13 takes them alternately. Written as a conditional
+    # appeal on (a, b, c, scale * c), whose condition asks a * scale == b, this
+    # never once ran -- and was written twice.
+    because(prop_VII_13, a, b, d, e)
+    because(prop_VII_13, b, c, e, f)
+
     claim("the pairs are in the same ratio", "VII.13", a * e == b * d and b * f == c * e)
     claim("so ex aequali the first is to the third as the fourth to the sixth",
           "VII.14", a * f == c * d)

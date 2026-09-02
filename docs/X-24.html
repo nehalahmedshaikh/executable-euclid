@@ -8,6 +8,8 @@ def prop_X_24(medial, scale) -&gt; Out:
     hypothesis("the scale is a genuine ratio", sign(scale) &gt; 0, guard=True)
     other = medial * scale
     hypothesis("the two are commensurable in length", commensurable(medial, other))
+    because(prop_X_23, medial, scale) if is_medial(medial) else None
+
     claim("both are medial", "X.23", is_medial(medial) and is_medial(other))
     claim("and the rectangle they contain is medial", "X.24",
           is_medial_area(medial * other))

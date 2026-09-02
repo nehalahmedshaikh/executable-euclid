@@ -9,6 +9,8 @@
 def prop_VII_2(a: int, b: int) -&gt; Out:
     hypothesis("both numbers are greater than a unit", a &gt; 1 and b &gt; 1, guard=True)
     measure = gcd(a, b)
+    because(prop_VII_1, a, b) if a &gt; b &gt; 1 else None
+
     claim("the result measures both numbers", "VII.1", a % measure == 0 and b % measure == 0)
     claim("and every common measure measures it", "VII.2",
           all(measure % d == 0 for d in range(1, min(a, b) + 1) if a % d == 0 and b % d == 0))

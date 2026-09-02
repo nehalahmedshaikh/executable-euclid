@@ -8,6 +8,11 @@ def prop_X_28(radicand: int) -&gt; Out:
     hypothesis("the radicand is not a square", not _is_square_int(radicand))
     a, b = _medials_in_square_only(radicand, rational_rectangle=False)
 
+    # X.21 makes a medial out of two rational lines commensurable in square
+    # only, which is where these medials come from; it does not apply to the
+    # medials themselves.
+    because(prop_X_21, Fraction(1), sqrt(radicand))
+
     claim("both lines are medial", "X.21", is_medial(a) and is_medial(b))
     claim("they are commensurable in square only", "X.Def.2",
           commensurable_in_square(a, b) and not commensurable(a, b))

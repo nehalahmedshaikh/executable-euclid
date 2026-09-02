@@ -5,6 +5,8 @@
 )
 def prop_VIII_17(a: int, b: int) -&gt; Out:
     hypothesis("the sides are genuine numbers", a &gt; 1 and b &gt; 1, guard=True)
+    because(prop_VIII_15, a, b)
+
     claim("if the cube does not measure the cube, neither does the side", "VIII.15",
           (not measures(a ** 3, b ** 3)) == (not measures(a, b)))
     return Out()

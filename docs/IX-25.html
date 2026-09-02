@@ -4,6 +4,8 @@ def prop_IX_25(a: int, b: int) -&gt; Out:
     hypothesis("an even number has an odd subtracted",
                measures(2, a) and not measures(2, b))
     hypothesis("the subtraction is a proper one", a &gt; b, guard=True)
+    because(prop_IX_23, [b]) if not measures(2, b) else None
+
     claim("the remainder is odd", "IX.23", not measures(2, a - b))
     return Out(remainder=a - b)
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

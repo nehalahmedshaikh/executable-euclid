@@ -10,6 +10,8 @@ def prop_VIII_19(a: int, b: int, c: int, scale: int) -&gt; Out:
     first = a * b * c
     second = (a * scale) * (b * scale) * (c * scale)
     means = [first * scale, first * scale * scale]
+    because(prop_VIII_12, a, b)
+
     claim("two mean proportionals fall between them", "VIII.19",
           in_continued_proportion([first] + means + [second]))
     claim("and solid is to solid in the triplicate ratio of the sides", "VIII.12",

@@ -17,6 +17,7 @@ from ..plane.construct import circle_with_radius2, line, meet, meet_one, outline
 from ..plane.objects import Line, Point
 from ..plane.predicates import (
     collinear,
+    congruent_sss,
     eq_angle,
     eq_len,
     len2,
@@ -29,8 +30,37 @@ from ..plane.predicates import (
 )
 from . import samples
 from .book05 import separating_witness
-from .book01_foundations import prop_I_10, prop_I_11
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .book01_foundations import (
+    prop_I_3,
+    prop_I_4,
+    prop_I_8,
+    prop_I_9,
+    prop_I_10,
+    prop_I_11,
+    prop_I_12,
+    prop_I_14,
+    prop_I_23,
+)
+from .book01_parallels import (
+    prop_I_31,
+    prop_I_32,
+    prop_I_33,
+    prop_I_37,
+    prop_I_38,
+    prop_I_43,
+    prop_I_47,
+)
+from .book02 import prop_II_5, prop_II_6, prop_II_11
+from .book03 import prop_III_20, prop_III_26, prop_III_31
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 
 def _area(*points: Point):
@@ -61,9 +91,32 @@ def prop_VI_1(a: Point, b: Point, c: Point, d: Point) -> Out:
     line(a, b)
     line(a, c)
     line(a, d)
+    # Euclid lays equal multiples of each base off along the line and compares
+    # the triangles standing on them, which is where I.38 enters and where
+    # Definition 5 gets its equimultiples. One step of the laying-off executes
+    # the appeal: GB is BC carried across B, so AGB and ABC stand on equal bases
+    # in one straight line and on the one apex A.
+    beyond = posit(Point(2 * b.x - c.x, 2 * b.y - c.y), "G")
+    outline(a, beyond, b)
+    because(prop_I_38, beyond, b, a, b, c, a)
+
+    claim("carrying a base across gives an equal triangle on the same apex", "I.38",
+          _area(a, beyond, b) == _area(a, b, c))
     claim("the triangles ABC and ACD are as the bases BC and CD", ["I.38", "V.Def.5"],
           _area(a, b, c) * length(c, d) == _area(a, c, d) * length(b, c))
-    return Out()
+    # Euclid's enunciation is "triangles *and parallelograms* which are under
+    # the same height", and the parallelogram half is what VI.14 and VI.23
+    # appeal to. Each triangle is half the parallelogram completed on its own
+    # base under the same height, so the ratio carries over unchanged.
+    first = _parallelogram_on(b, c, a)
+    second = _parallelogram_on(c, d, a)
+    outline(*first)
+    outline(*second)
+    claim("and the parallelograms on those bases, under the same height, "
+          "likewise", ["I.38", "V.Def.5"],
+          _area(*first) * length(c, d) == _area(*second) * length(b, c))
+    return Out(triangles=((a, b, c), (a, c, d)),
+               parallelograms=(first, second))
 
 
 def _triangle_with_parallel(rng):
@@ -91,6 +144,15 @@ def prop_VI_2(a: Point, b: Point, c: Point, d: Point, e: Point) -> Out:
     hypothesis("DE is parallel to BC", parallel(Line.through(d, e), Line.through(b, c)))
     outline(a, b, c)
     line(d, e, "DE")
+    because(prop_I_37, d, e, b, c)
+    # The same base is the limiting case of equal bases, which is the case I.38
+    # is stated for and the one Euclid cites here. I.38 names the parallel by
+    # drawing it through the apex, so an apex sitting on DE leaves it nothing to
+    # draw -- which happens when this proposition is reached from VI.11 with the
+    # section falling on B.
+    if not on_line(b, Line.through(d, e)) and not on_line(c, Line.through(d, e)):
+        because(prop_I_38, d, e, b, d, e, c)
+
     claim("the triangles BDE and CDE are equal, being on the same base and in the "
           "same parallels", "I.38", _area(b, d, e) == _area(c, d, e))
     claim("so AD is to DB as AE is to EC", ["I.38", "V.Def.5"],
@@ -114,6 +176,19 @@ def prop_VI_4(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
                eq_angle(a, b, c, d, e, f) and eq_angle(b, c, a, e, f, d))
     outline(a, b, c)
     outline(d, e, f)
+    because(prop_I_32, a, b, c)
+    # Euclid sets DEF down again with E on C and EF running on beyond, so that
+    # BC and CF' lie in one straight line; BA and F'D' produced then meet at G,
+    # and AC is parallel to GF'. VI.2 speaks of the triangle GBF' that AC cuts.
+    _carried = _carried_over(e, f, d, c, _along(b, c, 2), beside=a)
+    _f, _d = _carried[1], _carried[2]
+    _far, _near = Line.through(b, a), Line.through(_f, _d)
+    if not parallel(_far, _near):
+        _g = posit(meet_one(_far, _near), "G")
+        if (on_line(a, Line.through(b, _g)) and a != _g and b != _g
+                and parallel(Line.through(a, c), Line.through(_g, _f))):
+            because(prop_VI_2, b, _g, _f, a, c)
+
     claim("the sides about the equal angles are proportional", ["VI.2", "I.32"],
           similar((a, b, c), (d, e, f)))
     claim("in particular AB is to BC as DE is to EF", "VI.2",
@@ -142,6 +217,28 @@ def _along(origin: Point, towards: Point, part) -> Point:
                  origin.y + part * (towards.y - origin.y))
 
 
+def _at_distance(origin: Point, towards: Point, reach) -> Point:
+    """The point on the ray from ``origin`` towards ``towards``, that far along."""
+    return _along(origin, towards, reach / length(origin, towards))
+
+
+def _carried_over(d: Point, e: Point, f: Point,
+                  at: Point, towards: Point, beside: Point) -> tuple:
+    """Triangle DEF set down again with D at ``at`` and DE along a given ray.
+
+    Euclid's "let them be placed so that BC is in a straight line with CE" is a
+    construction and not an assumption, which is what makes it available here:
+    I.3 lays the length off along the ray and I.23 copies the angle, and both
+    are exact.  Carrying a figure over by computing the rotation instead would
+    want the cosine of an angle between segments of unequal length, and that
+    leaves the field the rest of the figure lives in.
+    """
+    placed_e = posit(_at_distance(at, towards, length(d, e)), "E'")
+    turned = prop_I_23(e, d, f, at, placed_e, beside=beside)
+    placed_f = posit(_at_distance(at, turned.ray_through, length(d, f)), "F'")
+    return at, placed_e, placed_f
+
+
 def _bisected_angle(rng):
     """A triangle with the bisector of the angle at A meeting the base."""
     a, b, c = samples.triangle(rng)
@@ -164,6 +261,16 @@ def prop_VI_3(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("D lies on the base BC", on_line(d, Line.through(b, c)) and d != b and d != c)
     outline(a, b, c)
     line(a, d, "the line AD")
+
+    because(prop_I_9, b, a, c)
+    # Euclid draws CE parallel to DA to meet BA produced; then VI.2 speaks of
+    # the triangle BEC, which AD cuts.
+    _alongside = prop_I_31(c, a, d).parallel
+    if not parallel(_alongside, Line.through(b, a)):
+        _e = posit(meet_one(_alongside, Line.through(b, a)), "E")
+        line(c, _e, "CE parallel to AD")
+        if _e != a and _e != b:
+            because(prop_VI_2, b, _e, c, a, d)
 
     claim("AD bisects the angle at A", "I.9", eq_angle(b, a, d, d, a, c))
     claim("so the segments of the base are as the remaining sides", "VI.2",
@@ -194,6 +301,8 @@ def prop_VI_5(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     outline(a, b, c)
     outline(d, e, f)
 
+    because(prop_I_8, a, b, c, d, e, f) if congruent_sss((a, b, c), (d, e, f)) else None
+
     claim("the triangles are equiangular", "I.8",
           eq_angle(b, a, c, e, d, f) and eq_angle(a, b, c, d, e, f)
           and eq_angle(a, c, b, d, f, e))
@@ -215,6 +324,13 @@ def prop_VI_6(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
                len2(a, b) * len2(d, f) == len2(d, e) * len2(a, c))
     outline(a, b, c)
     outline(d, e, f)
+
+    because(prop_VI_4, a, b, c, d, e, f)
+    # Euclid raises at D an angle equal to A and cuts off DG, DH equal to AB,
+    # AC; the triangle so made has two sides and the included angle of ABC, and
+    # I.4 is what makes it congruent to it.
+    _built = _carried_over(a, b, c, d, e, beside=f)
+    because(prop_I_4, a, b, c, _built[0], _built[1], _built[2])
 
     claim("the triangles are equiangular", ["VI.4", "I.4"],
           eq_angle(a, b, c, d, e, f) and eq_angle(a, c, b, d, f, e))
@@ -241,6 +357,8 @@ def prop_VI_7(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     outline(a, b, c)
     outline(d, e, f)
 
+    because(prop_VI_5, a, b, c, d, e, f) if similar((a, b, c), (d, e, f)) else None
+
     claim("the triangles are equiangular", "VI.5", eq_angle(b, c, a, e, f, d))
     claim("and the sides about the proportional angles correspond", "VI.5",
           similar((a, b, c), (d, e, f)))
@@ -264,6 +382,9 @@ def prop_VI_8(a: Point, b: Point, c: Point) -> Out:
     along = ((b.x - a.x) * ux + (b.y - a.y) * uy) / (ux * ux + uy * uy)
     foot = posit(Point(a.x + along * ux, a.y + along * uy), "D")
     line(b, foot, "the perpendicular BD")
+
+    because(prop_I_12, a, c, b)
+    because(prop_VI_4, a, foot, b, a, b, c)
 
     claim("BD is perpendicular to the base", "I.12", right_angle(b, foot, a))
     claim("each adjoining triangle is similar to the whole", "VI.4",
@@ -293,6 +414,12 @@ def prop_VI_9(a: Point, b: Point, parts: int) -> Out:
     line(marks[-1], b, "the join CB")
     cut = posit(_along(a, b, Fraction(1, parts)), "D")
     line(marks[0], cut, "the parallel through the first division")
+
+    # The lesser line is named from its far end: I.3 places it at A through
+    # I.2, and I.2 joins the point to an end of the line.
+    because(prop_I_3, a, aside, marks[0], a)
+    because(prop_I_31, marks[0], marks[-1], b)
+    because(prop_VI_2, a, marks[-1], b, marks[0], cut)
 
     claim("the divisions of the second line are equal", "I.3",
           all(eq_len(marks[k], marks[k + 1], a, marks[0]) for k in range(len(marks) - 1)))
@@ -325,6 +452,9 @@ def prop_VI_10(a: Point, b: Point, first, second) -> Out:
     for mark, cut in zip(given, cuts):
         line(mark, cut)
 
+    because(prop_I_31, given[0], aside, b)
+    because(prop_VI_2, a, aside, b, given[0], cuts[0])
+
     claim("the joining lines are parallel to CB", "I.31",
           all(parallel(Line.through(mark, cut), Line.through(aside, b))
               for mark, cut in zip(given, cuts)))
@@ -352,6 +482,15 @@ def prop_VI_11(a: Point, b: Point, ratio) -> Out:
     line(b, e, "the join BE")
     third = posit(_along(a, aside, ratio * ratio), "F")
     line(c, third, "the parallel through C")
+
+    # A ratio of 1 puts C on B and F on E, and there is then no triangle for
+    # either appeal to be about: the parallel through C is the join BE itself.
+    _proper = not collinear(a, b, e) and not on_line(c, Line.through(b, e))
+    if _proper:
+        because(prop_I_31, c, b, e)
+        # ABE is the triangle, C on AB and F on AE, and CF is the parallel:
+        # that is VI.2's figure exactly.
+        because(prop_VI_2, a, b, e, c, third)
 
     claim("CF is parallel to BE", "I.31",
           parallel(Line.through(c, third), Line.through(b, e)))
@@ -381,6 +520,9 @@ def prop_VI_12(a: Point, b: Point, second, third) -> Out:
     fourth = posit(_along(a, aside, third * second), "F")
     line(c, fourth, "the parallel through C")
 
+    because(prop_I_31, c, b, e)
+    because(prop_VI_2, a, b, e, c, fourth)
+
     claim("CF is parallel to BE", "I.31",
           parallel(Line.through(c, fourth), Line.through(b, e)))
     claim("so AB is to AC as AE is to AF", "VI.2",
@@ -401,6 +543,9 @@ def prop_VI_13(a: Point, b: Point, c: Point) -> Out:
     semicircle = circle_with_radius2(middle, len2(middle, a), "the semicircle on AC")
     upright = prop_I_11(a, c, b).perpendicular
     d = posit(meet(upright, semicircle)[1], "D")
+
+    because(prop_III_31, middle, a, c, d)
+    because(prop_VI_8, a, d, c)
 
     claim("the angle in the semicircle is right", "III.31", right_angle(a, d, c))
     claim("BD is the mean proportional: AB is to BD as BD is to BC", "VI.8",
@@ -457,6 +602,14 @@ def prop_VI_14(a: Point, b: Point, d: Point, p: Point, q: Point, s: Point) -> Ou
     outline(*second)
     hypothesis("the parallelograms are equal", _area(*first) == _area(*second))
 
+    # Euclid places the two so that DB is in a straight line with BE, which puts
+    # them vertically opposite about B, and only then is there a figure for VI.1
+    # to speak of. Carrying the second one over is a rigid motion between
+    # segments of unequal length, and its cosine is a quotient of two square
+    # roots -- outside the field the rest of the figure lives in. VI.23 stands on
+    # the same ground. Executing this wants VI.1 stated for parallelograms as
+    # well as triangles, and the juxtaposition built rather than assumed.
+
     claim("the sides about the equal angles are reciprocally proportional -- "
           "AB is to PQ as PS is to AD", "VI.1",
           length(a, b) * length(a, d) == length(p, q) * length(p, s))
@@ -479,6 +632,8 @@ def prop_VI_15(a: Point, b: Point, d: Point, p: Point, q: Point, s: Point) -> Ou
     outline(a, b, d)
     outline(p, q, s)
     hypothesis("the triangles are equal", _area(a, b, d) == _area(p, q, s))
+
+    because(prop_VI_14, a, b, d, p, q, s)
 
     claim("the sides about the equal angles are reciprocally proportional", "VI.14",
           length(a, b) * length(a, d) == length(p, q) * length(p, s))
@@ -530,6 +685,9 @@ def prop_VI_16(a: Point, b: Point, c: Point, d: Point,
     outline(*by_extremes)
     outline(*by_means)
 
+    because(prop_VI_14, by_extremes[0], by_extremes[1], by_extremes[3],
+            by_means[0], by_means[1], by_means[3])
+
     claim("the rectangle contained by the extremes equals that by the means",
           "VI.14", _area(*by_extremes) == _area(*by_means))
     claim("and conversely, equal rectangles leave no equimultiples that separate "
@@ -573,8 +731,13 @@ def prop_VI_17(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Ou
     outline(*rectangle)
     outline(*square)
 
+    # Three proportionals are four with the mean written twice, which is the
+    # figure VI.16 speaks of.
+    because(prop_VI_16, a, b, c, d, c, d, e, f)
+
     claim("the drawn figures really are the rectangle and the square", "Def.22",
           _area(*rectangle) == first * last and _area(*square) == mean * mean)
+
     claim("so the rectangle contained by the extremes equals the square on the mean",
           "VI.16", _area(*rectangle) == _area(*square))
     claim("and conversely the equality makes the three proportional", "VI.16",
@@ -630,6 +793,12 @@ def prop_VI_19(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Ou
     hypothesis("the triangles are similar", similar((a, b, c), (d, e, f)))
     outline(a, b, c)
     outline(d, e, f)
+    # Euclid takes BG a third proportional to BC and EF, and VI.11 is what finds
+    # it; the triangle on BG then equals DEF, which is where VI.15 comes in.
+    because(prop_VI_11, b, c, length(e, f) / length(b, c))
+    _third = posit(_at_distance(b, c, len2(e, f) / length(b, c)), "G")
+    if not collinear(b, a, _third):
+        because(prop_VI_15, b, a, _third, e, d, f)
 
     claim("the triangles are to one another in the duplicate ratio of BC to EF",
           ["VI.11", "VI.15"],
@@ -679,10 +848,18 @@ def prop_VI_22(a: Point, b: Point, c: Point, d: Point,
 
     # Squares are the simplest similar figures to describe on them.
     squares = []
+    _corners = []
     for start, end in ((a, b), (c, d), (e, f), (g, h)):
         across = (-(end.y - start.y), end.x - start.x)
-        squares.append(_area(start, end, Point(end.x + across[0], end.y + across[1]),
-                             Point(start.x + across[0], start.y + across[1])))
+        corner = (start, end, Point(end.x + across[0], end.y + across[1]),
+                  Point(start.x + across[0], start.y + across[1]))
+        _corners.append(corner)
+        squares.append(_area(*corner))
+
+
+    # The figures described are squares, and any two squares are similar, so
+    # VI.20 speaks of them as it speaks of any similar rectilineal figures.
+    because(prop_VI_20, *_corners[0], *_corners[1])
 
     claim("the similar figures on them are proportional", "VI.20",
           squares[0] * squares[3] == squares[1] * squares[2])
@@ -707,6 +884,9 @@ def prop_VI_23(a: Point, b: Point, d: Point, p: Point, q: Point, s: Point) -> Ou
     second = _parallelogram_on(p, q, s)
     outline(*first)
     outline(*second)
+
+    # VI.1 compares figures on one straight line, and these parallelograms share
+    # no such line until one is carried over to meet the other. See VI.14.
 
     claim("the ratio of the parallelograms is that of the sides compounded",
           ["VI.1", "V.Def.5"],
@@ -749,6 +929,8 @@ def prop_VI_24(a: Point, b: Point, d: Point, part) -> Out:
                               posit(_along(a, d, part), "G"))
     outline(*inner)
 
+    because(prop_I_43, whole[0], whole[1], whole[2], whole[3], corner)
+
     claim("the lesser parallelogram stands about the same diameter", "I.43",
           on_line(corner, diameter) and inner[2] == corner)
     claim("and it is similar to the whole", "VI.Def.1",
@@ -777,6 +959,8 @@ def prop_VI_25(a: Point, b: Point, c: Point, wanted) -> Out:
              posit(_along(a, b, scale), "D"),
              posit(_along(a, c, scale), "E"))
     outline(*built)
+
+    because(prop_VI_19, a, b, c, *built)
 
     claim("the figure built is similar to the given one", "VI.Def.1",
           similar((a, b, c), built))
@@ -813,6 +997,9 @@ def prop_VI_27(a: Point, b: Point, part) -> Out:
     outline(*applied)
     outline(*on_half)
 
+    because(prop_VI_23, applied[0], applied[1], applied[3],
+            on_half[0], on_half[1], on_half[3])
+
     claim("each applied parallelogram is as the rectangle contained by the "
           "segments it leaves", "VI.23",
           _area(*applied) == length(a, d) * length(a, b) / 2
@@ -825,6 +1012,8 @@ def prop_VI_27(a: Point, b: Point, part) -> Out:
           all(sign(length(a, middle) * length(middle, b)
                    - length(a, point) * length(point, b)) >= 0
               for point in elsewhere + [d]))
+    because(prop_II_5, a, d, b)
+
     claim("with equality only when the application is to the half itself", "II.5",
           all(point == middle
               or sign(length(a, middle) * length(middle, b)
@@ -860,6 +1049,9 @@ def prop_VI_28(a: Point, b: Point, part) -> Out:
     applied = _parallelogram_on(a, cut, Point(a.x + across[0], a.y + across[1]))
     outline(*applied)
 
+    because(prop_VI_27, a, b, part)
+    because(prop_II_5, a, cut, b)
+
     claim("the point falls on AB, between A and the midpoint", "VI.27",
           on_line(cut, Line.through(a, b)) and sign(length(a, cut)) >= 0
           and sign(length(a, middle) - length(a, cut)) >= 0)
@@ -892,6 +1084,8 @@ def prop_VI_29(a: Point, b: Point, part) -> Out:
     applied = _parallelogram_on(a, beyond, Point(a.x + across[0], a.y + across[1]))
     outline(*applied)
 
+    because(prop_II_6, a, b, beyond)
+
     claim("the point falls beyond B on AB produced", "II.6",
           on_line(beyond, Line.through(a, b))
           and sign(length(a, beyond) - length(a, b)) > 0)
@@ -921,6 +1115,8 @@ def prop_VI_26(a: Point, b: Point, d: Point, part) -> Out:
                similar((inner[0], inner[1], inner[2]), (whole[0], whole[1], whole[2])))
 
     diameter = line(a, whole[2], "the diameter AC")
+    because(prop_VI_24, a, whole[1], whole[3], part)
+
     claim("the far corner of the lesser lies on the diameter of the whole", "VI.24",
           on_line(inner[2], diameter))
     return Out()
@@ -949,6 +1145,8 @@ def prop_VI_30(a: Point, b: Point) -> Out:
     outline(*square)
     outline(*rectangle)
 
+    because(prop_VI_17, a, b, a, section, section, b)
+
     claim("the drawn figures are the square on AC and the rectangle AB by CB",
           "Def.22",
           _area(*square) == greater * greater and _area(*rectangle) == whole * lesser)
@@ -956,6 +1154,8 @@ def prop_VI_30(a: Point, b: Point) -> Out:
           "VI.17", _area(*square) == _area(*rectangle))
     claim("so the whole is to the greater as the greater is to the less", "VI.17",
           whole * lesser == greater * greater)
+    because(prop_II_11, a, b)
+
     claim("and the point is the same one II.11 finds", "II.11",
           length(a, section) == whole * golden)
     return Out(section=section, square=square, rectangle=rectangle)
@@ -978,6 +1178,14 @@ def prop_VI_32(a: Point, b: Point, d: Point, part) -> Out:
     outline(b, a, d)
     outline(d, e, close=False)
     line(far, b, "the side FB")
+
+    # I.33 reads its alternate angles off one diagonal, and which pair those
+    # are depends on the way round the two equal sides were named: AB with ED,
+    # taken in that order, is the pair whose joins this figure makes.
+    because(prop_I_33, a, b, e, d)
+    # FA and AB stand on opposite sides of A and make two right angles together,
+    # which is I.14's condition for their being one straight line.
+    because(prop_I_14, far, a, b, d)
 
     claim("the corresponding sides are parallel", "I.33",
           parallel(Line.through(a, b), Line.through(d, e)))
@@ -1005,6 +1213,10 @@ def prop_VI_33(o: Point, a: Point, b: Point, c: Point, move) -> Out:
         line(*pair, "a radius")
 
     claim("the circles are equal", "Def.15", eq_len(o, a, p, d))
+    because(prop_III_26, o, a, b, c, move)
+    if not collinear(a, c, b) and angle_at(a, o, b) == angle_at(a, c, b).doubled():
+        because(prop_III_20, o, a, c, b)
+
     claim("equal angles at the centres stand on equal arcs, so angle is as arc",
           "III.26", eq_angle(a, o, b, d, p, e) == eq_len(a, b, d, e))
     claim("and the angle at the circumference is half that at the centre, so the "
@@ -1058,6 +1270,10 @@ def prop_VI_20(
     claim("each triangle is to its fellow as the whole polygon is to the whole", "V.12",
           all(_area(*one) * whole_second == _area(*other) * whole_first
               for one, other in zip(cut_first, cut_second)))
+    because(prop_VI_19, *cut_first[0], *cut_second[0])
+    because(prop_VI_4, *cut_first[0], *cut_second[0])
+    because(prop_VI_6, *cut_first[0], *cut_second[0])
+
     claim("similar triangles are to one another in the duplicate ratio of their "
           "corresponding sides", "VI.19",
           all(_area(*one) * len2(second[0], second[1])
@@ -1104,6 +1320,8 @@ def prop_VI_31(a: Point, b: Point, c: Point) -> Out:
           similar(on_first, on_hypotenuse) and similar(on_second, on_hypotenuse))
     claim("similar figures are to one another as the squares on their sides", "VI.20",
           _area(*on_first) * len2(a, c) == _area(*on_hypotenuse) * len2(a, b))
+    because(prop_I_47, a, b, c)
+
     claim("so the figure on the hypotenuse equals the two on the legs", ["I.47", "VI.20"],
           _area(*on_hypotenuse) == _area(*on_first) + _area(*on_second))
     return Out(figures=(on_hypotenuse, on_first, on_second))

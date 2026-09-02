@@ -5,6 +5,12 @@ def prop_X_113(scale) -&gt; Out:
     apotome = 3 - sqrt(2)
     square = scale * scale
     breadth = square / apotome
+    # The breadth is to the scale as the scale is to the apotome, and VI.16 is
+    # the proposition about four lines standing so.
+    _lines = (breadth, scale, scale, apotome)
+    because(prop_VI_16, *[Point(x, level) for level, side in enumerate(_lines)
+                          for x in (0, side)])
+
     claim("the breadth is the square divided by the apotome", "VI.16",
           breadth * apotome == square)
     claim("and it is a binomial", "X.113", classify(breadth).family == "binomial")

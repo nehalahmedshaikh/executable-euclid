@@ -79,7 +79,7 @@ with the command that reproduces it, graded by how strong the claim is.
 | XII | 0 / 18 | the method of exhaustion |
 | XIII | **12 / 18** | the golden section, the pentagon, the regular solids |
 
-**402 propositions**, 6453 checked steps. Book XIII divides at its twelfth
+**402 propositions**, 1615 checked steps on one figure apiece and 14057 counting the propositions they carry out. Book XIII divides at its twelfth
 proposition: everything before that is plane geometry and is done, and
 everything after it, with Books XI and XII, is solid and waits on a kernel that
 leaves the plane. Books V and VII to X argue about numbers and magnitudes, so
@@ -93,29 +93,40 @@ tested exactly against the figure that was built. So a conclusion is confirmed
 true of the figure. Whether it *follows from the postulates by Euclid's rules of
 inference* is a separate question, and the machine is silent on it.
 
-**Dependencies are two different things, and only one is an observation.** 68
-edges are **executed** — one proposition calls another and the call is recorded
-as it happens. 400 are **cited** — a reference written by hand beside a step,
-following Heath's margins. A citation is checked for naming a proposition that
-exists and for not naming a later one, and that is all: `claim` records its
-warrant without consulting it, so a step could cite the wrong result and stay
-green. **15% of the graph is executed**, and the work of raising that is under
-way — a cited step becomes an executed one by calling the proposition it appeals
-to, which makes the appeal itself checkable. Nothing on the findings page rests
-on the rest: *"148 propositions depend on I.1"* is true, and it reads Euclid's
-own cross-references back.
+**Dependencies are two different things, and only one is an observation.** 457
+edges are **executed**: the step carries out the proposition it appeals to, on
+its own points, so that proposition's hypotheses are enforced against this figure
+and its conclusions checked on it. 20 are **cited** — a reference written beside
+a step, following Heath's margins, checked for naming a proposition that exists
+and for not naming a later one. That is all a citation is checked for, because
+`claim` records its warrant without consulting it, so a cited step could name the
+wrong result and stay green. **96% of the graph is executed**, and every edge
+that is not carries its reason in the source beside it. Fourteen of the twenty
+are reductios and the like, where the figure the citation names is the one the
+proposition disproves, so there is nothing to carry out; the remaining six are
+appeals not yet built. *"148 propositions depend on I.1"* reads Euclid's own
+cross-references back.
 
-**The necessity analysis is empirical and partial.** A hypothesis that survives
-being broken is reported as a candidate, with the number of configurations behind
-it. Coverage is 45%: a run that breaks two hypotheses at once cannot attribute
-the outcome to either, so it is discarded, and what cannot be broken alone is
-reported as untested.
+**The necessity analysis is empirical.** Each of the 754 hypotheses Euclid
+states is bent in turn and the conclusion watched. Coverage is 100% in that every
+one of them carries a verdict, and that figure is worth nothing on its own: a
+separating configuration — one that breaks the hypothesis and leaves its
+neighbours standing — was found for 54% of them. The rest are **implied**, which
+says the others may entail them and is the honest reading of a hypothesis that
+cannot be broken alone. A hypothesis that survives being broken is reported as a
+candidate, with the number of configurations behind it, and 346 implied verdicts
+are evidence of the same weak kind.
 
 **Certified and actually tested are not the same.** A claim that cannot come out
 false, or a hypothesis no sampled figure can satisfy, passes every run while
-checking nothing. Both have happened here;
-[`tests/test_corpus.py`](tests/test_corpus.py) reads every claim in the corpus
-for the shapes that cannot fail.
+checking nothing, and twenty-eight claims did: Book X applied an area to the
+rational line, gave the result a second name, and compared the two names.
+[`tests/test_corpus.py`](tests/test_corpus.py) follows each name back to what it
+was assigned, and sorts sums and products, before comparing the two sides of a
+claim — which is what makes that shape visible where reading the line does not.
+A claim can also be forced for a reason no rewriting reaches, so
+`euclid measure --unfalsified` bends the figure underneath every claim in the
+corpus and reports the ones that no bend of it made false.
 
 ## Where the words come from
 

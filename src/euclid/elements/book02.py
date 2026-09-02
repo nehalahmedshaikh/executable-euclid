@@ -21,10 +21,18 @@ from ..plane.predicates import (
     right_angle,
 )
 from . import samples
-from .book01_foundations import prop_I_10, prop_I_11
-from .book01_parallels import prop_I_46
+from .book01_foundations import prop_I_3, prop_I_10, prop_I_11, prop_I_12
+from .book01_parallels import prop_I_43, prop_I_46, prop_I_47
 from .figures import _across, _foot_of_the_perpendicular
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 
 def _area(*points: Point):
@@ -177,6 +185,13 @@ def prop_II_4(a: Point, b: Point, c: Point) -> Out:
     whole = length(a, c)
     first, second = length(a, b), length(b, c)
 
+    # ACED is the parallelogram, AE its diameter and H the point on it, which
+    # is I.43's own configuration; and the two figures said to be squares are
+    # built as such, on AB and on HK.
+    because(prop_I_43, a, c, e, d, h)
+    because(prop_I_46, a, b)
+    because(prop_I_46, h, k)
+
     claim("the segments together make the whole", "C.N.2", first + second == whole)
     claim("the two cuts leave four figures that fill the square", "C.N.2",
           _area(a, c, e, d)
@@ -216,6 +231,15 @@ def prop_II_5(a: Point, b: Point, c: Point) -> Out:
 
     first, second = length(a, b), length(b, c)
     half, offset = length(a, middle), length(middle, b)
+    because(prop_I_46, middle, c)
+    # Euclid's gnomon: the square on the half, cut by the diameter, has the
+    # piece between the sections standing at the corner, and I.43 makes the two
+    # complements equal. K is that corner, taken along the diameter.
+    _fraction = offset / half
+    _corner = posit(Point(square[0].x + _fraction * (square[2].x - square[0].x),
+                          square[0].y + _fraction * (square[2].y - square[0].y)), "K")
+    because(prop_I_43, square[0], square[1], square[2], square[3], _corner)
+
     claim("D bisects AC", "I.10", eq_len(a, middle, middle, c))
     claim("the drawn rectangle is contained by the unequal segments", "Def.22",
           _area(*rectangle) == first * second)
@@ -262,6 +286,9 @@ def prop_II_6(a: Point, b: Point, d: Point) -> Out:
     outline(a, d, close=False)
 
     half, added = length(a, c), length(b, d)
+    because(prop_II_5, a, b, d)
+    because(prop_I_46, a, c)
+
     claim("C bisects AB", "I.10", eq_len(a, c, c, b))
     claim("the rectangle contained by AD and DB, with the square on the half, "
           "equals the square on CD", ["II.5", "I.46"],
@@ -286,6 +313,9 @@ def prop_II_7(a: Point, b: Point, c: Point) -> Out:
     line(b, cut, "BF")
 
     whole, part, rest = length(a, c), length(b, c), length(a, b)
+    because(prop_I_46, a, c)
+    because(prop_II_4, a, b, c)
+
     claim("the square on the whole is the figure drawn on AC", "I.46",
           _area(*square) == whole * whole)
     claim("the squares on the whole and on one segment together equal twice the "
@@ -304,7 +334,12 @@ def prop_II_7(a: Point, b: Point, c: Point) -> Out:
 def prop_II_8(a: Point, b: Point, c: Point) -> Out:
     """AC is cut at B, and BC is added again beyond C."""
     hypothesis("B cuts AC", between(a, b, c))
-    beyond = posit(Point(c.x + (c.x - b.x), c.y + (c.y - b.y)), "D")
+    # CD is cut off equal to CB, which is I.3's business; the ray is produced
+    # twice the length so that I.3 has the greater line it asks for.
+    reach = Point(c.x + 2 * (c.x - b.x), c.y + 2 * (c.y - b.y))
+    beyond = posit(prop_I_3(c, reach, b, c).cut, "D")
+    because(prop_II_4, a, b, c)
+    because(prop_II_7, a, b, c)
 
     square = _rectangle(a, beyond, _across(a, beyond), "M", "N")
     outline(a, beyond, close=False)
@@ -337,6 +372,14 @@ def prop_II_9(a: Point, b: Point, d: Point) -> Out:
     outline(a, apex, b, close=False)
     line(apex, d, "ED")
 
+    # CE is the perpendicular I.11 erects at C, and the right-angled triangles
+    # standing on it are I.47's; the cut line itself is II.4's.
+    because(prop_I_11, a, b, c)
+    because(prop_I_47, a, c, apex)
+    because(prop_I_47, d, c, apex)
+    because(prop_I_47, b, c, apex)
+    because(prop_II_4, a, d, b)
+
     claim("CE is the half set up at right angles", "I.11",
           right_angle(apex, c, b) and eq_len(c, apex, c, b))
     claim("the squares on the unequal segments are double the square on the half "
@@ -359,6 +402,14 @@ def prop_II_10(a: Point, b: Point, d: Point) -> Out:
     apex = posit(Point(c.x + _across(c, b)[0], c.y + _across(c, b)[1]), "E")
     outline(a, apex, b, close=False)
     line(apex, d, "ED")
+
+    # CE is the perpendicular I.11 erects at C, the right-angled triangles
+    # standing on it are I.47's, and the produced line is II.4's.
+    because(prop_I_11, a, d, c)
+    because(prop_I_47, a, c, apex)
+    because(prop_I_47, d, c, apex)
+    because(prop_I_47, b, c, apex)
+    because(prop_II_4, a, b, d)
 
     claim("CE is the half set up at right angles", "I.11",
           right_angle(apex, c, b) and eq_len(c, apex, c, b))
@@ -387,6 +438,11 @@ def prop_II_11(a: Point, b: Point) -> Out:
 
     whole, greater = length(a, b), length(a, h)
     lesser = length(h, b)
+    # DA is bisected at E and produced to F, which is II.6's configuration, and
+    # EAB is right-angled at A, which is I.47's.
+    because(prop_II_6, d, a, f)
+    because(prop_I_47, middle, a, b)
+
     claim("H divides AB", "Post.1", on_line(h, Line.through(a, b)))
     claim("the rectangle contained by the whole and the lesser segment equals the "
           "square on the greater", ["II.6", "I.47"], whole * lesser == greater * greater)
@@ -413,6 +469,11 @@ def prop_II_12(a: Point, b: Point, c: Point) -> Out:
     line(a, d, "the perpendicular AD")
 
     hypothesis("the perpendicular falls outside the triangle, beyond B", between(c, b, d))
+    because(prop_I_12, c, b, a)
+    because(prop_I_47, a, d, c)
+    because(prop_I_47, a, d, b)
+    because(prop_II_4, c, b, d)
+
     claim("AD is perpendicular to CD", "I.12", right_angle(a, d, c))
     # CB and BD run the same way out of B, so the rectangle they contain is the
     # dot product -- exact, and without a square root anywhere.
@@ -442,6 +503,11 @@ def prop_II_13(a: Point, b: Point, c: Point) -> Out:
     line(a, d, "the perpendicular AD")
 
     hypothesis("the perpendicular falls within CB", between(c, d, b))
+    because(prop_I_12, c, b, a)
+    because(prop_I_47, a, d, c)
+    because(prop_I_47, a, d, b)
+    because(prop_II_7, c, d, b)
+
     claim("AD is perpendicular to CB", "I.12", right_angle(a, d, c))
     rectangle = length(c, b) * length(b, d)
     claim("the square on the side subtending the acute angle falls short of the "
@@ -470,6 +536,9 @@ def prop_II_14(a: Point, b: Point, c: Point) -> Out:
     # Euclid has no Book III here, and does not need it: the right angle is the
     # one he constructed at B, not the one in the semicircle. II.5 and I.47 do
     # the rest between them.
+    because(prop_I_47, middle, b, d)
+    because(prop_II_5, a, b, c)
+
     claim("BD stands at right angles to AC, being so constructed", "I.11",
           right_angle(d, b, a))
     claim("MD and MA are equal, both radii of the semicircle", "Def.15",

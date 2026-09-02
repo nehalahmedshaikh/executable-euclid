@@ -5,6 +5,9 @@
 )
 def prop_VII_27(a: int, b: int) -&gt; Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
+    because(prop_VII_25, a, b)
+    because(prop_VII_26, a, a, b, b)
+
     claim("their squares are prime to one another", "VII.25", coprime(a * a, b * b))
     claim("and so are their cubes, and this is always the case with the extremes",
           "VII.26", coprime(a * a * a, b * b * b))

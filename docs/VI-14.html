@@ -16,6 +16,14 @@ def prop_VI_14(a: Point, b: Point, d: Point, p: Point, q: Point, s: Point) -&gt;
     outline(*second)
     hypothesis("the parallelograms are equal", _area(*first) == _area(*second))
 
+    # Euclid places the two so that DB is in a straight line with BE, which puts
+    # them vertically opposite about B, and only then is there a figure for VI.1
+    # to speak of. Carrying the second one over is a rigid motion between
+    # segments of unequal length, and its cosine is a quotient of two square
+    # roots -- outside the field the rest of the figure lives in. VI.23 stands on
+    # the same ground. Executing this wants VI.1 stated for parallelograms as
+    # well as triangles, and the juxtaposition built rather than assumed.
+
     claim("the sides about the equal angles are reciprocally proportional -- "
           "AB is to PQ as PS is to AD", "VI.1",
           length(a, b) * length(a, d) == length(p, q) * length(p, s))

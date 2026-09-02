@@ -6,6 +6,8 @@
 def prop_VII_3(a: int, b: int, c: int) -&gt; Out:
     hypothesis("all three are greater than a unit", a &gt; 1 and b &gt; 1 and c &gt; 1, guard=True)
     measure = gcd(gcd(a, b), c)
+    because(prop_VII_2, a, b)
+
     claim("the measure found measures all three", "VII.2",
           all(measures(measure, n) for n in (a, b, c)))
     claim("and every common measure of the three measures it", "VII.2",

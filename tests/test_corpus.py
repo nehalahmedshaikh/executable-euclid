@@ -37,28 +37,158 @@ BOOK_SIZES = {
 }
 
 
-def test_no_claim_is_incapable_of_failing():
-    """A check that cannot come out false is not a check.
+# -- a claim that cannot come out false -------------------------------------
+#
+# This began as a search for two shapes: a literal ``True``, and a comparison
+# whose two sides read alike. Both had happened -- VI.16 and VII.19 each stated
+# a converse as ``(x == y) == (x == y)``, which reads like a biconditional and
+# asserts nothing -- and reading the source found them.
+#
+# Reading the source is not enough, because a name stands in the way. X.54 said
+#
+#     area = compound
+#     claim("...", "X.20", area == compound * 1)
+#
+# which is the same assertion wearing a second name, and twenty-four
+# propositions of Book X said it. So the two sides are put in a normal form
+# first: assignments are followed back to what they were assigned, the
+# operations that leave a value alone are dropped, and sums and products are
+# sorted so that ``a * b`` and ``b * a`` land in the same place. That last one
+# matters -- ``a * (b * scale) == b * (a * scale)`` was standing in for "the
+# sides are proportional" in three propositions, and is true of any four numbers.
+#
+# What this cannot see is a claim that is forced for a reason no rewriting
+# reaches. euclid.measure.mutation is the analysis for those: it bends the
+# figure underneath a claim and reports which claims never noticed.
 
-    Two shapes have turned up in practice, both of them passing every test:
-    a literal ``True``, and a comparison of something with itself. VI.16 and
-    VII.19 both stated their converse as ``(x == y) == (x == y)``, which reads
-    like a real biconditional and asserts nothing at all.
-    """
+_IDENTITIES = {(ast.Mult, 1), (ast.Div, 1), (ast.Add, 0), (ast.Sub, 0), (ast.Pow, 1)}
+_ONE_SIDED = (ast.Div, ast.Sub, ast.Pow)  # x/1 is x; 1/x is not
+_COMMUTATIVE = (ast.Add, ast.Mult, ast.BitAnd, ast.BitOr)
+
+
+def _fold(node):
+    """Drop the operations that leave a value alone: ``*1``, ``/1``, ``+0``, ``-0``."""
+    if not isinstance(node, ast.BinOp):
+        return node
+    left, right = _fold(node.left), _fold(node.right)
+    for side, other in ((right, left), (left, right)):
+        if not (isinstance(side, ast.Constant) and isinstance(side.value, int)):
+            continue
+        if (type(node.op), side.value) not in _IDENTITIES:
+            continue
+        if side is left and isinstance(node.op, _ONE_SIDED):
+            continue
+        return other
+    return ast.BinOp(left=left, op=node.op, right=right)
+
+
+def _substitute(node, env, depth=0):
+    """Replace each name by what it was last assigned, as far as that goes."""
+    if depth > 12:
+        return node
+    step = lambda n: _substitute(n, env, depth + 1)  # noqa: E731
+    if isinstance(node, ast.Name):
+        return step(env[node.id]) if node.id in env else node
+    if isinstance(node, ast.BinOp):
+        return ast.BinOp(left=step(node.left), op=node.op, right=step(node.right))
+    if isinstance(node, ast.UnaryOp):
+        return ast.UnaryOp(op=node.op, operand=step(node.operand))
+    if isinstance(node, ast.Call):
+        return ast.Call(func=step(node.func), args=[step(a) for a in node.args],
+                        keywords=[ast.keyword(arg=k.arg, value=step(k.value))
+                                  for k in node.keywords])
+    if isinstance(node, ast.Attribute):
+        return ast.Attribute(value=step(node.value), attr=node.attr, ctx=ast.Load())
+    if isinstance(node, ast.Subscript):
+        return ast.Subscript(value=step(node.value), slice=step(node.slice),
+                             ctx=ast.Load())
+    if isinstance(node, (ast.Tuple, ast.List)):
+        return type(node)(elts=[step(e) for e in node.elts], ctx=ast.Load())
+    return node
+
+
+def _flatten(node, op):
+    if isinstance(node, ast.BinOp) and isinstance(node.op, op):
+        return _flatten(node.left, op) + _flatten(node.right, op)
+    return [node]
+
+
+def _canonical(node):
+    """A string that does not care which way round a sum or a product was written."""
+    if isinstance(node, ast.BinOp) and isinstance(node.op, _COMMUTATIVE):
+        parts = sorted(_canonical(p) for p in _flatten(node, type(node.op)))
+        joiner = " + " if isinstance(node.op, ast.Add) else " * "
+        return "(" + joiner.join(parts) + ")"
+    if isinstance(node, ast.BinOp):
+        return (f"({_canonical(node.left)} {type(node.op).__name__} "
+                f"{_canonical(node.right)})")
+    if isinstance(node, ast.Call):
+        return f"{_canonical(node.func)}({', '.join(_canonical(a) for a in node.args)})"
+    if isinstance(node, ast.Attribute):
+        return f"{_canonical(node.value)}.{node.attr}"
+    return ast.unparse(node)
+
+
+def _normal(node, env):
+    return _canonical(_fold(_substitute(_fold(node), env)))
+
+
+def _bound_by(node):
+    """Every name this statement may rebind."""
+    found = set()
+    for inner in ast.walk(node):
+        targets = []
+        if isinstance(inner, ast.Assign):
+            targets = inner.targets
+        elif isinstance(inner, (ast.AugAssign, ast.AnnAssign)):
+            targets = [inner.target]
+        elif isinstance(inner, (ast.For, ast.comprehension)):
+            targets = [inner.target]
+        elif isinstance(inner, ast.withitem) and inner.optional_vars is not None:
+            targets = [inner.optional_vars]
+        for target in targets:
+            found |= {n.id for n in ast.walk(target) if isinstance(n, ast.Name)}
+    return found
+
+
+def _judge(target, env, offenders, where):
+    if isinstance(target, ast.BoolOp):
+        for part in target.values:
+            _judge(part, env, offenders, where)
+    elif isinstance(target, ast.Constant):
+        offenders.append(f"{where} asserts a literal {target.value!r}")
+    elif isinstance(target, ast.Compare) and len(target.ops) == 1:
+        left, right = _normal(target.left, env), _normal(target.comparators[0], env)
+        if left == right:
+            offenders.append(f"{where} compares {ast.unparse(target)[:64]} "
+                             f"with itself -- both sides are {left[:50]}")
+
+
+def _scan(body, env, offenders, filename):
+    """Walk one block in order, carrying what each name has been assigned."""
+    for stmt in body:
+        for call in ast.walk(stmt):
+            if (isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                    and call.func.id in ("claim", "hypothesis") and call.args):
+                _judge(call.args[-1], env, offenders,
+                       f"{filename}:{call.lineno}")
+        if (isinstance(stmt, ast.Assign) and len(stmt.targets) == 1
+                and isinstance(stmt.targets[0], ast.Name)):
+            env[stmt.targets[0].id] = stmt.value
+        else:
+            # Anything else -- a loop, a branch, a tuple unpacking -- may bind a
+            # name to something this walk cannot follow, so it stops following it.
+            for name in _bound_by(stmt):
+                env.pop(name, None)
+
+
+def test_no_claim_is_incapable_of_failing():
     offenders = []
     for path in BOOK_FILES:
-        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
-            if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
-                    and node.func.id in ("claim", "hypothesis") and node.args):
-                continue
-            target = node.args[-1]
-            if isinstance(target, ast.Constant):
-                offenders.append(f"{path.name}:{node.lineno} asserts a literal "
-                                 f"{target.value!r}")
-            elif (isinstance(target, ast.Compare) and len(target.ops) == 1
-                  and ast.unparse(target.left) == ast.unparse(target.comparators[0])):
-                offenders.append(f"{path.name}:{node.lineno} compares "
-                                 f"{ast.unparse(target.left)[:60]} with itself")
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                _scan(node.body, {}, offenders, path.name)
     assert not offenders, "claims that cannot fail:\n  " + "\n  ".join(offenders)
 
 
@@ -289,3 +419,72 @@ def test_a_guard_is_marked_as_one(corpus):
                 if "guard=True" not in tail.split("hypothesis(")[1][:300]:
                     unmarked.append((entry.ref, match.group(1)))
     assert not unmarked, f"unmarked well-formedness guards: {unmarked[:5]}"
+
+
+def test_an_appeal_is_carried_out_and_recorded():
+    """``because`` runs the cited proposition and records the edge.
+
+    Both halves matter. Running it is what checks the appeal: a step citing a
+    result that does not apply to its own points fails instead of passing. And
+    the edge has to be recorded, because the executed share of the graph is
+    read off exactly these calls.
+    """
+    import random
+
+    from euclid.elements.book01_foundations import prop_I_4
+    from euclid.elements.registry import BadConfiguration, because, get, run_sampled
+    from euclid.kernel.field import Context
+    from euclid.plane.objects import Point
+
+    entry = get("I.5")
+    entry.calls.discard("I.4")
+    run_sampled("I.5", random.Random(0))
+    assert "I.4" in entry.calls, "I.5 appeals to I.4 and the call went unrecorded"
+
+    with Context("test:appeal"), pytest.raises(BadConfiguration):
+        # I.4 wants two sides and the included angle equal, and these are not
+        # that, so the appeal must refuse the figure rather than pass it.
+        because(prop_I_4, Point(0, 0), Point(1, 0), Point(0, 1),
+                Point(0, 0), Point(2, 0), Point(0, 1))
+
+
+def test_an_appeal_does_not_follow_the_appeals_beneath_it():
+    """One level of appeal is the whole of it.
+
+    II.13 appeals to I.47 twice and I.47 appeals onward. Following every appeal
+    beneath those turned one run into a thousand nested constructions that
+    re-derived Book I from I.1, and cost seven minutes where it now costs two
+    seconds. Each proposition is certified in its own right, so the depth buys
+    no assurance -- only time.
+    """
+    import random
+
+    from euclid.elements.registry import run_sampled
+
+    nested = run_sampled("II.13", random.Random(0)).trace.descendants()
+    assert nested, "II.13 carries out the propositions it appeals to"
+    assert len(nested) < 150, (
+        f"II.13 ran {len(nested)} nested propositions; the appeal depth is unbounded")
+
+
+def test_a_length_can_be_cut_off_from_a_line_it_starts_on():
+    """I.3 must take a lesser line that already begins at the point.
+
+    I.2 carries a length to a point because the compass collapses; a line
+    already at the point needs no carrying, and asking for it made Postulate 1
+    draw a line from A to itself. Six propositions cut off a length that way --
+    I.5, I.9, I.11, I.18, IV.10 and VI.9 -- and each had to name the line
+    backwards to get past it.
+    """
+    from euclid.elements.book01_foundations import prop_I_3
+    from euclid.kernel.field import Context
+    from euclid.plane.objects import Point
+    from euclid.plane.predicates import eq_len
+
+    with Context("test:cut"):
+        a, b = Point(0, 0), Point(10, 0)
+        short = Point(3, 0)
+        cut = prop_I_3(a, b, a, short).cut       # the lesser line starts at A
+        assert eq_len(a, cut, a, short)
+        other = prop_I_3(a, b, short, a).cut     # and named the other way round
+        assert eq_len(a, other, a, short)

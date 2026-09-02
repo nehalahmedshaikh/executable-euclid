@@ -1,14 +1,23 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IX.7 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book IX &middot; Proposition 7</p><h1>IX.7</h1><blockquote>If a composite number by multiplying any number make some number, the product will be solid.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the numbers are genuine<span class="cite">given</span></li><li class="">the number is composite<span class="cite">by Def.VII.13</span></li><li class="">its product with any number is solid, having three sides<span class="cite">by Def.VII.17</span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> Def.VII.13, Def.VII.17</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IX.7 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book IX &middot; Proposition 7</p><h1>IX.7</h1><blockquote>If a composite number by multiplying any number make some number, the product will be solid.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the first is composite<span class="cite">given</span></li><li class="hyp">the second is a number<span class="cite">given</span></li><li class="">the composite is measured by some number, and so has two sides<span class="cite">by Def.VII.13</span></li><li class="">its product with any number is solid, having three sides<span class="cite">by Def.VII.17</span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> Def.VII.13, Def.VII.17</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
     "IX.7",
     THEOREM,
-    sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10), rng.randint(2, 20)),
+    sample=lambda rng: (rng.randint(2, 10) * rng.randint(2, 10), rng.randint(2, 20)),
 )
-def prop_IX_7(a: int, b: int, other: int) -&gt; Out:
-    """A composite number, given as a product of two, multiplied by a third."""
-    hypothesis("the numbers are genuine", a &gt; 1 and b &gt; 1 and other &gt; 1, guard=True)
-    composite = a * b
-    claim("the number is composite", "Def.VII.13", not is_prime(composite))
+def prop_IX_7(composite: int, other: int) -&gt; Out:
+    """A composite number multiplied by any number makes a solid number.
+
+    The composite is given, and its two sides are found rather than handed over.
+    Given the sides and multiplying them out, the conclusion compared the
+    product with the expression it had just been built from.
+    """
+    hypothesis("the first is composite", composite &gt; 1 and not is_prime(composite))
+    hypothesis("the second is a number", other &gt; 1, guard=True)
+    a = next(d for d in range(2, composite) if measures(d, composite))
+    b = composite // a
+    solid = composite * other
+    claim("the composite is measured by some number, and so has two sides",
+          "Def.VII.13", a &gt; 1 and b &gt; 1 and a * b == composite)
     claim("its product with any number is solid, having three sides", "Def.VII.17",
-          composite * other == a * b * other)
-    return Out(solid=composite * other, sides=(a, b, other))
+          a &gt; 1 and b &gt; 1 and other &gt; 1 and a * b * other == solid)
+    return Out(solid=solid, sides=(a, b, other))
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

@@ -6,6 +6,8 @@
 def prop_IX_16(a: int, b: int) -&gt; Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
     hypothesis("the first does not measure the second", not measures(a, b))
+    because(prop_VII_20, a, b, a, b)
+
     claim("the second is to no other number as the first is to the second", "VII.20",
           not any(a * c == b * b for c in range(1, b * b + 1)))
     return Out()

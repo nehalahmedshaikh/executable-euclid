@@ -8,6 +8,9 @@ def prop_IX_17(p: int, q: int, count: int) -&gt; Out:
     hypothesis("a genuine progression is asked for", count &gt;= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the extremes are prime to one another", coprime(terms[0], terms[-1]))
+    because(prop_IX_16, terms[0], terms[-1])
+    because(prop_VIII_6, p, q, count)
+
     claim("the first does not measure the second", "VIII.6",
           not measures(terms[0], terms[1]))
     claim("so the last is to no other number as the first is to the second", "IX.16",

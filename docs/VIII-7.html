@@ -8,6 +8,7 @@ def prop_VIII_7(ratio: int, count: int) -&gt; Out:
     hypothesis("the ratio and length are genuine", ratio &gt; 1 and count &gt;= 3, guard=True)
     terms = continued_proportion(1, (ratio, 1), count)
     hypothesis("the first measures the last", measures(terms[0], terms[-1]))
+
     claim("then it measures the second also", "VIII.7", measures(terms[0], terms[1]))
     claim("and indeed every one of them", "VIII.6",
           all(measures(terms[0], term) for term in terms))

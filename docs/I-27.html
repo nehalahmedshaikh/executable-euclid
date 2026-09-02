@@ -10,6 +10,10 @@ def prop_I_27(a: Point, b: Point, c: Point, d: Point, g: Point, h: Point) -&gt; 
     hypothesis("G lies on AB and H on CD", on_line(g, first) and on_line(h, second))
     hypothesis("the alternate angles AGH and GHD are equal", eq_angle(a, g, h, g, h, d))
 
+    # The triangle Euclid argues about is the one AB and CD would make if they
+    # met. They are parallel, so there is no meeting point to build it from and
+    # no figure for I.16 to speak of. Unlike the suppositions of I.14 and I.39,
+    # which are drawable, this citation cannot be executed.
     claim("were AB and CD to meet, a triangle would arise whose exterior angle equalled "
           "an interior and opposite angle, contrary to I.16; so they do not meet", "I.16",
           parallel(first, second))

@@ -9,6 +9,9 @@ def prop_V_6(x, y, times: int, taken: int) -&gt; Out:
     hypothesis("less is taken away than there is", taken &lt;= times)
     left, right = times * x - taken * x, times * y - taken * y
     remaining = times - taken
+    if remaining &gt;= 1:
+        because(prop_V_1, x, y, remaining)
+
     claim("the remainders are equimultiples of the same two magnitudes", "V.1",
           left == remaining * x and right == remaining * y)
     claim("and where one multiple remains they are equal to them", "C.N.3",

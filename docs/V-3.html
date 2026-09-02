@@ -8,6 +8,8 @@ def prop_V_3(b, d, times: int, again: int) -&gt; Out:
     fold B and D."""
     hypothesis("the magnitudes are positive", sign(b) &gt; 0 and sign(d) &gt; 0, guard=True)
     a, c = times * b, times * d
+    because(prop_V_1, b, d, times)
+
     claim("the equimultiples taken are multiples of the original multiples", "Def.2",
           again * a == again * (times * b) and again * c == again * (times * d))
     claim("so ex aequali they are equimultiples of the second and the fourth", "V.1",

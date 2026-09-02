@@ -10,6 +10,8 @@ def prop_V_12(a, b, c, d, e, f) -&gt; Out:
                all(sign(x) &gt; 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("and c : d = e : f", c * f == d * e)
+    because(prop_V_11, a, b, c, d, e, f)
+
     claim("so all three pairs stand in one ratio", "V.11",
           a * d == b * c and a * f == b * e)
     claim("so one antecedent is to one consequent as all are to all", "Def.5",

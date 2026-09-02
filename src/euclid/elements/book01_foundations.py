@@ -38,7 +38,15 @@ from ..plane.predicates import (
     same_side,
 )
 from . import samples
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 # ---------------------------------------------------------------------------
 # I.1 - I.3  the transfer of magnitude
@@ -105,7 +113,12 @@ def prop_I_3(a: Point, b: Point, c: Point, d: Point) -> Out:
     hypothesis("AB is greater than CD", len2(a, b) > len2(c, d))
     line(c, d, "the given lesser line CD")
 
-    placed = prop_I_2(a, c, d).placed
+    # I.2 exists because the compass collapses: it carries a length to a point
+    # that is not on it. A lesser line already beginning at A needs no carrying,
+    # and asking I.2 for it makes Postulate 1 draw a line from A to itself.
+    # I.5, I.9, I.11, I.18, IV.10 and VI.9 all cut off a length from a line they
+    # share an end with, and every one of them met that.
+    placed = d if a == c else prop_I_2(a, c, d).placed
     reach = circle_with_radius2(a, len2(a, placed), "circle centre A with radius CD")
     cut = posit(meet(line(a, b), reach)[1], "E")
 
@@ -156,22 +169,31 @@ def prop_I_4(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
 def prop_I_5(a: Point, b: Point, c: Point) -> Out:
     hypothesis("AB = AC", eq_len(a, b, a, c))
 
-    # produce AB to F and AC to G, cutting off equal parts (I.3)
-    reach = len2(a, b) * 2
-    beyond = circle_with_radius2(a, reach, "circle centre A with radius AF")
-    f = posit(meet(line(a, b), beyond)[1], "F")
-    g = posit(meet(line(a, c), beyond)[1], "G")
+    # Produce the two sides to D and E, take F at random on BD, and cut AG off
+    # equal to AF -- which is I.3's own business, so I.3 does it.
+    produced = circle_with_radius2(a, len2(a, b) * 3, "circle centre A through D and E")
+    d = posit(meet(line(a, b), produced)[1], "D")
+    e = posit(meet(line(a, c), produced)[1], "E")
+    taken = circle_with_radius2(a, len2(a, b) * 2, "circle centre A through F")
+    f = posit(meet(line(a, d), taken)[1], "F")
+    # The lesser line is named FA rather than AF: I.3 places it at A by I.2,
+    # and I.2 joins the point to an end of the line, so handing it a line that
+    # already starts at A asks Postulate 1 for a line to itself.
+    g = posit(prop_I_3(a, e, f, a).cut, "G")
     line(f, c)
     line(g, b)
 
-    claim("AF = AG by construction", "I.3", eq_len(a, f, a, g))
-    claim("triangles AFC and AGB have two sides and the included angle equal", "I.4",
-          eq_len(f, c, g, b))
-    claim("hence angle ACF = angle ABG", "I.4", eq_angle(a, c, f, a, b, g))
+    claim("F lies on AB produced and G on AC produced, with AF equal to AG", "I.3",
+          between(a, b, f) and between(a, c, g) and eq_len(a, f, a, g))
+
+    because(prop_I_4, a, f, c, a, g, b)
+    claim("so FC equals GB, and the angle ACF the angle ABG", "I.4",
+          eq_len(f, c, g, b) and eq_angle(a, c, f, a, b, g))
     claim("BF = CG, the remainders of equals", "C.N.3", eq_len(b, f, c, g))
-    claim("triangles BFC and CGB are then equal by two sides and the included angle", "I.4",
-          eq_angle(b, f, c, c, g, b))
-    claim("angle FBC = angle GCB, the angles under the base", "I.4", eq_angle(f, b, c, g, c, b))
+
+    because(prop_I_4, f, b, c, g, c, b)
+    claim("so the angles FBC and GCB under the base are equal", "I.4",
+          eq_angle(f, b, c, g, c, b))
     claim("therefore angle ABC = angle ACB, the angles at the base", "C.N.3",
           eq_angle(a, b, c, a, c, b))
     return Out()
@@ -186,6 +208,16 @@ def prop_I_5(a: Point, b: Point, c: Point) -> Out:
 def prop_I_6(a: Point, b: Point, c: Point) -> Out:
     hypothesis("angle ABC = angle ACB", eq_angle(a, b, c, a, c, b))
     outline(a, b, c)
+
+    # D is set on BA at the distance AC, which is the point Euclid's reductio
+    # cuts off, and I.4 then compares DBC with ACB. The cutting itself is done
+    # under the supposition AB > AC, and I.3 will not take two equal lines, so
+    # that citation cannot be run on a figure meeting this hypothesis.
+    reach = circle_with_radius2(b, len2(a, c), "circle centre B with radius AC")
+    d = posit(meet(line(b, a), reach)[1], "D")
+    line(d, c, "join DC")
+    because(prop_I_4, b, d, c, c, a, b)
+
     claim("were AB unequal to AC, the greater could be cut down to the less (I.3) and "
           "I.4 would make a part equal the whole, which is absurd; so AB = AC",
           ["I.3", "I.4", "C.N.5"], eq_len(a, b, a, c))
@@ -226,9 +258,58 @@ def prop_I_7(a: Point, b: Point, c: Point, d: Point) -> Out:
                not (Line.through(a, b).side_of(c) * Line.through(a, b).side_of(d) < 0))
     outline(a, c, b)
     outline(a, d, b)
+
+    # The only other point answering to AC = AD and BC = BD is the reflection of
+    # C in AB, and it is drawable. ACD' is isosceles on it, so I.5 gives the
+    # equal angles Euclid's reductio turns against itself.
+    mirror = _reflect(c, a, b)
+    if mirror != c:
+        line(c, mirror, "join CD")
+        because(prop_I_5, a, c, mirror)
+
     claim("if C and D were distinct, I.5 would give an angle both greater and less than "
           "another; so C and D coincide", "I.5", c == d)
     return Out()
+
+
+def _superpose(first: Point, second: Point, onto_first: Point, onto_second: Point,
+               reflected: bool = False):
+    """The rigid motion carrying one segment onto an equal one.
+
+    Euclid applies one triangle to another and reads off that they coincide,
+    which is the step his critics have never liked. It is exact here: the two
+    segments are equal, so the cosine and sine of the turn come out as a dot
+    and a cross product over the common squared length and no root is taken.
+    The application can then be carried out rather than appealed to.
+    """
+    ux, uy = second.x - first.x, second.y - first.y
+    vx, vy = onto_second.x - onto_first.x, onto_second.y - onto_first.y
+    span = ux * ux + uy * uy
+    cosine = (ux * vx + uy * vy) / span
+    sine = (ux * vy - uy * vx) / span
+
+    def carry(point: Point) -> Point:
+        source = _reflect(point, first, second) if reflected else point
+        dx, dy = source.x - first.x, source.y - first.y
+        return Point(onto_first.x + cosine * dx - sine * dy,
+                     onto_first.y + sine * dx + cosine * dy)
+
+    return carry
+
+
+def _applied(first, second, third, onto_first, onto_second, beside) -> Point:
+    """Where the third vertex lands when the triangle is applied to the other.
+
+    The two triangles may be of opposite orientation, and then the motion that
+    matches their bases is the one that turns the figure over. Which of the two
+    is wanted is settled by the side the answer has to fall on -- the choice
+    Euclid makes by drawing the figure one way round.
+    """
+    carried = _superpose(first, second, onto_first, onto_second)(third)
+    edge = Line.through(onto_first, onto_second)
+    if edge.side_of(carried) * edge.side_of(beside) < 0:
+        carried = _superpose(first, second, onto_first, onto_second, reflected=True)(third)
+    return carried
 
 
 def _sss_pair(rng):
@@ -246,8 +327,14 @@ def prop_I_8(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
     hypothesis("the three sides are equal respectively", congruent_sss((a, b, c), (d, e, f)))
     outline(a, b, c)
     outline(d, e, f)
+
+    # Apply DEF to ABC, DE upon AB, and ask I.7 whether the apexes can differ.
+    landed = _applied(d, e, f, a, b, beside=c)
+    because(prop_I_7, a, b, c, landed)
+
     claim("applying one triangle to the other, I.7 forbids the apexes to differ, "
-          "so angle BAC = angle EDF", "I.7", eq_angle(b, a, c, e, d, f))
+          "so angle BAC = angle EDF", "I.7",
+          landed == c and eq_angle(b, a, c, e, d, f))
     claim("likewise angle ABC = angle DEF", "I.7", eq_angle(a, b, c, d, e, f))
     claim("and angle BCA = angle EFD", "I.7", eq_angle(b, c, a, e, f, d))
     return Out()
@@ -266,10 +353,13 @@ def prop_I_8(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out:
 def prop_I_9(a: Point, b: Point, c: Point) -> Out:
     """Cut equal lengths along the two rays, then hang an equilateral triangle
     between their ends; the line to its apex bisects the angle."""
-    reach = min(len2(b, a), len2(b, c))
+    # D is taken at random on BA and BE cut off equal to it, which is I.3's
+    # business. A quarter of the shorter arm keeps BD strictly inside BC, the
+    # "greater" that I.3 asks for.
+    reach = min(len2(b, a), len2(b, c)) / 4
     gauge = circle_with_radius2(b, reach, "circle centre B")
     d = posit(meet(line(b, a), gauge)[1], "D")
-    e = posit(meet(line(b, c), gauge)[1], "E")
+    e = posit(prop_I_3(b, c, d, b).cut, "E")
 
     apex = posit(prop_I_1(d, e).apex, "F")
     if apex == b:
@@ -277,6 +367,8 @@ def prop_I_9(a: Point, b: Point, c: Point) -> Out:
         # the triangle on the other side of DE serves just as well
         apex = posit(meet(circle(d, e), circle(e, d))[1], "F")
     bisector = line(b, apex, "the bisector BF")
+
+    because(prop_I_8, b, d, apex, b, e, apex)
 
     claim("BD = BE by construction", "I.3", eq_len(b, d, b, e))
     claim("DF = EF, sides of the equilateral triangle DEF", "I.1", eq_len(d, apex, e, apex))
@@ -296,6 +388,9 @@ def prop_I_10(a: Point, b: Point) -> Out:
     bisected = prop_I_9(a, apex, b)
     middle = posit(meet_one(bisected.bisector, line(a, b)), "D")
 
+    # AC and BC are sides of the equilateral triangle, CD is common, and the
+    # angles at C were bisected: that is I.4's own hypothesis, so I.4 concludes.
+    because(prop_I_4, apex, a, middle, apex, b, middle)
     claim("AD = DB: the line is bisected", "I.4", eq_len(a, middle, middle, b))
     claim("D lies on AB", "Def.4", on_line(middle, Line.through(a, b)))
     claim("D lies between A and B", "C.N.5", between(a, middle, b))
@@ -311,12 +406,14 @@ def prop_I_11(a: Point, b: Point, c: Point) -> Out:
     hypothesis("C lies on AB", on_line(c, Line.through(a, b)))
     hypothesis("C is not an endpoint", c != a and c != b)
 
-    reach = min(len2(c, a), len2(c, b))
+    reach = min(len2(c, a), len2(c, b)) / 4
     gauge = circle_with_radius2(c, reach, "circle centre C")
-    d, e = meet(line(a, b), gauge, "DE")
-    d, e = posit(d, "D"), posit(e, "E")
+    d = posit(meet(line(a, b), gauge)[0], "D")
+    e = posit(prop_I_3(c, b, d, c).cut, "E")
     apex = posit(prop_I_1(d, e).apex, "F")
     upright = line(c, apex, "the perpendicular CF")
+
+    because(prop_I_8, d, c, apex, e, c, apex)
 
     claim("CD = CE by construction", "I.3", eq_len(c, d, c, e))
     claim("FD = FE, sides of the equilateral triangle", "I.1", eq_len(apex, d, apex, e))
@@ -349,6 +446,7 @@ def prop_I_12(a: Point, b: Point, c: Point) -> Out:
 
     claim("CG = CH, radii of the circle centre C", "Def.15", eq_len(c, g, c, h))
     claim("GE = EH, since E bisects GH", "I.10", eq_len(g, middle, middle, h))
+    because(prop_I_8, c, g, middle, c, h, middle)
     claim("triangles CGE and CHE have three sides equal", "I.8",
           congruent_sss((c, g, middle), (c, h, middle)))
     claim("hence the adjacent angles at E are equal, so CE is perpendicular to AB", "Def.10",
@@ -391,8 +489,19 @@ def prop_I_14(a: Point, b: Point, c: Point, d: Point) -> Out:
     line(b, d)
     total = angle_at(a, b, d) + angle_at(d, b, c)
     hypothesis("the adjacent angles sum to two right angles", total == STRAIGHT)
+
+    # Euclid supposes BE, and not BC, to be in a straight line with AB, and
+    # reaches an absurdity. The supposed line is drawable even though the
+    # absurdity is not, so I.13 is applied to it and the two angles compared.
+    supposed = posit(Point(b.x + (b.x - a.x), b.y + (b.y - a.y)), "E")
+    straight_on = prop_I_13(a, b, supposed, d).angles
+
+    claim("with BE in a straight line with AB, the angles ABD and DBE are two "
+          "right angles", "I.13", straight_on[0] + straight_on[1] == STRAIGHT)
+    claim("so the angle DBE equals the angle DBC, and BE falls along BC",
+          "C.N.3", angle_at(d, b, supposed) == angle_at(d, b, c))
     claim("BA and BC are therefore in one straight line", "I.13", collinear(a, b, c))
-    return Out()
+    return Out(supposed=supposed)
 
 
 @proposition(
@@ -404,6 +513,11 @@ def prop_I_15(a: Point, b: Point, c: Point, d: Point) -> Out:
     crossing = posit(meet_one(line(a, b), line(c, d)), "E")
     hypothesis("the lines genuinely cross between the endpoints",
                between(a, crossing, b) and between(c, crossing, d), guard=True)
+
+    # AC stands on the straight line AB at E, and BD on the straight line CD:
+    # both are I.13's configuration, so I.13 supplies both pairs.
+    because(prop_I_13, a, crossing, b, c)
+    because(prop_I_13, c, crossing, d, b)
 
     claim("angle AEC and angle CEB together are two right angles", "I.13",
           angle_at(a, crossing, c) + angle_at(c, crossing, b) == STRAIGHT)
@@ -440,6 +554,9 @@ def prop_I_16(a: Point, b: Point, c: Point) -> Out:
 
     claim("AE = EC and BE = EF by construction", "I.10",
           eq_len(a, middle, middle, c) and eq_len(b, middle, middle, f))
+    because(prop_I_15, a, c, b, f)
+    because(prop_I_4, middle, a, b, middle, c, f)
+
     claim("the vertical angles at E are equal", "I.15",
           eq_angle(a, middle, b, c, middle, f))
     claim("so triangles AEB and CEF are equal, giving angle BAE = angle ECF", "I.4",
@@ -460,6 +577,13 @@ def prop_I_17(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
     alpha, beta, gamma = angle_at(b, a, c), angle_at(a, b, c), angle_at(a, c, b)
+
+    # Each pair wants its own side produced, and the exterior angle so made is
+    # I.16's business. Three applications, one per pair.
+    because(prop_I_16, c, a, b)
+    because(prop_I_16, a, b, c)
+    because(prop_I_16, b, c, a)
+
     claim("angle A and angle B together fall short of two right angles", "I.16",
           alpha + beta < STRAIGHT)
     claim("so do angle B and angle C", "I.16", beta + gamma < STRAIGHT)
@@ -486,6 +610,15 @@ def prop_I_18(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("AC is greater than AB", len2(a, c) > len2(a, b))
     outline(a, b, c)
+
+    # AD is cut off from AC equal to AB, BD joined: ABD is then isosceles and
+    # ADB is exterior to BDC. The lesser line is named BA, since I.3 places it
+    # at A through I.2 and I.2 joins the point to an end of the line.
+    d = posit(prop_I_3(a, c, b, a).cut, "D")
+    line(b, d, "join BD")
+    because(prop_I_5, a, b, d)
+    because(prop_I_16, b, c, d)
+
     claim("cutting AD equal to AB from the greater side and using I.5 and I.16, "
           "the angle ABC exceeds the angle BCA", ["I.3", "I.5", "I.16"],
           angle_cmp(a, b, c, b, c, a) > 0)
@@ -501,6 +634,12 @@ def prop_I_19(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     hypothesis("the angle ABC is greater than the angle BCA", angle_cmp(a, b, c, b, c, a) > 0)
     outline(a, b, c)
+
+    # The case Euclid excludes is AB = AC, and no figure meeting this
+    # hypothesis is isosceles, so I.5 cannot be applied to one. I.18 can: it is
+    # this proposition read the other way, and it holds of the figure in hand.
+    because(prop_I_18, a, b, c)
+
     claim("were AC not greater than AB, I.5 or I.18 would contradict the hypothesis",
           ["I.5", "I.18"], len2(a, c) > len2(a, b))
     return Out()
@@ -516,6 +655,18 @@ def prop_I_20(a: Point, b: Point, c: Point) -> Out:
     hypothesis("ABC is a genuine triangle", not collinear(a, b, c), guard=True)
     outline(a, b, c)
     ab, bc, ca = length(a, b), length(b, c), length(c, a)
+
+    # BA is produced to D with AD equal to AC, so ACD is isosceles and I.5
+    # gives its base angles; the angle BCD then exceeds ADC, and I.19 turns
+    # that into BD greater than BC. BD is BA and AC together.
+    for near, far, apex in ((b, c, a), (c, a, b), (a, b, c)):
+        reach = circle_with_radius2(apex, len2(apex, far),
+                                    "circle centre the vertex, radius the far side")
+        beyond = meet(line(near, apex), reach)[1]
+        line(beyond, far)
+        because(prop_I_5, apex, far, beyond)
+        because(prop_I_19, near, far, beyond)
+
     claim("BA together with AC is greater than BC", ["I.5", "I.19"], ab + ca > bc)
     claim("AB together with BC is greater than AC", ["I.5", "I.19"], ab + bc > ca)
     claim("BC together with CA is greater than BA", ["I.5", "I.19"], bc + ca > ab)
@@ -536,6 +687,15 @@ def prop_I_21(a: Point, b: Point, c: Point, d: Point) -> Out:
     outline(a, b, c)
     line(a, d)
     line(b, d)
+
+    # BD is produced to meet AC at E, which is the point Euclid's two uses of
+    # I.20 are about, and DE produced to A makes BDA exterior to BDE.
+    crossing = meet_one(Line.through(b, d), Line.through(a, c))
+    line(b, crossing, "BD produced to E")
+    because(prop_I_20, a, b, crossing)
+    because(prop_I_20, c, crossing, d)
+    because(prop_I_16, c, crossing, d)
+
     claim("BD together with DA is less than BC together with CA", "I.20",
           length(b, d) + length(d, a) < length(b, c) + length(c, a))
     claim("but the angle BDA is greater than the angle BCA", "I.16",
@@ -611,6 +771,7 @@ def prop_I_22(
     claim("PG equals the third given line CA", "Def.15", eq_len(p, apex, c, a))
     claim("FG equals the second given line BC", "Def.15", eq_len(foot, apex, b, c))
     claim("PF equals the first given line AB", "Def.15", eq_len(p, foot, a, b))
+    because(prop_I_8, p, foot, apex, a, b, c)
     claim("so the triangle PFG is built from the three given lines", "I.8",
           congruent_sss((p, foot, apex), (a, b, c)))
     return Out(triangle=(p, foot, apex))
@@ -648,6 +809,7 @@ def prop_I_23(
 
     claim("the triangle on PQ has sides equal to BA, AC and CB", "I.22",
           congruent_sss((p, foot, apex), (b, a, c)))
+    because(prop_I_8, p, foot, apex, b, a, c)
     claim("therefore the angle at P equals the given angle ABC", "I.8",
           eq_angle(foot, p, apex, a, b, c))
     return Out(vertex=p, ray_through=apex)
@@ -699,6 +861,17 @@ def prop_I_24(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     outline(d, e, f)
     hypothesis("the angle at A is greater than the angle at D",
                angle_cmp(b, a, c, e, d, f) > 0)
+    # At D on DE the angle BAC is copied, and DG made equal to DF. I.4 then
+    # matches ABC with DEG, and I.19 compares EG with EF in the triangle EFG.
+    copied = prop_I_23(b, a, c, d, e, beside=f)
+    stretch = length(d, f) / length(d, copied.ray_through)
+    g = posit(Point(d.x + stretch * (copied.ray_through.x - d.x),
+                    d.y + stretch * (copied.ray_through.y - d.y)), "G")
+    line(e, g, "join EG")
+    line(f, g, "join FG")
+    because(prop_I_4, a, b, c, d, e, g)
+    because(prop_I_19, e, f, g)
+
     claim("the base BC is greater than the base EF", ["I.4", "I.19"], len2(b, c) > len2(e, f))
     return Out()
 
@@ -713,6 +886,11 @@ def prop_I_25(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     outline(a, b, c)
     outline(d, e, f)
     hypothesis("the base BC is greater than the base EF", len2(b, c) > len2(e, f))
+    # I.24 is this proposition read the other way, and its hypotheses hold of
+    # the figure in hand. The case Euclid excludes, the angles being equal, is
+    # I.4's, and no figure meeting this hypothesis has it.
+    because(prop_I_24, a, b, c, d, e, f)
+
     claim("were the angle at A not greater, I.4 or I.24 would contradict the bases",
           ["I.4", "I.24"], angle_cmp(b, a, c, e, d, f) > 0)
     return Out()
@@ -736,6 +914,11 @@ def prop_I_26(a: Point, b: Point, c: Point, d: Point, e: Point, f: Point) -> Out
     hypothesis("the adjoining side BC = EF", eq_len(b, c, e, f))
     outline(a, b, c)
     outline(d, e, f)
+    # The part Euclid cuts off is AB itself once the sides prove equal, so the
+    # triangle his reductio compares is this one, and I.16 speaks of it.
+    because(prop_I_16, a, b, c)
+    because(prop_I_4, b, a, c, e, d, f)
+
     claim("were AB unequal to DE, cutting off an equal part and applying I.4 would make "
           "the exterior angle equal to the interior and opposite, contrary to I.16; "
           "so AB = DE", ["I.4", "I.16"], eq_len(a, b, d, e))

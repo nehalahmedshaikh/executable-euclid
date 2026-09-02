@@ -12,6 +12,8 @@ def prop_X_14(a, b, c, d) -&gt; Out:
                sign(a * a - b * b) &gt; 0 and sign(c * c - d * d) &gt; 0)
     first = sqrt(a * a - b * b)
     second = sqrt(c * c - d * d)
+    because(prop_X_11, a, b, c, d) if a * d == b * c else None
+
     claim("the excess passes across the proportion", "X.11",
           commensurable(first, a) == commensurable(second, c))
     return Out(excesses=(first, second))

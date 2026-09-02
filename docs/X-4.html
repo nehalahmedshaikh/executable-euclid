@@ -11,6 +11,8 @@ def prop_X_4(a, b, c) -&gt; Out:
     first = common_measure(a, b)
     measure = common_measure(first, c)
 
+    because(prop_X_3, a, b) if commensurable(a, b) else None
+
     claim("the measure found measures all three", "X.3",
           all(isinstance(x / measure, Fraction)
               and (x / measure).denominator == 1 for x in (a, b, c)))

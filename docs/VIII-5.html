@@ -9,6 +9,9 @@ def prop_VIII_5(a: int, b: int, c: int, d: int) -&gt; Out:
     """The plane numbers are a*b and c*d."""
     hypothesis("the sides are genuine numbers", all(n &gt; 1 for n in (a, b, c, d)), guard=True)
     first, second = a * b, c * d
+    because(prop_VII_17, a, b, c)
+    because(prop_VII_18, a, b, c)
+
     claim("the plane numbers have the ratio compounded of the ratios of the sides",
           "VII.17", first * (c * d) == second * (a * b))
     claim("which is to say, the product of the two ratios", "VII.18",

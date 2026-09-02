@@ -35,9 +35,31 @@ from ..plane.predicates import (
     same_side,
 )
 from . import samples
-from .book01_foundations import prop_I_10
+from .book01_foundations import (
+    prop_I_4,
+    prop_I_5,
+    prop_I_8,
+    prop_I_10,
+    prop_I_11,
+    prop_I_16,
+    prop_I_17,
+    prop_I_18,
+    prop_I_19,
+    prop_I_20,
+    prop_I_24,
+)
+from .book01_parallels import prop_I_32, prop_I_47
+from .book02 import prop_II_5, prop_II_6
 from .figures import _across, _centre_of, _tangent_at, _turn
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 
 def _points_on_a_circle(rng):
@@ -86,6 +108,9 @@ def prop_III_1(o: Point, a: Point, b: Point, c: Point) -> Out:
     line(found, b)
     line(found, c)
 
+    because(prop_I_10, a, b)
+    because(prop_I_11, a, b, prop_I_10(a, b).midpoint)
+
     claim("the point found is equally distant from all three", ["I.10", "I.11"],
           eq_len(found, a, found, b) and eq_len(found, a, found, c))
     # III.9 proves the uniqueness, but it comes later; here it follows from the
@@ -106,6 +131,11 @@ def prop_III_2(o: Point, a: Point, b: Point) -> Out:
     around = circle(o, a, "the given circle")
     chord = line(a, b, "the joining line AB")
     middle = posit(prop_I_10(a, b).midpoint, "M")
+
+    # OM is shorter than the radius, which is what I.18 reads off the triangle;
+    # a chord through the centre leaves no triangle to read it off.
+    if not collinear(o, a, b):
+        because(prop_I_18, o, middle, a)
 
     claim("the midpoint of the join lies inside the circle", "Def.15",
           inside_circle(middle, around))
@@ -131,6 +161,9 @@ def prop_III_4(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     first, second = line(a, c, "AC"), line(b, d, "BD")
     hypothesis("the chords are not parallel", not parallel(first, second))
     crossing = posit(meet_one(first, second), "E")
+
+    because(prop_III_2, o, a, c)
+    because(prop_III_3, o, a, b, c)
 
     claim("all four ends lie on the circle, so both lines are chords of it",
           "Def.15",
@@ -202,6 +235,9 @@ def prop_III_9(o: Point, a: Point, b: Point, c: Point) -> Out:
     for point in (a, b, c):
         line(o, point)
 
+    because(prop_I_10, a, b)
+    because(prop_I_11, a, b, prop_I_10(a, b).midpoint)
+
     claim("the point equally distant from three points of a circle is unique",
           ["I.10", "I.11"], _centre_of(a, b, c) == o)
     claim("and it is the centre", "Def.15", eq_len(o, a, o, b) and eq_len(o, b, o, c))
@@ -223,6 +259,8 @@ def prop_III_10(o: Point, a: Point, b: Point, c: Point) -> Out:
     # Any circle through all three has the centre found from them, and so has
     # this centre and this radius: it *is* this circle. Two distinct circles
     # therefore cannot share three points, and cutting in three is impossible.
+    because(prop_III_9, o, a, b, c)
+
     claim("three points of a circle determine its centre", "III.9",
           _centre_of(a, b, c) == o)
     claim("and with the centre the radius, so any circle through all three is "
@@ -266,6 +304,14 @@ def prop_III_7(o: Point, a: Point, part) -> Out:
     for point in turned:
         line(f, point)
 
+    # Each line from F is the base of a triangle on the radius: I.20 bounds it,
+    # and I.24 compares two of them, the wider angle at the centre giving the
+    # longer base.
+    for point in turned:
+        because(prop_I_20, f, o, point)
+    for nearer, further in zip(turned, turned[1:]):
+        because(prop_I_24, o, f, further, o, f, nearer)
+
     claim("the line on which the centre is, is the greatest", "I.20",
           all(sign(length(f, far) - length(f, point)) > 0 for point in turned + [a]))
     claim("and the remainder of that diameter is the least", "I.20",
@@ -306,6 +352,13 @@ def prop_III_8(o: Point, a: Point, beyond) -> Out:
         ))
     for point in turned:
         line(p, point)
+
+    # Each line from P is the base of a triangle on a radius: I.20 bounds it,
+    # and I.24 makes the wider angle at the centre give the longer base.
+    for point in turned:
+        because(prop_I_20, p, o, point)
+    for nearer, further in zip(turned, turned[1:]):
+        because(prop_I_24, o, p, further, o, p, nearer)
 
     claim("of those falling on the concave circumference, that through the centre "
           "is greatest", "I.20",
@@ -370,6 +423,11 @@ def prop_III_12(o: Point, a: Point, p: Point) -> Out:
     hypothesis("they touch at A", on_circle(a, first) and on_circle(a, second))
     joined = line(o, p, "the line joining the centres")
 
+    # The centres and the point of contact make no triangle when they are in
+    # one straight line, which is exactly what this proposition proves.
+    if not collinear(o, p, a):
+        because(prop_I_20, o, p, a)
+
     claim("the point of contact lies on the line joining the centres", "I.20",
           on_line(a, joined))
     claim("and the distance between the centres is the sum of the radii", "C.N.2",
@@ -389,6 +447,8 @@ def prop_III_13(o: Point, a: Point, p: Point) -> Out:
     hypothesis("they touch at A", on_circle(a, outer) and on_circle(a, inner))
     hypothesis("the centres are distinct", o != p)
     line(o, p, "the line joining the centres")
+
+    because(prop_III_11, o, a, p)
 
     claim("no second point of the greater circle lies on the lesser", "III.11",
           not any(on_circle(point, inner) for point in _round(o, a) if point != a))
@@ -425,6 +485,10 @@ def prop_III_14(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     line(o, first)
     line(o, second)
 
+    because(prop_III_3, o, a, b, c)
+    because(prop_I_47, o, first, a)
+    because(prop_I_47, o, second, c)
+
     claim("the line from the centre to the midpoint is perpendicular to the chord",
           "III.3", right_angle(o, first, a) and right_angle(o, second, c))
     claim("the square on the radius is the square on the half-chord together with "
@@ -452,6 +516,13 @@ def prop_III_15(o: Point, a: Point, b: Point, c: Point) -> Out:
 
     near = posit(prop_I_10(a, b).midpoint, "E")
     remote = posit(prop_I_10(a, c).midpoint, "F")
+    # AD is a diameter and AB a chord: the triangle on the centre bounds one
+    # against the other by I.20, and I.47 turns the distance from the centre
+    # into the length of the chord.
+    because(prop_I_20, a, o, b)
+    because(prop_I_47, a, near, o)
+    because(prop_I_47, a, remote, o)
+
     claim("the diameter is the greatest of them", "I.20",
           sign(length(a, far) - length(a, b)) >= 0
           and sign(length(a, far) - length(a, c)) >= 0)
@@ -478,6 +549,12 @@ def prop_III_16(o: Point, a: Point) -> Out:
     steps = [Fraction(k, 4) for k in range(1, 6)]
     across = _across(o, a)
     along = [Point(a.x + step * across[0], a.y + step * across[1]) for step in steps]
+
+    # OAP is right-angled at A, so the angle there is the greatest of the three:
+    # I.17 bounds the pair and I.19 turns the angles into the sides.
+    for point in along:
+        because(prop_I_17, o, a, point)
+        because(prop_I_19, o, a, point)
 
     claim("the perpendicular meets the circle at A and nowhere else", "I.17",
           on_circle(a, around) and not any(on_circle(point, around) for point in along))
@@ -522,6 +599,9 @@ def prop_III_17(o: Point, a: Point, beyond) -> Out:
     claim("the angle at D being right, the angle at the point of contact is right "
           "too", "I.4",
           right_angle(o, d, e) and right_angle(o, touch, outside))
+    because(prop_I_4, o, d, e, o, touch, outside)
+    because(prop_III_16, o, touch)
+
     claim("so PT touches the circle and does not cut it", "III.16",
           on_circle(touch, around)
           and not any(inside_circle(Point(touch.x + Fraction(k, 4) * (outside.x - touch.x),
@@ -545,6 +625,9 @@ def prop_III_18(o: Point, a: Point, reach) -> Out:
     on_tangent = posit(Point(a.x + reach * across[0], a.y + reach * across[1]), "C")
     line(o, a, "the radius OA")
 
+    # OAC is right-angled at A, so I.19 turns its angles into its sides.
+    because(prop_I_19, o, a, on_tangent)
+
     claim("the radius to the point of contact is perpendicular to the tangent",
           "I.19", right_angle(o, a, on_tangent))
     claim("and the radius is the shortest line from the centre to the tangent", "I.19",
@@ -565,6 +648,8 @@ def prop_III_19(o: Point, a: Point, reach) -> Out:
     across = _across(o, a)
     on_tangent = posit(Point(a.x + reach * across[0], a.y + reach * across[1]), "C")
     upright = line(a, Point(a.x + (o.x - a.x), a.y + (o.y - a.y)), "the perpendicular at A")
+
+    because(prop_III_18, o, a, reach)
 
     claim("the perpendicular raised at the point of contact passes through the centre",
           "III.18", on_line(o, upright) and right_angle(o, a, on_tangent))
@@ -588,6 +673,9 @@ def prop_III_21(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     outline(a, c, b, close=False)
     outline(a, d, b, close=False)
     line(a, b, "the base AB")
+
+    because(prop_III_20, o, a, c, b)
+    because(prop_III_20, o, a, d, b)
 
     claim("each angle at the circumference is half the angle at the centre",
           "III.20", angle_at(a, c, b) == angle_at(a, d, b))
@@ -613,6 +701,8 @@ def prop_III_22(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     outline(a, b, c, d)
     line(a, c, "the diagonal AC")
     line(b, d, "the diagonal BD")
+
+    because(prop_III_21, o, a, b, c, d)
 
     claim("the opposite angles are together equal to two right angles", "III.21",
           angle_at(d, a, b) + angle_at(b, c, d) == STRAIGHT)
@@ -640,6 +730,10 @@ def prop_III_23(o: Point, a: Point, b: Point, c: Point) -> Out:
     # point in fact lies on this circle, so the second segment is this one.
     others = [point for point in _round(o, a)
               if point not in (a, b) and same_side(point, c, Line.through(a, b))]
+    because(prop_III_10, o, a, b, c)
+    for point in others[:2]:
+        because(prop_III_21, o, a, b, c, point)
+
     claim("the three named points lie on the given circle", "Def.15",
           all(on_circle(point, circle(o, a)) for point in (a, b, c)))
     claim("every point on this side standing at the same angle lies on this circle",
@@ -671,6 +765,15 @@ def prop_III_24(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     outline(d, f, e, close=False)
     line(d, e, "the equal base DE")
 
+    # III.21 wants two points in the one segment, so a second is taken from the
+    # arc on C's side; III.23 then says the two segments cannot differ.
+    alongside = [point for point in _round(o, a)
+                 if point not in (a, b, c) and same_side(point, c, Line.through(a, b))]
+    because(prop_I_4, c, a, b, f, d, e)
+    if alongside:
+        because(prop_III_21, o, a, b, c, alongside[0])
+    because(prop_III_23, o, a, b, c)
+
     claim("the segment stands on the given circle", "Def.15",
           all(on_circle(point, circle(o, a)) for point in (a, b, c)))
     claim("the bases are equal, the second being the first moved", "I.4",
@@ -701,6 +804,8 @@ def prop_III_25(o: Point, a: Point, b: Point, c: Point) -> Out:
 
     claim("the three given points are equidistant from the centre they determine",
           "Def.15", eq_len(o, a, o, b) and eq_len(o, a, o, c))
+    because(prop_III_1, o, a, c, b)
+
     claim("the centre found is equidistant from the three given points", "III.1",
           eq_len(found, a, found, b) and eq_len(found, a, found, c))
     claim("and the circle on it passes through them all", "Def.15",
@@ -729,6 +834,9 @@ def prop_III_26(o: Point, a: Point, b: Point, c: Point, move) -> Out:
           on_circle(a, first) and on_circle(b, first)
           and on_circle(d, second) and on_circle(e, second))
     claim("the circles are equal", "Def.15", eq_len(o, a, p, d))
+    because(prop_I_8, o, a, b, p, d, e)
+    because(prop_I_4, o, a, b, p, d, e)
+
     claim("the angles at the centres are equal", "I.8", eq_angle(a, o, b, d, p, e))
     claim("so the arcs they stand on are equal, their chords being equal", "I.4",
           eq_len(a, b, d, e))
@@ -758,6 +866,9 @@ def prop_III_28(o: Point, a: Point, b: Point, c: Point, move) -> Out:
           and on_circle(d, second) and on_circle(e, second))
     claim("the circles are equal and the chords equal", "Def.15",
           eq_len(o, a, p, d) and eq_len(a, b, d, e))
+    because(prop_I_8, o, a, b, p, d, e)
+    because(prop_III_26, o, a, b, c, move)
+
     claim("so the angles at the centres are equal", "I.8", eq_angle(a, o, b, d, p, e))
     claim("and equal angles at the centres stand on equal arcs", "III.26",
           eq_angle(a, o, b, d, p, e))
@@ -784,6 +895,14 @@ def prop_III_29(o: Point, a: Point, b: Point, c: Point, move) -> Out:
     claim("the arcs are arcs of the circles named", "Def.15",
           on_circle(a, first) and on_circle(b, first)
           and on_circle(d, second) and on_circle(e, second))
+    because(prop_I_4, o, a, b, p, d, e)
+    # III.27 speaks of the angles at the circumferences, so each wants a point
+    # of its own greater arc to stand at.
+    _here = _standing_on_the_major_arc(o, a, b)
+    _there = _standing_on_the_major_arc(p, d, e)
+    if _here is not None and _there is not None and angle_at(a, o, b) < STRAIGHT:
+        because(prop_III_27, o, a, b, _here, p, d, e, _there)
+
     claim("equal arcs are cut off by equal angles at the centres", "III.27",
           eq_angle(a, o, b, d, p, e))
     claim("so the chords subtending them are equal", "I.4", eq_len(a, b, d, e))
@@ -809,6 +928,8 @@ def prop_III_30(o: Point, a: Point, b: Point) -> Out:
               if sign((point.x - o.x) * (middle.x - o.x)
                       + (point.y - o.y) * (middle.y - o.y)) > 0]
     bisection = posit(halves[0], "C")
+
+    because(prop_I_4, middle, a, bisection, middle, b, bisection)
 
     claim("C lies on the circle", "Def.15", on_circle(bisection, around))
     claim("and the two chords to it are equal, so the arc is bisected", "I.4",
@@ -841,6 +962,14 @@ def prop_III_32(o: Point, a: Point, b: Point, c: Point) -> Out:
     # The chord AB divides the tangent's two directions between the two
     # segments; the one on the far side from C answers the alternate segment.
     alternate = ends[0] if not same_side(ends[0], c, Line.through(a, b)) else ends[1]
+
+    # The angle in the alternate segment wants a second point of that segment
+    # for III.21 to compare C with.
+    alongside = [point for point in _round(o, a)
+                 if point not in (a, b, c) and same_side(point, c, Line.through(a, b))]
+    because(prop_III_18, o, a, reach)
+    if alongside:
+        because(prop_III_21, o, a, b, c, alongside[0])
 
     claim("the tangent meets the radius at right angles", "III.18",
           right_angle(o, a, ends[0]) and sign(reach) > 0)
@@ -891,6 +1020,11 @@ def prop_III_33(a: Point, b: Point, p: Point, q: Point, r: Point) -> Out:
     apex = posit(beyond[0], "C")
     outline(a, apex, b, close=False)
 
+    alongside = [point for point in _round(centre, a)
+                 if point not in (a, b, apex) and same_side(point, apex, Line.through(a, b))]
+    if alongside:
+        because(prop_III_21, centre, a, b, apex, alongside[0])
+
     claim("the circle described passes through both ends of AB", "Def.15",
           on_circle(a, described) and on_circle(b, described))
     claim("and the angle in the segment equals the given angle", "III.21",
@@ -925,6 +1059,12 @@ def prop_III_34(o: Point, a: Point, p: Point, q: Point, r: Point) -> Out:
 
     claim("the chord and the third point lie on the given circle", "Def.15",
           on_circle(b, around) and on_circle(third, around))
+    # III.20 as encoded speaks of the segment where the angle at the centre is
+    # twice the one at the circumference; on the other arc the doubled angle is
+    # the reflex one, and the claim below allows for it.
+    if not collinear(a, third, b) and angle_at(a, o, b) == angle_at(a, third, b).doubled():
+        because(prop_III_20, o, a, third, b)
+
     claim("the angle at the centre is twice the given angle", "III.20",
           angle_at(a, o, b) == given.doubled()
           or angle_at(a, o, b) == STRAIGHT + STRAIGHT - given.doubled())
@@ -948,6 +1088,18 @@ def prop_III_35(o: Point, a: Point, b: Point, c: Point, d: Point) -> Out:
     crossing = posit(meet_one(first, second), "E")
     hypothesis("they cut one another within the circle",
                between(a, crossing, c) and between(b, crossing, d))
+
+    # Each chord is bisected by the perpendicular from the centre, so II.5
+    # applies to it; and the angle on the diameter is right, which is III.31.
+    first_mid = prop_I_10(a, c).midpoint
+    second_mid = prop_I_10(b, d).midpoint
+    because(prop_II_5, a, crossing, c)
+    because(prop_II_5, b, crossing, d)
+    because(prop_I_47, a, first_mid, o)
+    because(prop_I_47, b, second_mid, o)
+    opposite = posit(Point(2 * o.x - a.x, 2 * o.y - a.y), "A'")
+    if not collinear(a, c, opposite):
+        because(prop_III_31, o, a, opposite, c)
 
     claim("the rectangle contained by the segments of one chord equals that "
           "contained by the segments of the other", ["II.5", "III.31"],
@@ -994,6 +1146,12 @@ def prop_III_36(o: Point, a: Point, beyond, turn) -> Out:
     far = posit(max(crossings, key=lambda p: to_float(len2(outside, p))), "D")
     line(outside, far, "the secant PD")
 
+    # CD is the chord, bisected by the perpendicular from the centre and
+    # produced to P, which is II.6's configuration; PTO is right-angled at T.
+    because(prop_III_18, o, touch, Fraction(1))
+    because(prop_II_6, far, near, outside)
+    because(prop_I_47, outside, touch, o)
+
     claim("the tangent touches the circle at right angles to the radius", "III.18",
           on_circle(touch, around) and right_angle(o, touch, outside))
     claim("the rectangle contained by the whole secant and the part outside "
@@ -1013,6 +1171,10 @@ def prop_III_37(o: Point, a: Point, beyond, turn) -> Out:
     touch = result.tangent
     near, far = result.secant
     outside = posit(Point(o.x + beyond * (a.x - o.x), o.y + beyond * (a.y - o.y)), "P")
+
+    because(prop_III_36, o, a, beyond, turn)
+    because(prop_III_18, o, touch, Fraction(1))
+    because(prop_III_16, o, touch)
 
     claim("the rectangle equals the square on PT", "III.36",
           length(outside, near) * length(outside, far) == len2(outside, touch))
@@ -1040,6 +1202,8 @@ def prop_III_3(o: Point, a: Point, b: Point, c: Point) -> Out:
     middle = posit(prop_I_10(a, c).midpoint, "M")
     line(o, middle, "the line from the centre to the midpoint")
 
+    because(prop_I_8, o, a, middle, o, c, middle)
+
     claim("OA and OC are equal, being radii", "Def.15", eq_len(o, a, o, c))
     claim("the triangles OAM and OCM have three sides equal", "I.8",
           eq_len(a, middle, middle, c))
@@ -1065,8 +1229,26 @@ def prop_III_20(o: Point, a: Point, b: Point, c: Point) -> Out:
 
     at_centre = angle_at(a, o, c)
     at_circumference = angle_at(a, b, c)
+    # OAB and OBC are isosceles on the radii, and the exterior angle of each is
+    # the sum of the two interior and opposite: I.5 and I.32 between them.
+    if not collinear(o, a, b):
+        because(prop_I_5, o, a, b)
+        because(prop_I_32, o, a, b)
+    if not collinear(o, b, c):
+        because(prop_I_5, o, b, c)
+        because(prop_I_32, o, b, c)
+
+    # Euclid's angle at the centre stands on the same arc as the angle at the
+    # circumference, and when B is on the lesser arc that is the reflex angle --
+    # the case Heath draws as the third figure. ``angle_at`` returns the angle
+    # itself, never the reflex, so which of the two is meant has to be settled
+    # here: B and O fall on the same side of AC exactly when it is the plain one.
+    doubled = at_circumference + at_circumference
+    standing_on_the_greater_arc = same_side(o, b, Line.through(a, c))
     claim("the radii make isosceles triangles, whose exterior angles are double the "
-          "base angles", ["I.5", "I.32"], at_centre == at_circumference + at_circumference)
+          "base angles", ["I.5", "I.32"],
+          doubled == (at_centre if standing_on_the_greater_arc
+                      else STRAIGHT + STRAIGHT - at_centre))
     return Out(centre_angle=at_centre, circumference_angle=at_circumference)
 
 
@@ -1084,6 +1266,8 @@ def prop_III_31(o: Point, a: Point, b: Point, c: Point) -> Out:
     line(a, b, "the diameter AB")
     line(a, c)
     line(b, c)
+
+    because(prop_III_20, o, a, c, b)
 
     claim("the angle at the centre on the diameter is two right angles", "Def.17",
           angle_at(a, o, b) == STRAIGHT)
@@ -1161,6 +1345,9 @@ def prop_III_27(
 
     at_first = angle_at(a, d, b)
     at_second = angle_at(e, g, f)
+    because(prop_III_20, o, a, d, b)
+    because(prop_III_20, p, e, g, f)
+
     claim("the angle at the circumference is half the angle at the centre, in each "
           "circle", "III.20",
           at_first.doubled() == angle_at(a, o, b) and at_second.doubled() == angle_at(e, p, f))
@@ -1170,6 +1357,20 @@ def prop_III_27(
     claim("therefore the angles at the circumferences are equal, being the halves "
           "of equal angles", "C.N.1", at_first == at_second)
     return Out(angles=(at_first, at_second))
+
+
+def _standing_on_the_major_arc(centre: Point, first: Point, second: Point):
+    """A point of the circle on the same side of the chord as the centre.
+
+    An angle "stands on" an arc from the other arc, so appealing to III.27 needs
+    a point of the greater one.  Any exact point of the circle will serve, and
+    ``_round`` already produces a spread of them.
+    """
+    chord = Line.through(first, second)
+    for point in _round(centre, first):
+        if point not in (first, second) and same_side(point, centre, chord):
+            return point
+    return None
 
 
 def _round(centre: Point, through: Point) -> list:

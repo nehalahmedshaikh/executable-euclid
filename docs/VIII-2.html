@@ -14,6 +14,8 @@ def prop_VIII_2(p: int, q: int, count: int) -&gt; Out:
     hypothesis("a genuine progression is asked for", count &gt;= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
 
+    because(prop_VIII_1, p, q, count) if coprime(p, q) else None
+
     claim("as many numbers as were asked for were found", "VIII.2", len(terms) == count)
     claim("they are in continued proportion in the given ratio", "Def.VII.20",
           in_continued_proportion(terms)

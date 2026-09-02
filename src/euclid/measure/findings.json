@@ -1,6 +1,6 @@
 {
   "corpus": 402,
-  "method": "Every number here was computed by running the corpus. Depth is exact. The necessity figures are empirical: a hypothesis is broken by moving one given, and what survives is a candidate, not a theorem.",
+  "method": "Every number here was computed by running the corpus. Depth is exact. The necessity and mutation figures are empirical: one given is bent, and what survives the bending is a candidate, not a theorem.",
   "depth": {
     "ceilings": {
       "I": 4,
@@ -23,9 +23,9 @@
       "32": "X.115"
     },
     "histogram": {
-      "1": 231,
-      "2": 88,
-      "4": 62,
+      "1": 223,
+      "2": 89,
+      "4": 69,
       "8": 19,
       "32": 1
     },
@@ -60,22 +60,104 @@
   "necessity": {
     "trials": 48,
     "propositions": 402,
-    "hypotheses": 748,
-    "judged": 336,
-    "coverage": 0.4492,
-    "needed": 209,
-    "well_defined": 26,
-    "surviving_guards": 83,
+    "hypotheses": 754,
+    "judged": 754,
+    "separated": 408,
+    "coverage": 1.0,
+    "separated_share": 0.5411,
+    "implied": 346,
+    "needed": 276,
+    "well_defined": 43,
+    "surviving_guards": 58,
+    "truncated": [
+      "I.10",
+      "I.12",
+      "I.16",
+      "I.17",
+      "I.18",
+      "I.20",
+      "I.21",
+      "I.42",
+      "I.44",
+      "I.45",
+      "I.47",
+      "I.48",
+      "I.5",
+      "I.9",
+      "II.10",
+      "II.11",
+      "II.12",
+      "II.13",
+      "II.14",
+      "II.4",
+      "II.5",
+      "II.6",
+      "II.9",
+      "III.14",
+      "III.15",
+      "III.2",
+      "III.20",
+      "III.33",
+      "III.35",
+      "III.36",
+      "III.37",
+      "IV.10",
+      "IV.11",
+      "IV.12",
+      "IV.13",
+      "IV.14",
+      "IV.16",
+      "IV.3",
+      "IV.4",
+      "IV.8",
+      "IV.9",
+      "IX.13",
+      "IX.17",
+      "IX.36",
+      "VI.13",
+      "VI.27",
+      "VI.3",
+      "VI.30",
+      "VI.31",
+      "VI.8",
+      "VII.33",
+      "X.107",
+      "X.41",
+      "X.47",
+      "X.70",
+      "XIII.1",
+      "XIII.10",
+      "XIII.11",
+      "XIII.12",
+      "XIII.2",
+      "XIII.3",
+      "XIII.4",
+      "XIII.5",
+      "XIII.6",
+      "XIII.7",
+      "XIII.8",
+      "XIII.9"
+    ],
     "candidates": [
       {
-        "ref": "II.10",
-        "text": "B lies between A and D",
-        "configurations": 33
+        "ref": "X.39",
+        "text": "the sum of the squares on them is rational",
+        "configurations": 24
       },
       {
-        "ref": "II.9",
-        "text": "D cuts AB",
-        "configurations": 28
+        "ref": "X.45",
+        "text": "the whole is a major",
+        "configurations": 23
+      },
+      {
+        "ref": "V.6",
+        "text": "less is taken away than there is",
+        "configurations": 22
+      },
+      {
+        "ref": "VII.31",
+        "text": "the number is composite",
+        "configurations": 22
       },
       {
         "ref": "VIII.9",
@@ -83,19 +165,44 @@
         "configurations": 22
       },
       {
-        "ref": "X.11",
-        "text": "the four are proportional",
-        "configurations": 22
+        "ref": "IX.16",
+        "text": "the numbers are prime to one another",
+        "configurations": 17
       },
       {
-        "ref": "V.6",
-        "text": "less is taken away than there is",
-        "configurations": 19
+        "ref": "V.20",
+        "text": "a : b = d : e",
+        "configurations": 16
       },
       {
-        "ref": "VII.31",
-        "text": "the number is composite",
+        "ref": "X.67",
+        "text": "the line is of the kind in question",
+        "configurations": 16
+      },
+      {
+        "ref": "X.69",
+        "text": "the line is of the kind in question",
+        "configurations": 15
+      },
+      {
+        "ref": "X.68",
+        "text": "the line is of the kind in question",
         "configurations": 14
+      },
+      {
+        "ref": "X.70",
+        "text": "the line is of the kind in question",
+        "configurations": 14
+      },
+      {
+        "ref": "X.106",
+        "text": "the line is of the kind in question",
+        "configurations": 14
+      },
+      {
+        "ref": "X.107",
+        "text": "the line is of the kind in question",
+        "configurations": 12
       },
       {
         "ref": "II.1",
@@ -103,34 +210,74 @@
         "configurations": 11
       },
       {
+        "ref": "X.104",
+        "text": "the line is of the kind in question",
+        "configurations": 11
+      },
+      {
         "ref": "VI.10",
         "text": "the given line is cut in order",
-        "configurations": 11
+        "configurations": 10
+      },
+      {
+        "ref": "VIII.23",
+        "text": "the first is cube",
+        "configurations": 10
+      },
+      {
+        "ref": "VIII.22",
+        "text": "the first is square",
+        "configurations": 9
+      },
+      {
+        "ref": "X.89",
+        "text": "both terms are rational in square",
+        "configurations": 9
+      },
+      {
+        "ref": "X.105",
+        "text": "the line is of the kind in question",
+        "configurations": 9
+      },
+      {
+        "ref": "II.9",
+        "text": "D cuts AB",
+        "configurations": 5
       },
       {
         "ref": "X.1",
         "text": "the second is the less",
-        "configurations": 8
+        "configurations": 5
+      },
+      {
+        "ref": "X.10",
+        "text": "the assigned line is positive",
+        "configurations": 5
+      },
+      {
+        "ref": "II.10",
+        "text": "B lies between A and D",
+        "configurations": 4
+      },
+      {
+        "ref": "X.31",
+        "text": "the two are medial",
+        "configurations": 4
+      },
+      {
+        "ref": "X.72",
+        "text": "both areas are medial",
+        "configurations": 3
       },
       {
         "ref": "V.5",
         "text": "the part subtracted is less than the whole",
-        "configurations": 3
-      },
-      {
-        "ref": "X.57",
-        "text": "they are commensurable in square only",
-        "configurations": 3
-      },
-      {
-        "ref": "X.63",
-        "text": "they are commensurable in square only",
         "configurations": 2
       },
       {
-        "ref": "I.40",
-        "text": "the bases are equal and in one straight line",
-        "configurations": 1
+        "ref": "X.20",
+        "text": "the line is rational",
+        "configurations": 2
       },
       {
         "ref": "II.13",
@@ -138,24 +285,3697 @@
         "configurations": 1
       },
       {
+        "ref": "X.22",
+        "text": "the second is rational",
+        "configurations": 1
+      },
+      {
+        "ref": "X.110",
+        "text": "both are medial areas",
+        "configurations": 1
+      }
+    ]
+  },
+  "mutation": {
+    "trials": 48,
+    "propositions": 402,
+    "claims": 905,
+    "live": 425,
+    "coverage": 0.4696,
+    "unreached": 23,
+    "unfalsified": [
+      {
+        "ref": "I.1",
+        "text": "CA = AB, both radii of the circle centre A",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.1",
+        "text": "CB = BA, both radii of the circle centre B",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.1",
+        "text": "therefore CA = CB",
+        "by": [
+          "C.N.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.10",
+        "text": "AD = DB: the line is bisected",
+        "by": [
+          "I.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.10",
+        "text": "D lies between A and B",
+        "by": [
+          "C.N.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.10",
+        "text": "D lies on AB",
+        "by": [
+          "Def.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.11",
+        "text": "CD = CE by construction",
+        "by": [
+          "I.3"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.11",
+        "text": "FD = FE, sides of the equilateral triangle",
+        "by": [
+          "I.1"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.11",
+        "text": "triangles DCF and ECF have three sides equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.12",
+        "text": "CG = CH, radii of the circle centre C",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 20
+      },
+      {
+        "ref": "I.12",
+        "text": "GE = EH, since E bisects GH",
+        "by": [
+          "I.10"
+        ],
+        "bends": 20
+      },
+      {
+        "ref": "I.12",
+        "text": "hence the adjacent angles at E are equal, so CE is perpendicular to AB",
+        "by": [
+          "Def.10"
+        ],
+        "bends": 20
+      },
+      {
+        "ref": "I.12",
+        "text": "triangles CGE and CHE have three sides equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 20
+      },
+      {
+        "ref": "I.14",
+        "text": "with BE in a straight line with AB, the angles ABD and DBE are two right angles",
+        "by": [
+          "I.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.16",
+        "text": "AE = EC and BE = EF by construction",
+        "by": [
+          "I.10"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.16",
+        "text": "and likewise it exceeds the angle ABC",
+        "by": [
+          "C.N.5"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.16",
+        "text": "so triangles AEB and CEF are equal, giving angle BAE = angle ECF",
+        "by": [
+          "I.4"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.16",
+        "text": "the exterior angle ACD exceeds the interior and opposite angle BAC",
+        "by": [
+          "C.N.5"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.16",
+        "text": "the vertical angles at E are equal",
+        "by": [
+          "I.15"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.17",
+        "text": "and so do angle C and angle A",
+        "by": [
+          "I.16"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.17",
+        "text": "angle A and angle B together fall short of two right angles",
+        "by": [
+          "I.16"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.17",
+        "text": "so do angle B and angle C",
+        "by": [
+          "I.16"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "I.18",
+        "text": "cutting AD equal to AB from the greater side and using I.5 and I.16, the angle ABC exceeds the angle BCA",
+        "by": [
+          "I.3",
+          "I.5",
+          "I.16"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "I.2",
+        "text": "BG = BC, radii of the circle centre B",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.2",
+        "text": "DA = DB, sides of the equilateral triangle",
+        "by": [
+          "I.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.2",
+        "text": "DL = DG, radii of the circle centre D",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.2",
+        "text": "so AL = BG, the remainders",
+        "by": [
+          "C.N.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.2",
+        "text": "therefore AL = BC",
+        "by": [
+          "C.N.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.20",
+        "text": "AB together with BC is greater than AC",
+        "by": [
+          "I.5",
+          "I.19"
+        ],
+        "bends": 9
+      },
+      {
+        "ref": "I.20",
+        "text": "BA together with AC is greater than BC",
+        "by": [
+          "I.5",
+          "I.19"
+        ],
+        "bends": 9
+      },
+      {
+        "ref": "I.20",
+        "text": "BC together with CA is greater than BA",
+        "by": [
+          "I.5",
+          "I.19"
+        ],
+        "bends": 9
+      },
+      {
+        "ref": "I.22",
+        "text": "FG equals the second given line BC",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.22",
+        "text": "PF equals the first given line AB",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.22",
+        "text": "PG equals the third given line CA",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.22",
+        "text": "so the triangle PFG is built from the three given lines",
+        "by": [
+          "I.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.23",
+        "text": "the triangle on PQ has sides equal to BA, AC and CB",
+        "by": [
+          "I.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.23",
+        "text": "therefore the angle at P equals the given angle ABC",
+        "by": [
+          "I.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.3",
+        "text": "AE = AL = CD",
+        "by": [
+          "I.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.31",
+        "text": "the angle EAD equals the angle ADC, and they are alternate",
+        "by": [
+          "I.23"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.31",
+        "text": "therefore EF is parallel to BC",
+        "by": [
+          "I.27"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.32",
+        "text": "adding the angle at C, the three angles equal two right angles",
+        "by": [
+          "I.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.32",
+        "text": "the exterior angle ACD equals the sum of the angles at A and B",
+        "by": [
+          "I.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.42",
+        "text": "FECG is a parallelogram",
+        "by": [
+          "I.31"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "I.42",
+        "text": "and the triangle AEC is half of ABC, so the areas are equal",
+        "by": [
+          "I.38"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "I.42",
+        "text": "the angle FEC equals the given angle",
+        "by": [
+          "I.23"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "I.42",
+        "text": "the parallelogram is double the triangle AEC",
+        "by": [
+          "I.41"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "I.44",
+        "text": "BEFG equals the given triangle and has the given angle",
+        "by": [
+          "I.3",
+          "I.23",
+          "I.42"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "I.44",
+        "text": "HLKF is a parallelogram and HK its diameter",
+        "by": [
+          "I.31"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "I.44",
+        "text": "and the angle ABM equals the given angle, being vertical to GBE",
+        "by": [
+          "I.15"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "I.44",
+        "text": "the complements about the diameter are equal, so LABM equals BEFG",
+        "by": [
+          "I.43"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "I.44",
+        "text": "therefore the applied parallelogram equals the given triangle",
+        "by": [
+          "C.N.1"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "I.45",
+        "text": "and each is in the given angle",
+        "by": [
+          "I.44"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "I.45",
+        "text": "the first parallelogram equals the triangle ABC",
+        "by": [
+          "I.42"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "I.45",
+        "text": "the second, applied to its side, equals the triangle ACD",
+        "by": [
+          "I.44"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "I.45",
+        "text": "together they equal the whole figure",
+        "by": [
+          "C.N.2"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "I.46",
+        "text": "AD = AB by construction",
+        "by": [
+          "I.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.46",
+        "text": "ADEB is a parallelogram, so the opposite sides are equal",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.46",
+        "text": "and therefore all four angles are right",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.46",
+        "text": "the angle at A is right",
+        "by": [
+          "I.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.46",
+        "text": "the figure is equilateral and right-angled: a square",
+        "by": [
+          "Def.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "I.47",
+        "text": "the parallel through B meets AC within it, and the far side beyond",
+        "by": [
+          "I.31"
+        ],
+        "bends": 19
+      },
+      {
+        "ref": "I.47",
+        "text": "the squares are described on the three sides, each falling away from the triangle",
+        "by": [
+          "I.46"
+        ],
+        "bends": 19
+      },
+      {
+        "ref": "I.47",
+        "text": "therefore the square on AC equals the squares on AB and BC together",
+        "by": [
+          "C.N.2"
+        ],
+        "bends": 19
+      },
+      {
+        "ref": "I.9",
+        "text": "BD = BE by construction",
+        "by": [
+          "I.3"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.9",
+        "text": "DF = EF, sides of the equilateral triangle DEF",
+        "by": [
+          "I.1"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.9",
+        "text": "therefore angle ABF = angle FBC: the angle is bisected",
+        "by": [
+          "I.8"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "I.9",
+        "text": "triangles BDF and BEF have three sides equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "II.10",
+        "text": "CE is the half set up at right angles",
+        "by": [
+          "I.11"
+        ],
+        "bends": 7
+      },
+      {
+        "ref": "II.10",
+        "text": "the squares on the whole with the addition and on the addition are double the square on the half and the square on the half with the addition",
+        "by": [
+          "I.47",
+          "II.4"
+        ],
+        "bends": 7
+      },
+      {
+        "ref": "II.11",
+        "text": "H divides AB",
+        "by": [
+          "Post.1"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "II.11",
+        "text": "so the whole is cut in extreme and mean ratio",
+        "by": [
+          "Def.3"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "II.11",
+        "text": "the rectangle contained by the whole and the lesser segment equals the square on the greater",
+        "by": [
+          "II.6",
+          "I.47"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "II.12",
+        "text": "AD is perpendicular to CD",
+        "by": [
+          "I.12"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "II.13",
+        "text": "AD is perpendicular to CB",
+        "by": [
+          "I.12"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "II.13",
+        "text": "the square on the side subtending the acute angle falls short of the squares on the other two by twice the rectangle contained by CB and BD",
+        "by": [
+          "I.47",
+          "II.7"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "II.14",
+        "text": "MD and MA are equal, both radii of the semicircle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "II.4",
+        "text": "two of them are the squares on the segments",
+        "by": [
+          "I.46"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "II.5",
+        "text": "D bisects AC",
+        "by": [
+          "I.10"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "II.5",
+        "text": "and the drawn square is the square on the half",
+        "by": [
+          "I.46"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "II.6",
+        "text": "C bisects AB",
+        "by": [
+          "I.10"
+        ],
+        "bends": 25
+      },
+      {
+        "ref": "II.6",
+        "text": "the rectangle contained by AD and DB, with the square on the half, equals the square on CD",
+        "by": [
+          "II.5",
+          "I.46"
+        ],
+        "bends": 25
+      },
+      {
+        "ref": "II.7",
+        "text": "the square on the whole is the figure drawn on AC",
+        "by": [
+          "I.46"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "II.9",
+        "text": "CE is the half set up at right angles",
+        "by": [
+          "I.11"
+        ],
+        "bends": 8
+      },
+      {
+        "ref": "II.9",
+        "text": "the squares on the unequal segments are double the square on the half and the square on the line between the sections",
+        "by": [
+          "I.47",
+          "II.4"
+        ],
+        "bends": 8
+      },
+      {
+        "ref": "III.1",
+        "text": "the point found is equally distant from all three",
+        "by": [
+          "I.10",
+          "I.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.13",
+        "text": "no second point of the greater circle lies on the lesser",
+        "by": [
+          "III.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.13",
+        "text": "so circles that touch, touch at one point only",
+        "by": [
+          "III.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.14",
+        "text": "so equal chords are equally distant, and equidistant chords are equal",
+        "by": [
+          "I.47"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "III.16",
+        "text": "and every other point of it falls outside the circle",
+        "by": [
+          "I.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.16",
+        "text": "the perpendicular meets the circle at A and nowhere else",
+        "by": [
+          "I.17"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.17",
+        "text": "OD and OT are radii of the given circle, OE and OP of the wider one",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "III.17",
+        "text": "so PT touches the circle and does not cut it",
+        "by": [
+          "III.16"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "III.17",
+        "text": "so the triangles ODE and OTP have two sides and the angle between them equal",
+        "by": [
+          "I.4"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "III.17",
+        "text": "the angle at D being right, the angle at the point of contact is right too",
+        "by": [
+          "I.4"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "III.18",
+        "text": "the radius to the point of contact is perpendicular to the tangent",
+        "by": [
+          "I.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.19",
+        "text": "the perpendicular raised at the point of contact passes through the centre",
+        "by": [
+          "III.18"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.23",
+        "text": "every point on this side standing at the same angle lies on this circle",
+        "by": [
+          "III.21"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.23",
+        "text": "so the two similar segments coincide, and cannot be different",
+        "by": [
+          "III.10"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.24",
+        "text": "so similar segments on equal straight lines are equal",
+        "by": [
+          "III.23"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.24",
+        "text": "the bases are equal, the second being the first moved",
+        "by": [
+          "I.4"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.24",
+        "text": "the segments admit equal angles",
+        "by": [
+          "III.21"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.25",
+        "text": "and the circle on it passes through them all",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.25",
+        "text": "the centre found is equidistant from the three given points",
+        "by": [
+          "III.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.26",
+        "text": "so the arcs they stand on are equal, their chords being equal",
+        "by": [
+          "I.4"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.26",
+        "text": "the angles at the centres are equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.26",
+        "text": "the circles are equal",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.28",
+        "text": "and equal angles at the centres stand on equal arcs",
+        "by": [
+          "III.26"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.28",
+        "text": "so the angles at the centres are equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.28",
+        "text": "the circles are equal and the chords equal",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.29",
+        "text": "equal arcs are cut off by equal angles at the centres",
+        "by": [
+          "III.27"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.29",
+        "text": "so the chords subtending them are equal",
+        "by": [
+          "I.4"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "III.3",
+        "text": "the triangles OAM and OCM have three sides equal",
+        "by": [
+          "I.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.30",
+        "text": "C lies on the circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "III.32",
+        "text": "the tangent meets the radius at right angles",
+        "by": [
+          "III.18"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.33",
+        "text": "and the angle in the segment equals the given angle",
+        "by": [
+          "III.21"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "III.33",
+        "text": "the circle described passes through both ends of AB",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "III.34",
+        "text": "the angle at the centre is twice the given angle",
+        "by": [
+          "III.20"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "III.34",
+        "text": "the chord and the third point lie on the given circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "III.36",
+        "text": "the rectangle contained by the whole secant and the part outside equals the square on the tangent",
+        "by": [
+          "II.6",
+          "I.47"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "III.36",
+        "text": "the tangent touches the circle at right angles to the radius",
+        "by": [
+          "III.18"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "III.37",
+        "text": "and no point of PT beyond the contact falls inside the circle",
+        "by": [
+          "III.16"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "III.37",
+        "text": "so PT touches the circle: the radius to T meets it at right angles",
+        "by": [
+          "III.18"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "III.37",
+        "text": "the rectangle equals the square on PT",
+        "by": [
+          "III.36"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "III.4",
+        "text": "were E to bisect both, the lines from the centre would be perpendicular to each and the centre would lie on both",
+        "by": [
+          "III.3"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "III.5",
+        "text": "so no point of either circle lies on the other, and they never cut",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.5",
+        "text": "the two radii are unequal",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.6",
+        "text": "the two radii are unequal",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.6",
+        "text": "touching means one point in common, and these two share none",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
         "ref": "III.8",
-        "text": "P lies outside the circle",
-        "configurations": 1
+        "text": "and of the rest, the nearer to the least is the less",
+        "by": [
+          "I.24"
+        ],
+        "bends": 48
       },
       {
-        "ref": "V.10",
-        "text": "A and B are unequal",
-        "configurations": 1
+        "ref": "III.8",
+        "text": "of those falling on the concave circumference, that through the centre is greatest",
+        "by": [
+          "I.20"
+        ],
+        "bends": 48
       },
       {
-        "ref": "VII.30",
-        "text": "the first is prime",
-        "configurations": 1
+        "ref": "III.8",
+        "text": "of those falling on the convex circumference, that between the point and the diameter is least",
+        "by": [
+          "I.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "III.8",
+        "text": "only two equal lines fall from the point, one on each side of the least",
+        "by": [
+          "I.24"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.1",
+        "text": "AB equals the given line, both radii of the circle about A",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 37
+      },
+      {
+        "ref": "IV.1",
+        "text": "B lies on the given circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 37
+      },
+      {
+        "ref": "IV.10",
+        "text": "BD equals the greater segment AC",
+        "by": [
+          "I.3"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "IV.10",
+        "text": "each angle at the base is double the angle at the apex",
+        "by": [
+          "II.11",
+          "III.32"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "IV.10",
+        "text": "the triangle is isosceles, AB and AD both radii",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "IV.11",
+        "text": "and equiangular",
+        "by": [
+          "III.27"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.11",
+        "text": "every vertex lies on the given circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.11",
+        "text": "stepping the chord round the circle reaches five distinct points",
+        "by": [
+          "Post.3"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.11",
+        "text": "the diagonal exceeds the side in extreme and mean ratio",
+        "by": [
+          "II.11"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.11",
+        "text": "the pentagon is equilateral",
+        "by": [
+          "Def.19"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.14",
+        "text": "so one circle passes through all five",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.14",
+        "text": "the centre is equally distant from every vertex",
+        "by": [
+          "I.6"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.15",
+        "text": "and equiangular",
+        "by": [
+          "III.27"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.15",
+        "text": "every vertex lies on the circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.15",
+        "text": "stepping the radius round the circle reaches six distinct points",
+        "by": [
+          "Post.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.15",
+        "text": "the hexagon is equilateral, each side equal to the radius",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.2",
+        "text": "all three vertices lie on the given circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.2",
+        "text": "so the inscribed triangle is equiangular with the given one",
+        "by": [
+          "III.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.2",
+        "text": "the angle at each vertex is half the arc it stands on",
+        "by": [
+          "III.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.3",
+        "text": "each side touches the circle, meeting a radius at right angles",
+        "by": [
+          "III.16"
+        ],
+        "bends": 12
+      },
+      {
+        "ref": "IV.3",
+        "text": "so the circumscribed triangle is equiangular with the given one",
+        "by": [
+          "III.32"
+        ],
+        "bends": 12
+      },
+      {
+        "ref": "IV.4",
+        "text": "each perpendicular meets its side at right angles",
+        "by": [
+          "I.12"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.4",
+        "text": "so the circle on that radius touches all three sides",
+        "by": [
+          "III.16"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.4",
+        "text": "the centre lies on the bisector of each angle",
+        "by": [
+          "I.9"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.4",
+        "text": "the perpendiculars from it to the three sides are equal",
+        "by": [
+          "I.26"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "IV.5",
+        "text": "so the circle through A passes through B and C too",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.5",
+        "text": "the centre is equidistant from all three vertices",
+        "by": [
+          "I.10",
+          "I.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.6",
+        "text": "and every angle is right, standing on a diameter",
+        "by": [
+          "III.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.6",
+        "text": "every vertex lies on the circle",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.6",
+        "text": "the four sides are equal",
+        "by": [
+          "I.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.6",
+        "text": "the two diameters are at right angles",
+        "by": [
+          "I.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.7",
+        "text": "and every angle is right",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.7",
+        "text": "each side meets the circle at the end of a radius, and so touches it",
+        "by": [
+          "III.16"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IV.7",
+        "text": "the four sides are equal",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.18",
+        "text": "a third proportional exists exactly when the first measures the square of the second",
+        "by": [
+          "VII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.18",
+        "text": "and when it does, it is that quotient",
+        "by": [
+          "VII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.19",
+        "text": "a fourth proportional exists exactly when the first measures the product of the second and third",
+        "by": [
+          "VII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.19",
+        "text": "and when it does, it is that quotient",
+        "by": [
+          "VII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.2",
+        "text": "and no pair whose product is square fails to be",
+        "by": [
+          "IX.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.20",
+        "text": "so that prime is not among those given, and the list was not complete",
+        "by": [
+          "IX.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.20",
+        "text": "yet it is measured by some prime",
+        "by": [
+          "VII.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.35",
+        "text": "as the excess of the second is to the first, so is the excess of the last to all those before it",
+        "by": [
+          "IX.35"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "IX.35",
+        "text": "the terms are in continued proportion",
+        "by": [
+          "Def.VII.20"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "IX.35",
+        "text": "which sums the series",
+        "by": [
+          "IX.35"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "IX.36",
+        "text": "the doubling series sums to the stated total",
+        "by": [
+          "IX.35"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "IX.5",
+        "text": "and no other multiplier makes the product cube",
+        "by": [
+          "IX.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.6",
+        "text": "and no number whose square is cube fails to be one",
+        "by": [
+          "IX.6"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "IX.7",
+        "text": "its product with any number is solid, having three sides",
+        "by": [
+          "Def.VII.17"
+        ],
+        "bends": 31
+      },
+      {
+        "ref": "IX.7",
+        "text": "the composite is measured by some number, and so has two sides",
+        "by": [
+          "Def.VII.13"
+        ],
+        "bends": 31
+      },
+      {
+        "ref": "IX.8",
+        "text": "the terms are in continued proportion from a unit",
+        "by": [
+          "Def.VII.20"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "V.1",
+        "text": "AB is that multiple of E, and CD of F",
+        "by": [
+          "Def.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.1",
+        "text": "so their sum is the same multiple of the sum",
+        "by": [
+          "C.N.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.13",
+        "text": "and equimultiples can be produced that show it",
+        "by": [
+          "Def.7"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "V.15",
+        "text": "parts have the same ratio as their equimultiples",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.2",
+        "text": "and the sum of the third and sixth the same multiple of the fourth",
+        "by": [
+          "V.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.2",
+        "text": "the sum of the first and fifth is a multiple of the second",
+        "by": [
+          "Def.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.24",
+        "text": "the fifth stands to the second as the sixth to the fourth",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.3",
+        "text": "so ex aequali they are equimultiples of the second and the fourth",
+        "by": [
+          "V.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.3",
+        "text": "the equimultiples taken are multiples of the original multiples",
+        "by": [
+          "Def.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.5",
+        "text": "the remainder is the same multiple of the remainder",
+        "by": [
+          "C.N.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.6",
+        "text": "and where one multiple remains they are equal to them",
+        "by": [
+          "C.N.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.6",
+        "text": "the remainders are equimultiples of the same two magnitudes",
+        "by": [
+          "V.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "V.8",
+        "text": "equimultiples can be found which separate the two ratios",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 0 and n = 1 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 1 and n = 0 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 1 and n = 1 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 18
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 1 and n = 2 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 1 and n = 3 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 1 and n = 4 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 2
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 11 and n = 8 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 2 and n = 1 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 2 and n = 3 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 2
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 2 and n = 7 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 3 and n = 1 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 3 and n = 2 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 3 and n = 4 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 5 and n = 4 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.8",
+        "text": "with m = 6 and n = 17 the multiples fall on opposite sides",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "V.9",
+        "text": "so a magnitude having this ratio to b is determined uniquely",
+        "by": [
+          "Def.5"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "VI.1",
+        "text": "carrying a base across gives an equal triangle on the same apex",
+        "by": [
+          "I.38"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.10",
+        "text": "so AB is cut in the same ratios as the given line",
+        "by": [
+          "VI.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.10",
+        "text": "the joining lines are parallel to CB",
+        "by": [
+          "I.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.11",
+        "text": "CF is parallel to BE",
+        "by": [
+          "I.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.11",
+        "text": "so AB is to AC as AC is to AF",
+        "by": [
+          "VI.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.12",
+        "text": "CF is parallel to BE",
+        "by": [
+          "I.31"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "VI.12",
+        "text": "so AB is to AC as AE is to AF",
+        "by": [
+          "VI.2"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "VI.13",
+        "text": "the angle in the semicircle is right",
+        "by": [
+          "III.31"
+        ],
+        "bends": 8
+      },
+      {
+        "ref": "VI.16",
+        "text": "and conversely, equal rectangles leave no equimultiples that separate the ratios",
+        "by": [
+          "VI.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.17",
+        "text": "and conversely the equality makes the three proportional",
+        "by": [
+          "VI.16"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.17",
+        "text": "the drawn figures really are the rectangle and the square",
+        "by": [
+          "Def.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.18",
+        "text": "and it stands on the given straight line",
+        "by": [
+          "Post.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.18",
+        "text": "the figure described is similar to the given one",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.20",
+        "text": "the polygons divide into triangles equal in multitude",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.21",
+        "text": "the third is similar to the first",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.22",
+        "text": "and conversely, proportional figures make the lines proportional",
+        "by": [
+          "VI.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.24",
+        "text": "and it is similar to the whole",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "VI.24",
+        "text": "the lesser parallelogram stands about the same diameter",
+        "by": [
+          "I.43"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "VI.25",
+        "text": "and equal to the area asked for",
+        "by": [
+          "VI.19"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "VI.25",
+        "text": "the figure built is similar to the given one",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "VI.26",
+        "text": "the far corner of the lesser lies on the diameter of the whole",
+        "by": [
+          "VI.24"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.27",
+        "text": "each applied parallelogram is as the rectangle contained by the segments it leaves",
+        "by": [
+          "VI.23"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VI.27",
+        "text": "with equality only when the application is to the half itself",
+        "by": [
+          "II.5"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VI.30",
+        "text": "and the point is the same one II.11 finds",
+        "by": [
+          "II.11"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VI.30",
+        "text": "so the whole is to the greater as the greater is to the less",
+        "by": [
+          "VI.17"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VI.30",
+        "text": "the drawn figures are the square on AC and the rectangle AB by CB",
+        "by": [
+          "Def.22"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VI.30",
+        "text": "they are equal, which is what cutting in extreme and mean ratio means",
+        "by": [
+          "VI.17"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VI.31",
+        "text": "similar figures are to one another as the squares on their sides",
+        "by": [
+          "VI.20"
+        ],
+        "bends": 25
+      },
+      {
+        "ref": "VI.31",
+        "text": "the three figures are similar to one another",
+        "by": [
+          "VI.4"
+        ],
+        "bends": 25
+      },
+      {
+        "ref": "VI.32",
+        "text": "so the remaining sides fall in one straight line",
+        "by": [
+          "I.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.32",
+        "text": "the corresponding sides are parallel",
+        "by": [
+          "I.33"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VI.33",
+        "text": "equal angles at the centres stand on equal arcs, so angle is as arc",
+        "by": [
+          "III.26"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "VI.33",
+        "text": "the circles are equal",
+        "by": [
+          "Def.15"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "VI.8",
+        "text": "BD is perpendicular to the base",
+        "by": [
+          "I.12"
+        ],
+        "bends": 21
+      },
+      {
+        "ref": "VI.9",
+        "text": "so AD is the part asked for",
+        "by": [
+          "VI.2"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "VI.9",
+        "text": "the divisions of the second line are equal",
+        "by": [
+          "I.3"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "VI.9",
+        "text": "the line through the first division is parallel to CB",
+        "by": [
+          "I.31"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "VII.1",
+        "text": "so if a unit is left, the numbers are prime to one another",
+        "by": [
+          "Def.VII.12"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "VII.1",
+        "text": "the subtraction terminates",
+        "by": [
+          "VII.1"
+        ],
+        "bends": 36
+      },
+      {
+        "ref": "VII.14",
+        "text": "so ex aequali the first is to the third as the fourth to the sixth",
+        "by": [
+          "VII.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.14",
+        "text": "the pairs are in the same ratio",
+        "by": [
+          "VII.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.16",
+        "text": "a taken b times equals b taken a times",
+        "by": [
+          "VII.16"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VII.17",
+        "text": "the products have the same ratio as the numbers multiplied",
+        "by": [
+          "VII.17"
+        ],
+        "bends": 32
+      },
+      {
+        "ref": "VII.18",
+        "text": "the products have the same ratio as the multipliers",
+        "by": [
+          "VII.18"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VII.19",
+        "text": "and conversely, equal products bring the pairs to the same least terms",
+        "by": [
+          "VII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.2",
+        "text": "and every common measure measures it",
+        "by": [
+          "VII.2"
+        ],
+        "bends": 42
+      },
+      {
+        "ref": "VII.2",
+        "text": "the result measures both numbers",
+        "by": [
+          "VII.1"
+        ],
+        "bends": 42
+      },
+      {
+        "ref": "VII.22",
+        "text": "the least of the ratio are prime to one another",
+        "by": [
+          "VII.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.28",
+        "text": "and conversely, a sum prime to one makes the two prime to one another",
+        "by": [
+          "VII.28"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.3",
+        "text": "and every common measure of the three measures it",
+        "by": [
+          "VII.2"
+        ],
+        "bends": 39
+      },
+      {
+        "ref": "VII.3",
+        "text": "the measure found measures all three",
+        "by": [
+          "VII.2"
+        ],
+        "bends": 39
+      },
+      {
+        "ref": "VII.31",
+        "text": "a prime factor was found",
+        "by": [
+          "VII.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.31",
+        "text": "and it measures the number",
+        "by": [
+          "Def.VII.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.32",
+        "text": "the number is prime, or some prime measures it",
+        "by": [
+          "VII.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.33",
+        "text": "and no smaller pair has that ratio",
+        "by": [
+          "VII.21"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "VII.33",
+        "text": "it is in least terms, being prime to one another",
+        "by": [
+          "VII.22"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "VII.33",
+        "text": "the pair found has the same ratio",
+        "by": [
+          "VII.33"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "VII.34",
+        "text": "and nothing less is",
+        "by": [
+          "VII.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.34",
+        "text": "the number found is measured by both",
+        "by": [
+          "VII.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.36",
+        "text": "and nothing less is",
+        "by": [
+          "VII.35"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.36",
+        "text": "the number found is measured by all three",
+        "by": [
+          "VII.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.39",
+        "text": "and no smaller number has them all",
+        "by": [
+          "VII.36"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.39",
+        "text": "the number found has all three parts",
+        "by": [
+          "VII.38"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.4",
+        "text": "and parts of it otherwise, so many of the greater's parts as the numerator counts",
+        "by": [
+          "Def.VII.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.4",
+        "text": "the less is a part of the greater when it measures it",
+        "by": [
+          "Def.VII.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.4",
+        "text": "the two counts have no common measure but a unit, so the description is the plainest there is",
+        "by": [
+          "Def.VII.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.7",
+        "text": "each is the same part of its own",
+        "by": [
+          "Def.VII.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.7",
+        "text": "so the remainder is the same part of the remainder",
+        "by": [
+          "VII.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VII.8",
+        "text": "the remainder is the same parts of the remainder",
+        "by": [
+          "VII.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.1",
+        "text": "the numbers are in continued proportion",
+        "by": [
+          "Def.VII.20"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.10",
+        "text": "then as many fall between the two numbers themselves",
+        "by": [
+          "VIII.10"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VIII.11",
+        "text": "and it is the only one",
+        "by": [
+          "VIII.8"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.11",
+        "text": "so square is to square in the duplicate ratio of side to side",
+        "by": [
+          "VIII.11"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.11",
+        "text": "the number found is a mean proportional",
+        "by": [
+          "VIII.11"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.12",
+        "text": "and cube is to cube in the triplicate ratio of side to side",
+        "by": [
+          "VIII.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.12",
+        "text": "two mean proportionals fall between the cubes",
+        "by": [
+          "VIII.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.13",
+        "text": "and so are the cubes",
+        "by": [
+          "VIII.13"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VIII.13",
+        "text": "the squares of the terms are proportional",
+        "by": [
+          "VIII.13"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VIII.14",
+        "text": "if the square measures the square, the side measures the side",
+        "by": [
+          "VIII.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.15",
+        "text": "if the cube measures the cube, the side measures the side",
+        "by": [
+          "VIII.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.16",
+        "text": "if the square does not measure the square, neither does the side",
+        "by": [
+          "VIII.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.17",
+        "text": "if the cube does not measure the cube, neither does the side",
+        "by": [
+          "VIII.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.19",
+        "text": "and solid is to solid in the triplicate ratio of the sides",
+        "by": [
+          "VIII.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.19",
+        "text": "two mean proportionals fall between them",
+        "by": [
+          "VIII.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "VIII.2",
+        "text": "as many numbers as were asked for were found",
+        "by": [
+          "VIII.2"
+        ],
+        "bends": 39
+      },
+      {
+        "ref": "VIII.2",
+        "text": "they are in continued proportion in the given ratio",
+        "by": [
+          "Def.VII.20"
+        ],
+        "bends": 39
+      },
+      {
+        "ref": "VIII.4",
+        "text": "and the middle is the least that both consequents measure",
+        "by": [
+          "VII.34"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "VIII.4",
+        "text": "the first pair keeps its ratio",
+        "by": [
+          "VII.18"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "VIII.4",
+        "text": "the second pair keeps its ratio",
+        "by": [
+          "VII.18"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "VIII.5",
+        "text": "the plane numbers have the ratio compounded of the ratios of the sides",
+        "by": [
+          "VII.17"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "VIII.5",
+        "text": "which is to say, the product of the two ratios",
+        "by": [
+          "VII.18"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "VIII.8",
+        "text": "and the outer ratio is unchanged",
+        "by": [
+          "VII.18"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.8",
+        "text": "as many fall between the scaled pair as between the original",
+        "by": [
+          "VIII.8"
+        ],
+        "bends": 24
+      },
+      {
+        "ref": "VIII.9",
+        "text": "a progression runs from a unit up to each extreme",
+        "by": [
+          "VIII.2"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "VIII.9",
+        "text": "with as many terms between as fell between the extremes",
+        "by": [
+          "VIII.9"
+        ],
+        "bends": 40
+      },
+      {
+        "ref": "X.10",
+        "text": "but commensurable with it in square",
+        "by": [
+          "X.9"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.10",
+        "text": "the first is incommensurable in length with the assigned line",
+        "by": [
+          "X.9"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.10",
+        "text": "the second is incommensurable with it in square as well",
+        "by": [
+          "X.9"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.100",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.100"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.100",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.94"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.101",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.101"
+        ],
+        "bends": 44
+      },
+      {
+        "ref": "X.101",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.95"
+        ],
+        "bends": 44
+      },
+      {
+        "ref": "X.102",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.102"
+        ],
+        "bends": 32
+      },
+      {
+        "ref": "X.102",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.96"
+        ],
+        "bends": 32
+      },
+      {
+        "ref": "X.103",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.103"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.103",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.104",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.104"
+        ],
+        "bends": 38
+      },
+      {
+        "ref": "X.104",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 38
+      },
+      {
+        "ref": "X.105",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.105"
+        ],
+        "bends": 43
+      },
+      {
+        "ref": "X.105",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 43
+      },
+      {
+        "ref": "X.106",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.106"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.106",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.107",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.107"
+        ],
+        "bends": 17
+      },
+      {
+        "ref": "X.107",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 18
+      },
+      {
+        "ref": "X.108",
+        "text": "and its side is an apotome or a minor line",
+        "by": [
+          "X.108"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.108",
+        "text": "the remaining area is irrational",
+        "by": [
+          "X.108"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.109",
+        "text": "and its side is one of the named lines",
+        "by": [
+          "X.109"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.109",
+        "text": "the remaining area is irrational",
+        "by": [
+          "X.109"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.110",
+        "text": "and its side is one of the named lines",
+        "by": [
+          "X.110"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.110",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.110"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.111",
+        "text": "and the thirteen names are distinct from one another",
+        "by": [
+          "X.111"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.111",
+        "text": "one is a binomial and the other an apotome",
+        "by": [
+          "X.36"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.111",
+        "text": "so an apotome is not the same as a binomial",
+        "by": [
+          "X.111"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.112",
+        "text": "and it is an apotome, the terms of the binomial being reversed in sign",
+        "by": [
+          "X.112"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.112",
+        "text": "the breadth is the square divided by the binomial",
+        "by": [
+          "VI.16"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.113",
+        "text": "and it is a binomial",
+        "by": [
+          "X.113"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.113",
+        "text": "the breadth is the square divided by the apotome",
+        "by": [
+          "VI.16"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.114",
+        "text": "so the side of the equal square is rational in square",
+        "by": [
+          "X.114"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.114",
+        "text": "the area contained is rational",
+        "by": [
+          "X.114"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.17",
+        "text": "and the rectangle they contain is a quarter the square on the less",
+        "by": [
+          "II.5"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.17",
+        "text": "the parts are commensurable exactly when the excess is commensurable with the greater",
+        "by": [
+          "X.17"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.17",
+        "text": "the two parts make up the greater",
+        "by": [
+          "II.5"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.18",
+        "text": "the parts are incommensurable exactly when the excess is incommensurable with the greater",
+        "by": [
+          "X.18"
+        ],
+        "bends": 44
+      },
+      {
+        "ref": "X.19",
+        "text": "the rectangle they contain is rational",
+        "by": [
+          "X.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.2",
+        "text": "so if it never measures the one before it, they are incommensurable",
+        "by": [
+          "X.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.2",
+        "text": "the subtraction ends exactly when a common measure exists",
+        "by": [
+          "X.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.20",
+        "text": "and commensurable in length with the line applied to",
+        "by": [
+          "X.20"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.20",
+        "text": "the breadth produced is rational",
+        "by": [
+          "X.20"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.21",
+        "text": "the rectangle they contain is irrational",
+        "by": [
+          "X.Def.4"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.22",
+        "text": "but incommensurable in length with the line applied to",
+        "by": [
+          "X.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.26",
+        "text": "a medial area does not exceed a medial area by a rational area",
+        "by": [
+          "X.26"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.27",
+        "text": "and the rectangle they contain is rational",
+        "by": [
+          "X.19"
+        ],
+        "bends": 14
+      },
+      {
+        "ref": "X.27",
+        "text": "both lines are medial",
+        "by": [
+          "X.21"
+        ],
+        "bends": 14
+      },
+      {
+        "ref": "X.27",
+        "text": "they are commensurable in square only",
+        "by": [
+          "X.Def.2"
+        ],
+        "bends": 14
+      },
+      {
+        "ref": "X.28",
+        "text": "and the rectangle they contain is medial",
+        "by": [
+          "X.21"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.28",
+        "text": "they are commensurable in square only",
+        "by": [
+          "X.Def.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.29",
+        "text": "and the excess is commensurable in length with the greater",
+        "by": [
+          "X.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.29",
+        "text": "both lines are rational",
+        "by": [
+          "X.Def.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.29",
+        "text": "they are commensurable in length here, being whole numbers",
+        "by": [
+          "X.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.3",
+        "text": "and it is the greatest such, the two counts having no common factor",
+        "by": [
+          "VII.22"
+        ],
+        "bends": 34
+      },
+      {
+        "ref": "X.3",
+        "text": "it measures them a whole number of times",
+        "by": [
+          "Def.X.1"
+        ],
+        "bends": 34
+      },
+      {
+        "ref": "X.3",
+        "text": "the measure found measures both",
+        "by": [
+          "X.3"
+        ],
+        "bends": 34
+      },
+      {
+        "ref": "X.30",
+        "text": "and the excess is incommensurable in length with the greater",
+        "by": [
+          "X.30"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.30",
+        "text": "both lines are rational",
+        "by": [
+          "X.Def.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.31",
+        "text": "and the excess is commensurable with the greater",
+        "by": [
+          "X.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.31",
+        "text": "the rectangle they contain is medial or rational",
+        "by": [
+          "X.25"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.32",
+        "text": "and the excess is commensurable with the greater",
+        "by": [
+          "X.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.33",
+        "text": "the sum of the squares on them is rational",
+        "by": [
+          "X.33"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.33",
+        "text": "the two are incommensurable in square",
+        "by": [
+          "X.33"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.34",
+        "text": "and the rectangle they contain is rational",
+        "by": [
+          "X.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.35",
+        "text": "and the two areas are incommensurable with one another",
+        "by": [
+          "X.35"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.35",
+        "text": "the rectangle is medial",
+        "by": [
+          "X.35"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.36",
+        "text": "and assigns it one of the six species",
+        "by": [
+          "X.48-53"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.36",
+        "text": "the whole is irrational",
+        "by": [
+          "X.36"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.37",
+        "text": "the whole is irrational",
+        "by": [
+          "X.37"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.38",
+        "text": "the whole is irrational",
+        "by": [
+          "X.38"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.39",
+        "text": "the whole is irrational",
+        "by": [
+          "X.39"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.4",
+        "text": "and every common measure of the three measures it",
+        "by": [
+          "X.3"
+        ],
+        "bends": 11
+      },
+      {
+        "ref": "X.4",
+        "text": "the measure found measures all three",
+        "by": [
+          "X.3"
+        ],
+        "bends": 11
+      },
+      {
+        "ref": "X.40",
+        "text": "the whole is irrational",
+        "by": [
+          "X.40"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.41",
+        "text": "the whole is irrational",
+        "by": [
+          "X.41"
+        ],
+        "bends": 41
+      },
+      {
+        "ref": "X.42",
+        "text": "and those two terms add back to it, so the point of division is the only one",
+        "by": [
+          "X.42"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.45",
+        "text": "and those two terms add back to it, so the point of division is the only one",
+        "by": [
+          "X.42"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.45",
+        "text": "the division into terms is recovered from the line itself",
+        "by": [
+          "X.42"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.48",
+        "text": "the sum is a binomial",
+        "by": [
+          "X.36"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.5",
+        "text": "and the two numbers can be exhibited",
+        "by": [
+          "VII.33"
+        ],
+        "bends": 37
+      },
+      {
+        "ref": "X.5",
+        "text": "the ratio is that of a number to a number",
+        "by": [
+          "X.5"
+        ],
+        "bends": 37
+      },
+      {
+        "ref": "X.54",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.54"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.55",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.55"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.56",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.56"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.57",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.57"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.58",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.58"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.59",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.59"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.60",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.60"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.60",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.54"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.61",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.61"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.61",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.55"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.62",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.62"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.62",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.56"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.63",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.63"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.63",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.57"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.64",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.64"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.64",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.58"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.65",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.65"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.65",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.59"
+        ],
+        "bends": 48
       },
       {
         "ref": "X.66",
-        "text": "the line is of the kind in question",
-        "configurations": 1
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.66"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.67",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.67"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.68",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.68"
+        ],
+        "bends": 44
+      },
+      {
+        "ref": "X.68",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.69",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.69"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.69",
+        "text": "the second line is commensurable with the first",
+        "by": [
+          "X.12"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.7",
+        "text": "and no pair of numbers puts them in proportion",
+        "by": [
+          "X.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.7",
+        "text": "their ratio is not that of any number to a number",
+        "by": [
+          "X.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.70",
+        "text": "and it is a line of the very same kind",
+        "by": [
+          "X.70"
+        ],
+        "bends": 18
+      },
+      {
+        "ref": "X.71",
+        "text": "and its side is one of the four named lines",
+        "by": [
+          "X.71"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.71",
+        "text": "the sum of the two areas is irrational",
+        "by": [
+          "X.71"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.72",
+        "text": "and its side is one of the named lines",
+        "by": [
+          "X.72"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.72",
+        "text": "the sum is irrational",
+        "by": [
+          "X.72"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.73",
+        "text": "and assigns it one of the six species",
+        "by": [
+          "X.85-90"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.73",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.73"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.74",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.74"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.75",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.75"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.76",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.76"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.77",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.77"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.78",
+        "text": "the remainder is irrational",
+        "by": [
+          "X.78"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.79",
+        "text": "and they give back the line, so the division is the only one",
+        "by": [
+          "X.79"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.79",
+        "text": "the two terms are recovered from the line itself",
+        "by": [
+          "X.79"
+        ],
+        "bends": 45
+      },
+      {
+        "ref": "X.85",
+        "text": "the remainder is an apotome",
+        "by": [
+          "X.73"
+        ],
+        "bends": 22
+      },
+      {
+        "ref": "X.88",
+        "text": "the remainder is an apotome",
+        "by": [
+          "X.73"
+        ],
+        "bends": 46
+      },
+      {
+        "ref": "X.9",
+        "text": "and lines incommensurable in length have not",
+        "by": [
+          "X.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.9",
+        "text": "lines commensurable in length have squares in the ratio of two square numbers",
+        "by": [
+          "X.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "X.91",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.91"
+        ],
+        "bends": 22
+      },
+      {
+        "ref": "X.92",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.92"
+        ],
+        "bends": 28
+      },
+      {
+        "ref": "X.93",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.93"
+        ],
+        "bends": 30
+      },
+      {
+        "ref": "X.94",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.94"
+        ],
+        "bends": 43
+      },
+      {
+        "ref": "X.95",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.95"
+        ],
+        "bends": 47
+      },
+      {
+        "ref": "X.96",
+        "text": "the side of the equal square is irrational",
+        "by": [
+          "X.96"
+        ],
+        "bends": 34
+      },
+      {
+        "ref": "X.97",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.97"
+        ],
+        "bends": 23
+      },
+      {
+        "ref": "X.97",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.91"
+        ],
+        "bends": 23
+      },
+      {
+        "ref": "X.98",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.98"
+        ],
+        "bends": 35
+      },
+      {
+        "ref": "X.98",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.92"
+        ],
+        "bends": 35
+      },
+      {
+        "ref": "X.99",
+        "text": "taking the side of that square returns the line",
+        "by": [
+          "X.99"
+        ],
+        "bends": 27
+      },
+      {
+        "ref": "X.99",
+        "text": "the line is the irrational the earlier proposition named",
+        "by": [
+          "X.93"
+        ],
+        "bends": 27
+      },
+      {
+        "ref": "XIII.1",
+        "text": "D lies on BA produced, with AD half of AB",
+        "by": [
+          "Post.2",
+          "I.10"
+        ],
+        "bends": 16
+      },
+      {
+        "ref": "XIII.1",
+        "text": "the square on CD is five times the square on AD",
+        "by": [
+          "II.6"
+        ],
+        "bends": 16
+      },
+      {
+        "ref": "XIII.12",
+        "text": "the alternate vertices of the hexagon form an equilateral triangle",
+        "by": [
+          "IV.15"
+        ],
+        "bends": 14
+      },
+      {
+        "ref": "XIII.12",
+        "text": "the square on its side is triple of the square on the radius",
+        "by": [
+          "I.47"
+        ],
+        "bends": 14
+      },
+      {
+        "ref": "XIII.2",
+        "text": "CD is double of AC",
+        "by": [
+          "Post.2"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "XIII.2",
+        "text": "and it is the greater of the two",
+        "by": [
+          "Def.3"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "XIII.3",
+        "text": "D bisects the greater segment AC",
+        "by": [
+          "I.10"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "XIII.3",
+        "text": "the square on DB is five times the square on DC",
+        "by": [
+          "II.6"
+        ],
+        "bends": 5
+      },
+      {
+        "ref": "XIII.4",
+        "text": "AC is the greater segment",
+        "by": [
+          "Def.3"
+        ],
+        "bends": 31
+      },
+      {
+        "ref": "XIII.4",
+        "text": "the squares on the whole and on the lesser segment together are triple of the square on the greater",
+        "by": [
+          "II.7"
+        ],
+        "bends": 31
+      },
+      {
+        "ref": "XIII.5",
+        "text": "AD equals the greater segment AC",
+        "by": [
+          "Post.2"
+        ],
+        "bends": 32
+      },
+      {
+        "ref": "XIII.5",
+        "text": "DB is cut at A in extreme and mean ratio",
+        "by": [
+          "VI.30"
+        ],
+        "bends": 32
+      },
+      {
+        "ref": "XIII.5",
+        "text": "and AB is its greater segment",
+        "by": [
+          "Def.3"
+        ],
+        "bends": 32
       }
     ]
   },
@@ -291,53 +4111,26 @@
     "buckets": {
       "rational": [
         "I.15",
-        "I.18",
-        "I.19",
-        "I.24",
-        "I.25",
-        "I.26",
         "I.27",
         "I.28",
         "I.29",
-        "I.30",
-        "I.33",
-        "I.34",
         "I.35",
         "I.36",
         "I.37",
-        "I.38",
-        "I.39",
         "I.4",
-        "I.40",
         "I.41",
-        "I.48",
         "I.6",
         "I.8",
         "II.1",
         "II.2",
         "II.3",
-        "II.4",
-        "II.7",
-        "II.8",
-        "III.1",
-        "III.10",
         "III.11",
         "III.12",
         "III.13",
-        "III.16",
-        "III.19",
-        "III.23",
-        "III.24",
-        "III.25",
         "III.26",
         "III.28",
-        "III.29",
-        "III.34",
         "III.5",
         "III.6",
-        "III.9",
-        "IV.5",
-        "IV.6",
         "IV.7",
         "IX.1",
         "IX.11",
@@ -394,28 +4187,17 @@
         "V.7",
         "V.8",
         "V.9",
-        "VI.1",
-        "VI.10",
-        "VI.11",
-        "VI.12",
         "VI.14",
         "VI.15",
         "VI.16",
         "VI.17",
         "VI.18",
-        "VI.19",
-        "VI.20",
         "VI.21",
         "VI.22",
         "VI.23",
-        "VI.24",
         "VI.26",
-        "VI.31",
         "VI.32",
-        "VI.4",
         "VI.5",
-        "VI.6",
-        "VI.9",
         "VII.1",
         "VII.10",
         "VII.11",
@@ -492,31 +4274,39 @@
       ],
       "measuring_only": [
         "I.13",
-        "I.17",
-        "I.20",
-        "I.21",
-        "II.13",
+        "I.30",
+        "I.33",
+        "I.34",
+        "III.16",
         "III.21",
         "III.22",
+        "III.23",
+        "III.24",
         "III.27",
         "III.32",
-        "III.35",
-        "III.7",
-        "III.8",
         "IV.2",
         "IV.3",
-        "IV.4",
-        "VI.2",
-        "VI.3",
         "VI.33",
-        "VI.7",
-        "VI.8"
+        "VI.7"
       ],
       "discharged_luckily": [
         "I.22",
+        "I.24",
+        "I.25",
         "I.31",
         "I.32",
-        "I.43"
+        "I.38",
+        "I.39",
+        "I.40",
+        "I.43",
+        "III.7",
+        "III.8",
+        "VI.1",
+        "VI.10",
+        "VI.2",
+        "VI.20",
+        "VI.24",
+        "VI.4"
       ],
       "needs_continuity": [
         "I.1",
@@ -524,39 +4314,66 @@
         "I.11",
         "I.12",
         "I.16",
+        "I.17",
+        "I.18",
+        "I.19",
         "I.2",
+        "I.20",
+        "I.21",
+        "I.26",
         "I.3",
         "I.42",
         "I.44",
         "I.45",
         "I.46",
         "I.47",
+        "I.48",
         "I.5",
+        "I.7",
         "I.9",
         "II.10",
         "II.11",
+        "II.12",
+        "II.13",
         "II.14",
+        "II.4",
         "II.5",
         "II.6",
+        "II.7",
+        "II.8",
         "II.9",
+        "III.1",
+        "III.10",
         "III.14",
         "III.15",
         "III.17",
         "III.2",
+        "III.20",
+        "III.25",
         "III.3",
         "III.30",
         "III.33",
+        "III.35",
         "III.36",
         "III.37",
+        "III.4",
+        "III.9",
         "IV.1",
         "IV.10",
         "IV.15",
+        "IV.4",
+        "IV.5",
+        "IV.6",
         "IV.8",
         "IV.9",
         "VI.13",
         "VI.27",
         "VI.28",
         "VI.29",
+        "VI.3",
+        "VI.31",
+        "VI.8",
+        "VI.9",
         "XIII.12"
       ],
       "needs_magnitude": [
@@ -602,19 +4419,22 @@
       "configuration_dependent": [
         "I.14",
         "I.23",
-        "I.7",
-        "II.12",
         "III.18",
-        "III.20",
+        "III.19",
+        "III.29",
         "III.31",
-        "III.4",
+        "III.34",
         "IX.10",
         "IX.2",
         "IX.30",
         "IX.31",
         "IX.8",
         "V.6",
+        "VI.11",
+        "VI.12",
+        "VI.19",
         "VI.25",
+        "VI.6",
         "VII.24",
         "VII.26",
         "VII.29",
@@ -707,12 +4527,12 @@
       ]
     },
     "counts": {
-      "rational": 199,
-      "measuring_only": 20,
-      "discharged_luckily": 4,
-      "needs_continuity": 39,
+      "rational": 161,
+      "measuring_only": 15,
+      "discharged_luckily": 17,
+      "needs_continuity": 66,
       "needs_magnitude": 38,
-      "configuration_dependent": 21,
+      "configuration_dependent": 24,
       "untestable": 81
     },
     "witnesses": [
@@ -723,10 +4543,10 @@
         "radicand": "4/75"
       },
       {
-        "ref": "I.20",
+        "ref": "I.34",
         "cause": "measurement",
-        "site": "angles.py:length:39",
-        "radicand": "26/9"
+        "site": "angles.py:between_rays:58",
+        "radicand": "32"
       }
     ]
   },

@@ -10,6 +10,11 @@ def prop_III_12(o: Point, a: Point, p: Point) -&gt; Out:
     hypothesis("they touch at A", on_circle(a, first) and on_circle(a, second))
     joined = line(o, p, "the line joining the centres")
 
+    # The centres and the point of contact make no triangle when they are in
+    # one straight line, which is exactly what this proposition proves.
+    if not collinear(o, p, a):
+        because(prop_I_20, o, p, a)
+
     claim("the point of contact lies on the line joining the centres", "I.20",
           on_line(a, joined))
     claim("and the distance between the centres is the sum of the radii", "C.N.2",

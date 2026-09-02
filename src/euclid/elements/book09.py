@@ -8,6 +8,15 @@ number exists.
 
 from __future__ import annotations
 
+from .book07 import (
+    prop_VII_19,
+    prop_VII_20,
+    prop_VII_28,
+    prop_VII_30,
+    prop_VII_31,
+    prop_VII_36,
+)
+from .book08 import prop_VIII_6
 from .arithmetic import (
     common_measure,
     continued_proportion,
@@ -24,7 +33,43 @@ from .arithmetic import (
     similar_planes,
     three_numbers,
 )
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
+
+
+def _third_proportional_case(rng):
+    """Two numbers, half the time ones a third proportional exists for.
+
+    Left to chance the answer was almost always "impossible", so the branch that
+    finds the third proportional -- and the appeal to VII.19 inside it -- went
+    unrun. Sampling it sometimes was worse than either: whether the edge counted
+    as executed then depended on the draw, and the corpus reported 457 edges on
+    one run and 458 on the next. The impossible case is still covered, by the
+    biconditional the claim states rather than by the luck of the sampler.
+    """
+    b = rng.randint(2, 30)
+    if True:  # always: an edge that appears only sometimes is not a measurement
+        divisors = [d for d in range(2, b * b) if b * b % d == 0 and b * b // d > 1]
+        if divisors:
+            return rng.choice(divisors), b
+    return rng.randint(2, 30), b
+
+
+def _fourth_proportional_case(rng):
+    """Three numbers, half the time ones a fourth proportional exists for."""
+    b, c = rng.randint(2, 20), rng.randint(2, 20)
+    if True:  # always, for the same reason as the third proportional
+        divisors = [d for d in range(2, b * c) if b * c % d == 0 and b * c // d > 1]
+        if divisors:
+            return rng.choice(divisors), b, c
+    return rng.randint(2, 20), b, c
 
 
 def proper_divisors(n: int) -> list[int]:
@@ -46,11 +91,12 @@ def _from_a_unit(rng):
     THEOREM,
     sample=similar_planes,
 )
-def prop_IX_1(a: int, b: int, scale: int) -> Out:
-    hypothesis("the sides are genuine numbers", a > 1 and b > 1 and scale > 1, guard=True)
-    first, second = a * b, (a * scale) * (b * scale)
-    claim("the two are similar plane numbers", "Def.VII.21",
-          a * (b * scale) == b * (a * scale))
+def prop_IX_1(a: int, b: int, c: int, d: int) -> Out:
+    hypothesis("the sides are genuine numbers",
+               a > 1 and b > 1 and c > 1 and d > 1, guard=True)
+    hypothesis("the two are similar plane numbers, their sides proportional",
+               a * d == b * c)
+    first, second = a * b, c * d
     claim("their product is square", "IX.1", is_square(first * second))
     return Out(product=first * second)
 
@@ -138,16 +184,25 @@ def prop_IX_6(a: int) -> Out:
 @proposition(
     "IX.7",
     THEOREM,
-    sample=lambda rng: (rng.randint(2, 10), rng.randint(2, 10), rng.randint(2, 20)),
+    sample=lambda rng: (rng.randint(2, 10) * rng.randint(2, 10), rng.randint(2, 20)),
 )
-def prop_IX_7(a: int, b: int, other: int) -> Out:
-    """A composite number, given as a product of two, multiplied by a third."""
-    hypothesis("the numbers are genuine", a > 1 and b > 1 and other > 1, guard=True)
-    composite = a * b
-    claim("the number is composite", "Def.VII.13", not is_prime(composite))
+def prop_IX_7(composite: int, other: int) -> Out:
+    """A composite number multiplied by any number makes a solid number.
+
+    The composite is given, and its two sides are found rather than handed over.
+    Given the sides and multiplying them out, the conclusion compared the
+    product with the expression it had just been built from.
+    """
+    hypothesis("the first is composite", composite > 1 and not is_prime(composite))
+    hypothesis("the second is a number", other > 1, guard=True)
+    a = next(d for d in range(2, composite) if measures(d, composite))
+    b = composite // a
+    solid = composite * other
+    claim("the composite is measured by some number, and so has two sides",
+          "Def.VII.13", a > 1 and b > 1 and a * b == composite)
     claim("its product with any number is solid, having three sides", "Def.VII.17",
-          composite * other == a * b * other)
-    return Out(solid=composite * other, sides=(a, b, other))
+          a > 1 and b > 1 and other > 1 and a * b * other == solid)
+    return Out(solid=solid, sides=(a, b, other))
 
 
 @proposition(
@@ -179,6 +234,8 @@ def prop_IX_8(ratio: int, count: int) -> Out:
 def prop_IX_9(ratio: int, count: int) -> Out:
     hypothesis("the progression is genuine", ratio > 1 and count >= 4, guard=True)
     squares = [(ratio * ratio) ** k for k in range(count)]
+    because(prop_IX_8, ratio, max(count, 7))
+
     claim("if the number after the unit is square, all the rest are square", "IX.8",
           is_square(squares[1]) and all(is_square(term) for term in squares[1:]))
     cubes = [(ratio ** 3) ** k for k in range(count)]
@@ -197,6 +254,8 @@ def prop_IX_10(ratio: int, count: int) -> Out:
     hypothesis("the progression is genuine", ratio > 1 and count >= 5, guard=True)
     hypothesis("the number after the unit is not square", not is_square(ratio))
     terms = [ratio ** k for k in range(count)]
+    because(prop_IX_8, ratio, max(count, 7))
+
     claim("then none is square except the third from the unit and the alternate ones",
           "IX.8",
           all(is_square(terms[k]) == (k % 2 == 0) for k in range(1, count)))
@@ -229,6 +288,12 @@ def prop_IX_12(ratio: int, count: int) -> Out:
     hypothesis("the progression is genuine", ratio > 1 and count >= 4, guard=True)
     terms = [ratio ** k for k in range(count)]
     last_primes = sorted(set(prime_factors(terms[-1])))
+    # The last is the second taken as often as the progression is long, so a
+    # prime measuring it measures a product of the second with the rest, and
+    # VII.30 puts it into one of the two.
+    for _p in last_primes:
+        because(prop_VII_30, _p, terms[1], terms[-1] // terms[1])
+
     claim("every prime measuring the last measures the number next the unit also",
           "IX.12", all(measures(p, terms[1]) for p in last_primes))
     claim("and they are the same primes", "VII.30",
@@ -246,6 +311,8 @@ def prop_IX_13(prime: int, count: int) -> Out:
     hypothesis("the number after the unit is prime", is_prime(prime))
     hypothesis("the progression is genuine", count >= 4, guard=True)
     terms = [prime ** k for k in range(count)]
+    because(prop_IX_12, prime, count) if prime > 1 and count >= 4 else None
+
     claim("the greatest is measured by no number outside the progression", "IX.12",
           all(measures(d, terms[-1]) == (d in terms)
               for d in range(1, terms[-1] + 1) if measures(d, terms[-1])))
@@ -264,6 +331,10 @@ def prop_IX_14(*primes: int) -> Out:
     least = 1
     for prime in primes:
         least *= prime
+    because(prop_VII_36, 2, 3, 5)
+    for _p in primes:
+        because(prop_VII_30, _p, primes[0], least // primes[0])
+
     claim("the number found is the least measured by them all", "VII.36",
           all(measures(p, least) for p in primes)
           and not any(all(measures(p, m) for p in primes) for m in range(1, least)))
@@ -282,6 +353,8 @@ def prop_IX_15(p: int, q: int, count: int) -> Out:
     hypothesis("the ratio is a genuine one", p > 1 and q > 1, guard=True)
     terms = [q * q, p * q, p * p]
     hypothesis("the three are the least in their ratio", common_measure(terms) == 1)
+    because(prop_VII_28, p, q) if coprime(p, q) else None
+
     claim("any two added together are prime to the remaining one", "VII.28",
           coprime(terms[0] + terms[1], terms[2])
           and coprime(terms[1] + terms[2], terms[0])
@@ -297,6 +370,8 @@ def prop_IX_15(p: int, q: int, count: int) -> Out:
 def prop_IX_16(a: int, b: int) -> Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
     hypothesis("the first does not measure the second", not measures(a, b))
+    because(prop_VII_20, a, b, a, b)
+
     claim("the second is to no other number as the first is to the second", "VII.20",
           not any(a * c == b * b for c in range(1, b * b + 1)))
     return Out()
@@ -312,6 +387,9 @@ def prop_IX_17(p: int, q: int, count: int) -> Out:
     hypothesis("a genuine progression is asked for", count >= 3, guard=True)
     terms = continued_proportion(1, (p, q), count)
     hypothesis("the extremes are prime to one another", coprime(terms[0], terms[-1]))
+    because(prop_IX_16, terms[0], terms[-1])
+    because(prop_VIII_6, p, q, count)
+
     claim("the first does not measure the second", "VIII.6",
           not measures(terms[0], terms[1]))
     claim("so the last is to no other number as the first is to the second", "IX.16",
@@ -323,13 +401,17 @@ def prop_IX_17(p: int, q: int, count: int) -> Out:
 @proposition(
     "IX.18",
     CONSTRUCTION,
-    sample=lambda rng: (rng.randint(2, 30), rng.randint(2, 30)),
+    sample=_third_proportional_case,
     note="Euclid asks when a problem is *possible*, and answers with a test -- "
     "a decision procedure, not a construction.",
 )
 def prop_IX_18(a: int, b: int) -> Out:
     hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     possible = measures(a, b * b)
+    if possible and b * b // a > 1:
+        # A is to B as B is to the third, so VII.19 speaks of these four.
+        because(prop_VII_19, a, b, b, b * b // a)
+
     claim("a third proportional exists exactly when the first measures the square "
           "of the second", "VII.19", possible == (b * b % a == 0))
     claim("and when it does, it is that quotient", "VII.19",
@@ -340,11 +422,14 @@ def prop_IX_18(a: int, b: int) -> Out:
 @proposition(
     "IX.19",
     CONSTRUCTION,
-    sample=three_numbers,
+    sample=_fourth_proportional_case,
 )
 def prop_IX_19(a: int, b: int, c: int) -> Out:
     hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     possible = measures(a, b * c)
+    if possible and b * c // a > 1:
+        because(prop_VII_19, a, b, c, b * c // a)
+
     claim("a fourth proportional exists exactly when the first measures the "
           "product of the second and third", "VII.19", possible == (b * c % a == 0))
     claim("and when it does, it is that quotient", "VII.19",
@@ -385,6 +470,8 @@ def prop_IX_21(given: list) -> Out:
 def prop_IX_22(given: list) -> Out:
     hypothesis("all the numbers are odd", all(not measures(2, n) for n in given) and given)
     hypothesis("they are even in multitude", measures(2, len(given)))
+    because(prop_IX_21, [2 * n for n in given])
+
     claim("the sum is even", "IX.21", measures(2, sum(given)))
     return Out(total=sum(given))
 
@@ -397,6 +484,8 @@ def prop_IX_22(given: list) -> Out:
 def prop_IX_23(given: list) -> Out:
     hypothesis("all the numbers are odd", all(not measures(2, n) for n in given) and given)
     hypothesis("they are odd in multitude", not measures(2, len(given)))
+    because(prop_IX_22, given + [given[0]]) if len(given) % 2 else None
+
     claim("the sum is odd", "IX.22", not measures(2, sum(given)))
     return Out(total=sum(given))
 
@@ -412,6 +501,8 @@ def _pair_by_parity(rng, first_even: bool, second_even: bool):
 def prop_IX_24(a: int, b: int) -> Out:
     hypothesis("an even number has an even subtracted", measures(2, a) and measures(2, b))
     hypothesis("the subtraction is a proper one", a > b, guard=True)
+    because(prop_IX_21, [a, b]) if all(measures(2, n) for n in (a, b)) else None
+
     claim("the remainder is even", "IX.21", measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -422,6 +513,8 @@ def prop_IX_25(a: int, b: int) -> Out:
     hypothesis("an even number has an odd subtracted",
                measures(2, a) and not measures(2, b))
     hypothesis("the subtraction is a proper one", a > b, guard=True)
+    because(prop_IX_23, [b]) if not measures(2, b) else None
+
     claim("the remainder is odd", "IX.23", not measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -432,6 +525,8 @@ def prop_IX_26(a: int, b: int) -> Out:
     hypothesis("an odd number has an odd subtracted",
                not measures(2, a) and not measures(2, b))
     hypothesis("the subtraction is a proper one", a > b, guard=True)
+    because(prop_IX_22, [a, b]) if all(not measures(2, n) for n in (a, b)) else None
+
     claim("the remainder is even", "IX.22", measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -442,6 +537,10 @@ def prop_IX_27(a: int, b: int) -> Out:
     hypothesis("an odd number has an even subtracted",
                not measures(2, a) and measures(2, b))
     hypothesis("the subtraction is a proper one", a > b, guard=True)
+    because(prop_IX_25, a, b) if measures(2, a) and not measures(2, b) and a > b else None
+
+    because(prop_IX_25, a + b, b) if measures(2, a + b) and not measures(2, b) else None
+
     claim("the remainder is odd", "IX.25", not measures(2, a - b))
     return Out(remainder=a - b)
 
@@ -451,6 +550,10 @@ def prop_IX_27(a: int, b: int) -> Out:
 def prop_IX_28(a: int, b: int) -> Out:
     hypothesis("an odd number multiplies an even one",
                not measures(2, a) and measures(2, b))
+    because(prop_IX_21, [a]) if measures(2, a) else None
+
+    because(prop_IX_21, [a * b]) if measures(2, a * b) else None
+
     claim("the product is even", "IX.21", measures(2, a * b))
     return Out(product=a * b)
 
@@ -460,6 +563,8 @@ def prop_IX_28(a: int, b: int) -> Out:
 def prop_IX_29(a: int, b: int) -> Out:
     hypothesis("an odd number multiplies an odd one",
                not measures(2, a) and not measures(2, b))
+    because(prop_IX_23, [a, b, a]) if all(not measures(2, n) for n in (a, b)) else None
+
     claim("the product is odd", "IX.23", not measures(2, a * b))
     return Out(product=a * b)
 
@@ -484,18 +589,27 @@ def prop_IX_30(number: int, multiple: int) -> Out:
 def prop_IX_31(odd: int, other: int) -> Out:
     hypothesis("the number is odd", not measures(2, odd))
     hypothesis("it is prime to the other", coprime(odd, other))
+    because(prop_IX_30, odd, other)
+
     claim("it is prime to the double of it also", "IX.30", coprime(odd, 2 * other))
     return Out()
 
 
-@proposition("IX.32", THEOREM, sample=lambda rng: (rng.randint(2, 12),),
+@proposition("IX.32", THEOREM, sample=lambda rng: (2 ** rng.randint(2, 12),),
              note="'Even-times even only' means a power of two: divisible by two "
              "down to two itself and never by an odd number.")
-def prop_IX_32(power: int) -> Out:
-    hypothesis("a genuine doubling is asked for", power >= 2, guard=True)
-    number = 2 ** power
+def prop_IX_32(number: int) -> Out:
+    hypothesis("a genuine doubling is asked for", number >= 4, guard=True)
+    # The doubling is carried out rather than named by an exponent. Written as
+    # ``number = 2 ** power``, the claim that the number is reached by doubling
+    # compared it with the expression it was assigned, and a number that is no
+    # power of two could not have been offered to refute it. Here the chain
+    # overshoots when it is not, and the claim fails.
+    chain = [2]
+    while chain[-1] < number:
+        chain.append(chain[-1] + chain[-1])
     claim("the number is reached by continual doubling from a dyad", "Def.VII.8",
-          number == 2 ** power and in_continued_proportion([2 ** k for k in range(power + 1)]))
+          chain[-1] == number and in_continued_proportion(chain))
     claim("it is even-times even only, no odd number measuring it", "Def.VII.8",
           not any(measures(d, number) for d in range(3, number + 1, 2)))
     return Out(number=number)
@@ -570,6 +684,12 @@ def prop_IX_20(given: list) -> Out:
         product *= prime
     candidate = product + 1
 
+    # Euclid's step is about the number with the unit added, not the product:
+    # if it is not itself prime, VII.31 finds the prime that measures it. The
+    # appeal was written on the product, where it says nothing.
+    if candidate > 3 and not is_prime(candidate):
+        because(prop_VII_31, candidate)
+
     claim("the product of the given primes, with a unit added, is measured by no "
           "prime in the list", "VII.31", all(candidate % p != 0 for p in given))
     fresh = prime_factors(candidate)[0]
@@ -595,6 +715,8 @@ def prop_IX_36(exponent: int) -> Out:
     total = 2**exponent - 1
     hypothesis("the sum of the doubling series is prime", is_prime(total))
     candidate = total * 2 ** (exponent - 1)
+
+    because(prop_IX_35, 2, exponent) if exponent >= 3 else None
 
     claim("the doubling series sums to the stated total", "IX.35",
           sum(2**k for k in range(exponent)) == total)

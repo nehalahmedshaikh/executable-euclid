@@ -11,6 +11,7 @@ def _same_kind(a, b, scale, _k=kind, _sub=subtractive) -&gt; Out:
                named.name == wanted or named.family == wanted)
 
     other = compound * scale
+    because(prop_X_12, compound, compound, scale)
     claim("the second line is commensurable with the first", "X.12",
           commensurable(compound, other))
     other_named = classify(other)

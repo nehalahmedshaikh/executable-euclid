@@ -1,20 +1,29 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.61 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 61</p><h1>X.61</h1><blockquote>The square on the first bimedial straight line applied to a rational straight line produces as breadth the second binomial.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">both terms are rational in square<span class="cite">given</span></li><li class="hyp">they are commensurable in square only<span class="cite">given</span></li><li class="hyp">the compound is positive<span class="cite">given</span></li><li class="">the square applied to a rational line gives a breadth<span class="cite">by <a href="X-20.html">X.20</a></span></li><li class="">and the breadth is itself one of the compound irrationals<span class="cite">by <a href="X-61.html">X.61</a></span></li><li class="">taking the side of that square returns the line<span class="cite">by <a href="X-61.html">X.61</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="X-20.html">X.20</a></p><p><strong>Depth:</strong> 1 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(ref, THEOREM,
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.61 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 61</p><h1>X.61</h1><blockquote>The square on the first bimedial straight line applied to a rational straight line produces as breadth the second binomial.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">both terms are rational in square<span class="cite">given</span></li><li class="hyp">they are commensurable in square only<span class="cite">given</span></li><li class="hyp">the compound is positive<span class="cite">given</span></li><li class="">the line is the irrational the earlier proposition named<span class="cite">by <a href="X-55.html">X.55</a></span></li><li class="">the square applied to a rational line gives as breadth the second binomial<span class="cite">by <a href="X-61.html">X.61</a></span></li><li class="">taking the side of that square returns the line<span class="cite">by <a href="X-61.html">X.61</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="X-55.html">X.55</a></p><p><strong>Rests on:</strong> X.48-53</p><p><strong>Depth:</strong> 3 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(ref, THEOREM,
              sample=lambda rng, _i=index: _binomial_of_species(_i))
-def _square(a, b, _sub=subtractive, _i=index) -&gt; Out:
+def _square(a, b, _sub=subtractive, _i=index, _by=source_ref) -&gt; Out:
     hypothesis("both terms are rational in square",
                is_rational_in_square(a) and is_rational_in_square(b))
     hypothesis("they are commensurable in square only", not commensurable(a, b))
     compound = (a - b) if _sub else (a + b)
     hypothesis("the compound is positive", sign(compound) &gt; 0)
-    breadth = compound * compound  # applied to the assigned line, 1
+    # The line this proposition is about is the irrational one, the side
+    # of the area on the compound, which X.54-59 and X.91-96 named. The
+    # square was being taken on the compound itself, so the breadth came
+    # back as the square of a binomial and the conclusion had to be
+    # weakened to "one of the compound irrationals" to hold at all.
+    because(get(_by).wrapped, a, b)
+    irrational = sqrt(compound)  # the side that proposition produces
+    breadth = irrational * irrational  # applied to the assigned line, 1
 
-    named = classify(breadth) if sign(breadth) &gt; 0 else None
-    claim("the square applied to a rational line gives a breadth", "X.20",
-          breadth == compound * compound)
-    claim("and the breadth is itself one of the compound irrationals", ref,
-          named is not None and named.family in
-          ("binomial", "apotome", "medial-based", "rational", "medial"))
+    claim("the line is the irrational the earlier proposition named", _by,
+          not isinstance(irrational, Fraction))
+    named = classify(breadth)
+    claim(f"the square applied to a rational line gives as breadth the "
+          f"{BINOMIAL_SPECIES[_i - 1]} "
+          f"{'apotome' if _sub else 'binomial'}", ref,
+          named.family == ("apotome" if _sub else "binomial")
+          and named.species == BINOMIAL_SPECIES[_i - 1])
     claim("taking the side of that square returns the line", ref,
-          sqrt(breadth) == compound)
+          sqrt(breadth) == irrational)
     return Out(breadth=breadth)
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

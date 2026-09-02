@@ -1,13 +1,17 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IX.18 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book IX &middot; Proposition 18</p><h1>IX.18</h1><blockquote>Given two numbers, to investigate whether it is possible to find a third proportional to them.<span class="src">Heath, 1908</span></blockquote><p class="note">Euclid asks when a problem is *possible*, and answers with a test -- a decision procedure, not a construction.</p><h2>Every step, checked</h2><ul class="claims"><li class="hyp">both are numbers<span class="cite">given</span></li><li class="">a third proportional exists exactly when the first measures the square of the second<span class="cite">by <a href="VII-19.html">VII.19</a></span></li><li class="">and when it does, it is that quotient<span class="cite">by <a href="VII-19.html">VII.19</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="VII-19.html">VII.19</a></p><p><strong>Depth:</strong> 1 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
     "IX.18",
     CONSTRUCTION,
-    sample=lambda rng: (rng.randint(2, 30), rng.randint(2, 30)),
+    sample=_third_proportional_case,
     note="Euclid asks when a problem is *possible*, and answers with a test -- "
     "a decision procedure, not a construction.",
 )
 def prop_IX_18(a: int, b: int) -&gt; Out:
     hypothesis("both are numbers", a &gt; 1 and b &gt; 1, guard=True)
     possible = measures(a, b * b)
+    if possible and b * b // a &gt; 1:
+        # A is to B as B is to the third, so VII.19 speaks of these four.
+        because(prop_VII_19, a, b, b, b * b // a)
+
     claim("a third proportional exists exactly when the first measures the square "
           "of the second", "VII.19", possible == (b * b % a == 0))
     claim("and when it does, it is that quotient", "VII.19",

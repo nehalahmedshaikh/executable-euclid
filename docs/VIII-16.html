@@ -6,6 +6,8 @@
 def prop_VIII_16(a: int, b: int) -&gt; Out:
     """The contrapositive of VIII.14, which Euclid states separately."""
     hypothesis("the sides are genuine numbers", a &gt; 1 and b &gt; 1, guard=True)
+    because(prop_VIII_14, a, b)
+
     claim("if the square does not measure the square, neither does the side",
           "VIII.14", (not measures(a * a, b * b)) == (not measures(a, b)))
     return Out()

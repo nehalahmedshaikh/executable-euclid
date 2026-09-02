@@ -14,6 +14,9 @@ def prop_VIII_1(p: int, q: int, count: int) -&gt; Out:
     # Consecutive terms are *not* coprime -- p^k q^(n-1-k) and its successor
     # share p^k q^(n-2-k). What makes the progression least is that the whole
     # set has no common measure, which the extremes being coprime forces.
+    because(prop_VII_20, terms[0], terms[-1], terms[0], terms[-1])
+    because(prop_VII_21, terms[0], terms[-1]) if coprime(terms[0], terms[-1]) else None
+
     claim("the numbers are in continued proportion", "Def.VII.20",
           in_continued_proportion(terms))
     claim("the terms have no common measure but a unit", "VII.21",

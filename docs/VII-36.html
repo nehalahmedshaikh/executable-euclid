@@ -6,6 +6,9 @@
 def prop_VII_36(a: int, b: int, c: int) -&gt; Out:
     hypothesis("all three are numbers", a &gt; 1 and b &gt; 1 and c &gt; 1, guard=True)
     least = lcm(lcm(a, b), c)
+    because(prop_VII_34, a, b)
+    because(prop_VII_35, a, b, 1)
+
     claim("the number found is measured by all three", "VII.34",
           all(measures(n, least) for n in (a, b, c)))
     claim("and nothing less is", "VII.35",

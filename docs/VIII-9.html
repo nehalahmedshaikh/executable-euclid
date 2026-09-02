@@ -12,6 +12,8 @@ def prop_VIII_9(p: int, q: int, count: int) -&gt; Out:
     # its own powers, and there are as many steps as there were between them.
     to_unit_first = [q ** k for k in range(count)]
     to_unit_last = [p ** k for k in range(count)]
+    because(prop_VIII_2, p, q, count) if coprime(p, q) else None
+
     claim("a progression runs from a unit up to each extreme", "VIII.2",
           in_continued_proportion(to_unit_first) and in_continued_proportion(to_unit_last)
           and to_unit_first[0] == 1 and to_unit_last[0] == 1)

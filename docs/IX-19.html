@@ -1,11 +1,14 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>IX.19 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book IX &middot; Proposition 19</p><h1>IX.19</h1><blockquote>Given three numbers, to investigate when it is possible to find a fourth proportional to them.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">all three are numbers<span class="cite">given</span></li><li class="">a fourth proportional exists exactly when the first measures the product of the second and third<span class="cite">by <a href="VII-19.html">VII.19</a></span></li><li class="">and when it does, it is that quotient<span class="cite">by <a href="VII-19.html">VII.19</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="VII-19.html">VII.19</a></p><p><strong>Depth:</strong> 1 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
     "IX.19",
     CONSTRUCTION,
-    sample=three_numbers,
+    sample=_fourth_proportional_case,
 )
 def prop_IX_19(a: int, b: int, c: int) -&gt; Out:
     hypothesis("all three are numbers", a &gt; 1 and b &gt; 1 and c &gt; 1, guard=True)
     possible = measures(a, b * c)
+    if possible and b * c // a &gt; 1:
+        because(prop_VII_19, a, b, c, b * c // a)
+
     claim("a fourth proportional exists exactly when the first measures the "
           "product of the second and third", "VII.19", possible == (b * c % a == 0))
     claim("and when it does, it is that quotient", "VII.19",

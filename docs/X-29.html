@@ -13,6 +13,8 @@ def prop_X_29(scale: int, offset: int) -&gt; Out:
     b = Fraction(4 * scale)
     excess = sqrt(a * a - b * b)
 
+    because(prop_X_5, Fraction(1), Fraction(2))
+
     claim("both lines are rational", "X.Def.3",
           is_rational_in_square(a) and is_rational_in_square(b))
     claim("they are commensurable in length here, being whole numbers", "X.5",

@@ -8,6 +8,9 @@
 def prop_VII_39(a: int, b: int, c: int) -&gt; Out:
     hypothesis("the parts are genuine", a &gt; 1 and b &gt; 1 and c &gt; 1, guard=True)
     least = lcm(lcm(a, b), c)
+    because(prop_VII_36, a, b, c)
+    because(prop_VII_38, a, lcm(a, b)) if measures(a, lcm(a, b)) and a &gt; 1 else None
+
     claim("the number found has all three parts", "VII.38",
           all(measures(n, least) for n in (a, b, c)))
     claim("and no smaller number has them all", "VII.36",

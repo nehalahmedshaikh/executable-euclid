@@ -6,6 +6,8 @@
 def prop_VII_32(n: int) -&gt; Out:
     hypothesis("the number is greater than a unit", n &gt; 1, guard=True)
     factors = prime_factors(n)
+    because(prop_VII_31, n) if n &gt; 3 and not is_prime(n) else None
+
     claim("the number is prime, or some prime measures it", "VII.31",
           is_prime(n) or (bool(factors) and is_prime(factors[0])
                           and measures(factors[0], n)))

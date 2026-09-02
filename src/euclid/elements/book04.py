@@ -30,10 +30,30 @@ from ..plane.predicates import (
     same_side,
 )
 from . import samples
-from .book01_foundations import prop_I_10
+from .book01_foundations import (
+    prop_I_3,
+    prop_I_4,
+    prop_I_6,
+    prop_I_9,
+    prop_I_10,
+    prop_I_11,
+    prop_I_12,
+    prop_I_8,
+    prop_I_26,
+)
+from .book01_parallels import prop_I_34, prop_I_47
+from .book03 import (
+    _standing_on_the_major_arc,
+    prop_III_16,
+    prop_III_20,
+    prop_III_27,
+    prop_III_30,
+    prop_III_31,
+    prop_III_32,
+)
 from .book02 import prop_II_11
 from .figures import _across, _centre_of, _foot_of_the_perpendicular, _tangent_at, _turn
-from .registry import CONSTRUCTION, Out, claim, hypothesis, proposition
+from .registry import CONSTRUCTION, Out, because, claim, hypothesis, proposition
 
 
 @proposition(
@@ -78,6 +98,9 @@ def prop_IV_5(a: Point, b: Point, c: Point) -> Out:
     line(centre, b, "a radius")
     line(centre, c, "a radius")
 
+    because(prop_I_10, a, b)
+    because(prop_I_11, a, b, prop_I_10(a, b).midpoint)
+
     claim("the centre is equidistant from all three vertices", ["I.10", "I.11"],
           eq_len(centre, a, centre, b) and eq_len(centre, a, centre, c))
     claim("so the circle through A passes through B and C too", "Def.15",
@@ -103,6 +126,10 @@ def prop_IV_6(o: Point, a: Point) -> Out:
     line(a, c, "the diameter AC")
     line(b, d, "the diameter BD, at right angles to it")
     outline(a, b, c, d)
+
+    because(prop_I_11, a, c, o)
+    because(prop_I_4, o, a, b, o, b, c)
+    because(prop_III_31, o, a, c, b)
 
     claim("the two diameters are at right angles", "I.11", right_angle(a, o, b))
     claim("every vertex lies on the circle", "Def.15",
@@ -142,6 +169,10 @@ def prop_IV_7(o: Point, a: Point) -> Out:
         posit(Point(o.x - reach[0], o.y - reach[1]), "C"),
         posit(Point(o.x - across[0], o.y - across[1]), "D"),
     ]
+    for point in touching:
+        because(prop_III_16, o, point)
+    because(prop_I_34, corners[0], corners[1], corners[2], corners[3])
+
     claim("each side meets the circle at the end of a radius, and so touches it", "III.16",
           all(on_circle(point, around) for point in touching)
           and all(right_angle(o, touching[i], corners[i]) for i in range(4)))
@@ -170,6 +201,10 @@ def prop_IV_8(a: Point, b: Point, c: Point, d: Point) -> Out:
             for index, side in enumerate(((a, b), (b, c), (c, d), (d, a)))]
     inscribed = circle(centre, feet[0], "the inscribed circle")
 
+    because(prop_I_34, a, b, c, d)
+    because(prop_I_12, a, b, centre)
+    because(prop_III_16, centre, feet[0])
+
     claim("the centre is equally distant from all four sides", "I.34",
           all(eq_len(centre, foot, centre, feet[0]) for foot in feet))
     claim("and each of those distances is at right angles to its side", "I.12",
@@ -195,6 +230,9 @@ def prop_IV_9(a: Point, b: Point, c: Point, d: Point) -> Out:
 
     centre = posit(prop_I_10(a, c).midpoint, "O")
     around = circle(centre, a, "the circumscribed circle")
+
+    because(prop_I_34, a, b, c, d)
+    because(prop_I_6, centre, a, b)
 
     claim("the diameters bisect one another", "I.34",
           centre == prop_I_10(b, d).midpoint)
@@ -233,6 +271,9 @@ def prop_IV_15(o: Point, a: Point) -> Out:
     outline(*vertices)
     claim("every vertex lies on the circle", "Def.15",
           all(on_circle(vertex, around) for vertex in vertices))
+    because(prop_III_27, o, vertices[0], vertices[1], vertices[2],
+            o, vertices[1], vertices[2], vertices[3])
+
     claim("the hexagon is equilateral, each side equal to the radius", "Def.15",
           all(eq_len(vertices[i], vertices[(i + 1) % 6], o, a) for i in range(6)))
     claim("and equiangular", "III.27",
@@ -262,6 +303,9 @@ def prop_IV_2(o: Point, a: Point, d: Point, e: Point, f: Point) -> Out:
     b = posit(_turn(o, a, at_f.doubled()), "B")
     c = posit(_turn(o, b, at_d.doubled()), "C")
     outline(a, b, c)
+
+    if not collinear(a, b, c):
+        because(prop_III_20, o, b, a, c)
 
     claim("all three vertices lie on the given circle", "Def.15",
           on_circle(b, around) and on_circle(c, around))
@@ -304,6 +348,15 @@ def prop_IV_3(o: Point, a: Point, d: Point, e: Point, f: Point) -> Out:
     ]
     outline(*corners)
 
+    for touch in touches:
+        because(prop_III_16, o, touch)
+    # The angle between a tangent and the chord equals the angle in the
+    # alternate segment, which is what carries the given angles round to the
+    # circumscribed triangle.
+    for index in range(3):
+        because(prop_III_32, o, touches[index], touches[(index + 1) % 3],
+                touches[(index + 2) % 3])
+
     claim("each side touches the circle, meeting a radius at right angles", "III.16",
           all(on_circle(point, around) for point in touches)
           and all(right_angle(o, touches[i], corners[i]) for i in range(3)))
@@ -332,6 +385,11 @@ def prop_IV_12(o: Point, a: Point) -> Out:
         for index in range(5)
     ]
     outline(*corners)
+
+    for point in touches:
+        because(prop_III_16, o, point)
+    because(prop_I_47, corners[0], touches[0], o)
+    because(prop_I_8, o, touches[0], corners[0], o, touches[1], corners[1])
 
     claim("each side touches the circle at a vertex of the inscribed pentagon", "III.16",
           all(on_circle(point, around) for point in touches)
@@ -376,6 +434,11 @@ def prop_IV_4(a: Point, b: Point, c: Point) -> Out:
         line(centre, foot)
     inscribed = circle(centre, feet[0], "the inscribed circle")
 
+    because(prop_I_9, b, a, c)
+    because(prop_I_12, b, c, centre)
+    because(prop_I_26, centre, feet[0], b, centre, feet[2], b)
+    because(prop_III_16, centre, feet[0])
+
     claim("the centre lies on the bisector of each angle", "I.9",
           all(eq_angle(*pair) for pair in (
               (b, a, centre, centre, a, c),
@@ -410,6 +473,13 @@ def prop_IV_10(a: Point, b: Point) -> Out:
     outline(a, b, d)
     line(section, d, "CD")
 
+    because(prop_I_3, a, b, section, a)
+    # The base angle is read off the circle about the triangle BCD, where BD
+    # touches it: III.32 is the step that makes it equal to the angle at A.
+    _about = _centre_of(b, section, d)
+    if not collinear(b, section, d):
+        because(prop_III_32, _about, b, section, d)
+
     claim("BD equals the greater segment AC", "I.3", eq_len(b, d, a, section))
     claim("the triangle is isosceles, AB and AD both radii", "Def.15", eq_len(a, b, a, d))
     claim("each angle at the base is double the angle at the apex", ["II.11", "III.32"],
@@ -437,6 +507,10 @@ def prop_IV_13(o: Point, a: Point) -> Out:
         line(o, foot)
     inscribed = circle(o, feet[0], "the inscribed circle")
 
+    because(prop_I_4, o, feet[0], vertices[0], o, feet[1], vertices[1])
+    because(prop_I_12, vertices[0], vertices[1], o)
+    because(prop_III_16, o, feet[0])
+
     claim("the centre is equally distant from every side", "I.4",
           all(eq_len(o, foot, o, feet[0]) for foot in feet))
     claim("and meets each at right angles", "I.12",
@@ -459,6 +533,8 @@ def prop_IV_14(o: Point, a: Point) -> Out:
     for vertex in vertices:
         line(o, vertex)
     around = circle(o, vertices[0], "the circumscribed circle")
+
+    because(prop_I_6, o, vertices[0], vertices[1])
 
     claim("the centre is equally distant from every vertex", "I.6",
           all(eq_len(o, vertex, o, vertices[0]) for vertex in vertices))
@@ -520,6 +596,10 @@ def prop_IV_16(o: Point, a: Point) -> Out:
     outline(*vertices)
     claim("every vertex lies on the circle", "Def.15",
           all(on_circle(vertex, around) for vertex in vertices))
+    because(prop_III_30, o, vertices[0], vertices[1])
+    because(prop_III_27, o, vertices[0], vertices[1], vertices[2],
+            o, vertices[1], vertices[2], vertices[3])
+
     claim("the figure is equilateral", "Def.19",
           all(eq_len(vertices[i], vertices[(i + 1) % 15], vertices[0], vertices[1])
               for i in range(15)))
@@ -564,9 +644,23 @@ def prop_IV_11(o: Point, a: Point) -> Out:
     claim("the pentagon is equilateral", "Def.19",
           all(eq_len(vertices[i], vertices[(i + 1) % 5], vertices[0], vertices[1])
               for i in range(5)))
+    # Equal sides cut off equal arcs, and III.27 makes the angles standing on
+    # them equal. The circle is compared with itself, which III.27 allows: two
+    # equal circles are what it asks for, and no circle is unequal to itself.
+    if len(vertices) == 5:
+        for index in range(5):
+            first, second = vertices[index], vertices[(index + 1) % 5]
+            third, fourth = vertices[(index + 1) % 5], vertices[(index + 2) % 5]
+            here = _standing_on_the_major_arc(o, first, second)
+            there = _standing_on_the_major_arc(o, third, fourth)
+            if here is not None and there is not None:
+                because(prop_III_27, o, first, second, here, o, third, fourth, there)
+
     claim("and equiangular", "III.27",
           all(eq_angle(vertices[i - 1], vertices[i], vertices[(i + 1) % 5],
                        vertices[4], vertices[0], vertices[1]) for i in range(5)))
+    because(prop_II_11, vertices[0], vertices[2])
+
     golden = (sqrt(5) - 1) / 2
     claim("the diagonal exceeds the side in extreme and mean ratio", "II.11",
           length(vertices[0], vertices[2]) * golden == length(vertices[0], vertices[1]))

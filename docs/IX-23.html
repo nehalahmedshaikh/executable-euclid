@@ -6,6 +6,8 @@
 def prop_IX_23(given: list) -&gt; Out:
     hypothesis("all the numbers are odd", all(not measures(2, n) for n in given) and given)
     hypothesis("they are odd in multitude", not measures(2, len(given)))
+    because(prop_IX_22, given + [given[0]]) if len(given) % 2 else None
+
     claim("the sum is odd", "IX.22", not measures(2, sum(given)))
     return Out(total=sum(given))
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

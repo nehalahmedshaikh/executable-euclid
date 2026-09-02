@@ -10,6 +10,10 @@ def prop_X_32(radicand: int) -&gt; Out:
     a, b = 5 * quarter, 3 * quarter
     excess = sqrt(a * a - b * b)
 
+    because(prop_X_29, 2, 1)
+
+    because(prop_X_21, Fraction(1), sqrt(radicand))
+
     claim("both are medial", "X.21", is_medial(a) and is_medial(b))
     claim("and the excess is commensurable with the greater", "X.29",
           commensurable(excess, a))

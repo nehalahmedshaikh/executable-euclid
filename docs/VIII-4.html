@@ -14,6 +14,9 @@ def prop_VIII_4(a: int, b: int, c: int, d: int) -&gt; Out:
     middle = lcm(second, third)
     terms = [first * (middle // second), middle, fourth * (middle // third)]
 
+    because(prop_VII_18, a, b, c)
+    because(prop_VII_34, a, b)
+
     claim("the first pair keeps its ratio", "VII.18", terms[0] * b == terms[1] * a)
     claim("the second pair keeps its ratio", "VII.18", terms[1] * d == terms[2] * c)
     claim("and the middle is the least that both consequents measure", "VII.34",

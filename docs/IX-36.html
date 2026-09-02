@@ -11,6 +11,8 @@ def prop_IX_36(exponent: int) -&gt; Out:
     hypothesis("the sum of the doubling series is prime", is_prime(total))
     candidate = total * 2 ** (exponent - 1)
 
+    because(prop_IX_35, 2, exponent) if exponent &gt;= 3 else None
+
     claim("the doubling series sums to the stated total", "IX.35",
           sum(2**k for k in range(exponent)) == total)
     claim("the product of the sum and the last term is perfect", "IX.36",

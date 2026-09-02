@@ -1,20 +1,29 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.95 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 95</p><h1>X.95</h1><blockquote>If an area be contained by a rational straight line and a fifth apotome, the "side" of the area is a straight line which produces with a rational area a medial whole.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">both terms are rational in square<span class="cite">given</span></li><li class="hyp">they are commensurable in square only<span class="cite">given</span></li><li class="hyp">the compound is positive<span class="cite">given</span></li><li class="">the area is contained by a rational line and the compound<span class="cite">by <a href="X-20.html">X.20</a></span></li><li class="">the side of the equal square is irrational<span class="cite">by <a href="X-95.html">X.95</a></span></li><li class="">and the classifier names it as one of the thirteen<span class="cite">by <a href="X-95.html">X.95</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="X-20.html">X.20</a></p><p><strong>Depth:</strong> 1 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(ref, THEOREM,
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>X.95 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book X &middot; Proposition 95</p><h1>X.95</h1><blockquote>If an area be contained by a rational straight line and a fifth apotome, the "side" of the area is a straight line which produces with a rational area a medial whole.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">both terms are rational in square<span class="cite">given</span></li><li class="hyp">they are commensurable in square only<span class="cite">given</span></li><li class="hyp">the compound is positive<span class="cite">given</span></li><li class="">the area is contained by a rational line and the fifth apotome<span class="cite">by <a href="X-89.html">X.89</a></span></li><li class="">the side of the equal square is irrational<span class="cite">by <a href="X-95.html">X.95</a></span></li><li class="">and it is the line called that which produces with a rational area a medial whole<span class="cite">by <a href="X-95.html">X.95</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> <a href="X-89.html">X.89</a></p><p><strong>Used by:</strong> <a href="X-101.html">X.101</a></p><p><strong>Rests on:</strong> X.85-90</p><p><strong>Depth:</strong> 2 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(ref, THEOREM,
              sample=lambda rng, _i=index: _binomial_of_species(_i))
-def _side(a, b, _sub=subtractive) -&gt; Out:
+def _side(a, b, _sub=subtractive, _kind=kind, _by=species_ref) -&gt; Out:
     hypothesis("both terms are rational in square",
                is_rational_in_square(a) and is_rational_in_square(b))
     hypothesis("they are commensurable in square only", not commensurable(a, b))
     compound = (a - b) if _sub else (a + b)
     hypothesis("the compound is positive", sign(compound) &gt; 0)
-    area = compound  # applied to the assigned rational line, which is 1
-    side = sqrt(area)
+    # The area is applied to the assigned rational line, which is 1, so
+    # the area and the compound are one magnitude. This step used to
+    # compare them and cite X.20 for it, which asserted nothing: what
+    # the proposition stands on is which species the compound is, and
+    # that is what X.48-53 and X.85-90 determine.
+    because(get(_by).wrapped, a, b)
+    named_compound = classify(compound)
+    claim(f"the area is contained by a rational line and the "
+          f"{BINOMIAL_SPECIES[index - 1]} "
+          f"{'apotome' if _sub else 'binomial'}", _by,
+          named_compound.family == ("apotome" if _sub else "binomial")
+          and named_compound.species == BINOMIAL_SPECIES[index - 1])
 
-    claim("the area is contained by a rational line and the compound",
-          "X.20", area == compound * 1)
+    side = sqrt(compound)
     claim("the side of the equal square is irrational", ref,
           not isinstance(side, Fraction))
-    claim("and the classifier names it as one of the thirteen", ref,
-          classify(side).name in SPECIES
-          or classify(side).family in ("binomial", "apotome", "medial-based"))
+    named = classify(side)
+    claim(f"and it is the line called {_kind}", ref,
+          named.family == _kind if index == 1 else named.name == _kind)
     return Out(side=side)
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

@@ -10,6 +10,14 @@ def prop_V_21(a, b, c, d, e, f) -&gt; Out:
                all(sign(x) &gt; 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = e : f", a * f == b * e)
     hypothesis("b : c = d : e", b * e == c * d)
+    # The ratios compared are a : b against c : b, which differ exactly when A
+    # and C do. V.13 speaks of a ratio greater than another, and no figure
+    # meeting these hypotheses has one, so it stays cited.
+    if a != c:
+        because(prop_V_8, a, b, c, b)
+
+    because(prop_V_13, a, b, e, f, c, d) if a * f == b * e and ratio_cmp(e, f, c, d) &gt; 0 else None
+
     claim("as the first stands to the third, so the fourth stands to the sixth",
           ["V.8", "V.13"], sign(a - c) == sign(d - f))
     return Out()

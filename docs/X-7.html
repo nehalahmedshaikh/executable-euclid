@@ -6,6 +6,9 @@
 def prop_X_7(a, b) -&gt; Out:
     hypothesis("the magnitudes are positive", sign(a) &gt; 0 and sign(b) &gt; 0, guard=True)
     hypothesis("they are incommensurable", not commensurable(a, b))
+    # X.5 speaks of commensurable magnitudes, and this proposition is about the
+    # pair that are not: Euclid reaches it by supposing the contrary, so the
+    # appeal has no figure here that is not the one being refuted.
     claim("their ratio is not that of any number to a number", "X.7",
           not isinstance(a / b, Fraction))
     claim("and no pair of numbers puts them in proportion", "X.5",

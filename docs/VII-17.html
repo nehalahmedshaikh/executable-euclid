@@ -6,6 +6,6 @@
 def prop_VII_17(a: int, b: int, c: int) -&gt; Out:
     hypothesis("all three are numbers", a &gt; 1 and b &gt; 1 and c &gt; 1, guard=True)
     claim("the products have the same ratio as the numbers multiplied", "VII.17",
-          (a * b) * c == (a * c) * b)
+          _taken(_taken(a, b), c) == _taken(_taken(a, c), b))
     return Out()
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

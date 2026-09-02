@@ -27,7 +27,7 @@ from typing import Optional
 
 from ..kernel.field import Constructible, is_zero, sign, sqrt, to_float
 from . import samples
-from .registry import THEOREM, Out, claim, hypothesis, proposition
+from .registry import THEOREM, Out, because, claim, hypothesis, proposition
 
 __all__ = [
     "anthyphairesis",
@@ -253,6 +253,9 @@ def prop_V_2(b, d, first_times: int, second_times: int) -> Out:
     hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0, guard=True)
     a, c = first_times * b, first_times * d
     e, f = second_times * b, second_times * d
+    because(prop_V_1, b, d, first_times)
+    because(prop_V_1, b, d, second_times)
+
     claim("the sum of the first and fifth is a multiple of the second", "Def.2",
           a + e == (first_times + second_times) * b)
     claim("and the sum of the third and sixth the same multiple of the fourth", "V.1",
@@ -270,6 +273,8 @@ def prop_V_3(b, d, times: int, again: int) -> Out:
     fold B and D."""
     hypothesis("the magnitudes are positive", sign(b) > 0 and sign(d) > 0, guard=True)
     a, c = times * b, times * d
+    because(prop_V_1, b, d, times)
+
     claim("the equimultiples taken are multiples of the original multiples", "Def.2",
           again * a == again * (times * b) and again * c == again * (times * d))
     claim("so ex aequali they are equimultiples of the second and the fourth", "V.1",
@@ -323,6 +328,9 @@ def prop_V_6(x, y, times: int, taken: int) -> Out:
     hypothesis("less is taken away than there is", taken <= times)
     left, right = times * x - taken * x, times * y - taken * y
     remaining = times - taken
+    if remaining >= 1:
+        because(prop_V_1, x, y, remaining)
+
     claim("the remainders are equimultiples of the same two magnitudes", "V.1",
           left == remaining * x and right == remaining * y)
     claim("and where one multiple remains they are equal to them", "C.N.3",
@@ -376,6 +384,8 @@ def prop_V_12(a, b, c, d, e, f) -> Out:
                all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("and c : d = e : f", c * f == d * e)
+    because(prop_V_11, a, b, c, d, e, f)
+
     claim("so all three pairs stand in one ratio", "V.11",
           a * d == b * c and a * f == b * e)
     claim("so one antecedent is to one consequent as all are to all", "Def.5",
@@ -409,6 +419,12 @@ def prop_V_14(a, b, c, d) -> Out:
     hypothesis("the magnitudes are positive",
                all(sign(x) > 0 for x in (a, b, c, d)), guard=True)
     hypothesis("a : b = c : d", a * d == b * c)
+    # V.8 wants two ratios that differ, and these are equal by hypothesis. The
+    # pair Euclid actually sets against each other is a : b and c : b, which
+    # differ exactly when A and C do.
+    if a != c:
+        because(prop_V_8, a, b, c, b)
+
     claim("as the first stands to the third, so the second stands to the fourth",
           "V.8", sign(a - c) == sign(b - d))
     return Out()
@@ -492,6 +508,14 @@ def prop_V_20(a, b, c, d, e, f) -> Out:
                all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = d : e", a * e == b * d)
     hypothesis("b : c = e : f", b * f == c * e)
+    # The ratios compared are a : b against c : b, which differ exactly when A
+    # and C do. V.13 speaks of a ratio greater than another, and no figure
+    # meeting these hypotheses has one, so it stays cited.
+    if a != c:
+        because(prop_V_8, a, b, c, b)
+
+    because(prop_V_13, a, b, d, e, c, f) if a * e == b * d and ratio_cmp(d, e, c, f) > 0 else None
+
     claim("as the first stands to the third, so the fourth stands to the sixth",
           ["V.8", "V.13"], sign(a - c) == sign(d - f))
     return Out()
@@ -518,6 +542,14 @@ def prop_V_21(a, b, c, d, e, f) -> Out:
                all(sign(x) > 0 for x in (a, b, c, d, e, f)), guard=True)
     hypothesis("a : b = e : f", a * f == b * e)
     hypothesis("b : c = d : e", b * e == c * d)
+    # The ratios compared are a : b against c : b, which differ exactly when A
+    # and C do. V.13 speaks of a ratio greater than another, and no figure
+    # meeting these hypotheses has one, so it stays cited.
+    if a != c:
+        because(prop_V_8, a, b, c, b)
+
+    because(prop_V_13, a, b, e, f, c, d) if a * f == b * e and ratio_cmp(e, f, c, d) > 0 else None
+
     claim("as the first stands to the third, so the fourth stands to the sixth",
           ["V.8", "V.13"], sign(a - c) == sign(d - f))
     return Out()
@@ -593,6 +625,8 @@ def prop_V_25(a, b, c, d) -> Out:
     hypothesis("a : b = c : d", a * d == b * c)
     hypothesis("A is the greatest and D the least",
                sign(a - b) > 0 and sign(a - c) > 0 and sign(b - d) > 0 and sign(c - d) > 0)
+    because(prop_V_19, a, b, c, d)
+
     claim("the greatest and the least together exceed the other two", "V.19",
           sign((a + d) - (b + c)) > 0)
     return Out()

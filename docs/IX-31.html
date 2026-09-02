@@ -3,6 +3,8 @@
 def prop_IX_31(odd: int, other: int) -&gt; Out:
     hypothesis("the number is odd", not measures(2, odd))
     hypothesis("it is prime to the other", coprime(odd, other))
+    because(prop_IX_30, odd, other)
+
     claim("it is prime to the double of it also", "IX.30", coprime(odd, 2 * other))
     return Out()
 </pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

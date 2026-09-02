@@ -2,6 +2,10 @@
 def _divided(a, b, _kind=kind) -&gt; Out:
     whole = a + b
     named = classify(whole)
+    # X.42 divides a binomial; X.43 to X.47 are the same argument for
+    # the other five compounds, so each hands it its own kind.
+    if ref != "X.42":
+        because(get("X.42").wrapped, a, b, _kind)
     hypothesis(f"the whole is a {ADDED_NAMES[_kind]}",
                named.name == ADDED_NAMES[_kind] or named.family == ADDED_NAMES[_kind])
     claim("the division into terms is recovered from the line itself",

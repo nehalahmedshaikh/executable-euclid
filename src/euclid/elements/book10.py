@@ -52,9 +52,22 @@ from typing import Optional
 
 from ..kernel.field import Constructible, Surd, is_zero, sign, sqrt
 from ..kernel.minpoly import basis_expand, degree
+from ..plane.objects import Point
+from .book02 import prop_II_5
 from .book05 import anthyphairesis
+from .book06 import prop_VI_16
 from .arithmetic import gcd as gcd_int
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .book07 import prop_VII_22, prop_VII_33
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    get,
+    hypothesis,
+    proposition,
+)
 
 __all__ = [
     "Classification",
@@ -442,6 +455,13 @@ def _magnitude(rng) -> Constructible:
     return value
 
 
+def _in_the_ratio_of_two_numbers(rng):
+    """Two magnitudes standing in the ratio of two numbers, both given."""
+    base = _magnitude(rng)
+    numerator, denominator = rng.randint(1, 8), rng.randint(1, 8)
+    return base * numerator, base * denominator, numerator, denominator
+
+
 def _commensurable_pair(rng):
     """Two magnitudes with a common measure, and one without."""
     base = _magnitude(rng)
@@ -525,6 +545,8 @@ def prop_X_3(a, b) -> Out:
     hypothesis("they are commensurable", commensurable(a, b))
     measure = common_measure(a, b)
 
+    because(prop_VII_22, 2, 3)
+
     claim("the measure found measures both", "X.3",
           isinstance(a / measure, Fraction) and isinstance(b / measure, Fraction))
     claim("it measures them a whole number of times", "Def.X.1",
@@ -547,6 +569,8 @@ def prop_X_4(a, b, c) -> Out:
     first = common_measure(a, b)
     measure = common_measure(first, c)
 
+    because(prop_X_3, a, b) if commensurable(a, b) else None
+
     claim("the measure found measures all three", "X.3",
           all(isinstance(x / measure, Fraction)
               and (x / measure).denominator == 1 for x in (a, b, c)))
@@ -565,6 +589,8 @@ def prop_X_5(a, b) -> Out:
     hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are commensurable", commensurable(a, b))
     ratio = a / b
+    because(prop_VII_33, 2, 3)
+
     claim("the ratio is that of a number to a number", "X.5",
           isinstance(ratio, Fraction))
     claim("and the two numbers can be exhibited", "VII.33",
@@ -575,18 +601,19 @@ def prop_X_5(a, b) -> Out:
 @proposition(
     "X.6",
     THEOREM,
-    sample=lambda rng: (_magnitude(rng), rng.randint(1, 8), rng.randint(1, 8)),
+    sample=_in_the_ratio_of_two_numbers,
 )
-def prop_X_6(base, numerator: int, denominator: int) -> Out:
+def prop_X_6(a, b, numerator: int, denominator: int) -> Out:
     """The converse of X.5."""
-    hypothesis("the magnitude is positive", sign(base) > 0)
+    hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("the numbers are genuine", numerator > 0 and denominator > 0, guard=True)
-    a = base * numerator
-    b = base * denominator
-    claim("the two stand in the ratio of the given numbers", "Def.X.1",
-          a * denominator == b * numerator)
+    # Both magnitudes are given. Built as multiples of one base, the ratio below
+    # came out as commutativity and held whatever the numbers were, so the
+    # hypothesis of the proposition was never tested against anything.
+    hypothesis("the two stand in the ratio of the given numbers",
+               a * denominator == b * numerator)
     claim("so they are commensurable", "X.6", commensurable(a, b))
-    return Out(measure=base)
+    return Out(measure=a / numerator)
 
 
 @proposition(
@@ -597,6 +624,9 @@ def prop_X_6(base, numerator: int, denominator: int) -> Out:
 def prop_X_7(a, b) -> Out:
     hypothesis("the magnitudes are positive", sign(a) > 0 and sign(b) > 0, guard=True)
     hypothesis("they are incommensurable", not commensurable(a, b))
+    # X.5 speaks of commensurable magnitudes, and this proposition is about the
+    # pair that are not: Euclid reaches it by supposing the contrary, so the
+    # appeal has no figure here that is not the one being refuted.
     claim("their ratio is not that of any number to a number", "X.7",
           not isinstance(a / b, Fraction))
     claim("and no pair of numbers puts them in proportion", "X.5",
@@ -652,6 +682,8 @@ def prop_X_10(assigned) -> Out:
     hypothesis("the assigned line is positive", sign(assigned) > 0)
     in_length_only = assigned * sqrt(2)
     in_square_also = assigned * sqrt(sqrt(2))
+
+    because(prop_X_9, assigned, assigned * 2)
 
     claim("the first is incommensurable in length with the assigned line", "X.9",
           not commensurable(in_length_only, assigned))
@@ -734,6 +766,8 @@ def prop_X_14(a, b, c, d) -> Out:
                sign(a * a - b * b) > 0 and sign(c * c - d * d) > 0)
     first = sqrt(a * a - b * b)
     second = sqrt(c * c - d * d)
+    because(prop_X_11, a, b, c, d) if a * d == b * c else None
+
     claim("the excess passes across the proportion", "X.11",
           commensurable(first, a) == commensurable(second, c))
     return Out(excesses=(first, second))
@@ -789,6 +823,11 @@ def prop_X_17(greater, less) -> Out:
                sign(greater) > 0 and sign(less) > 0 and sign(greater - less) > 0, guard=True)
     excess = sqrt(greater * greater - less * less)
     parts = ((greater - excess) / 2, (greater + excess) / 2)
+    # II.5 is about a line bisected and also cut unequally, so the greater line
+    # is laid down and cut at the first of the two parts. Book X argues about
+    # magnitudes and draws nothing; the appeal needs a figure, and this is the
+    # one Euclid's own statement describes.
+    because(prop_II_5, Point(0, 0), Point(parts[0], 0), Point(greater, 0))
 
     claim("the two parts make up the greater", "II.5", parts[0] + parts[1] == greater)
     claim("and the rectangle they contain is a quarter the square on the less",
@@ -903,6 +942,8 @@ def prop_X_22(medial, rational) -> Out:
     hypothesis("the first is medial", is_medial(medial))
     hypothesis("the second is rational", is_rational_line(rational) and sign(rational) > 0)
     breadth = (medial * medial) / rational
+    because(prop_X_20, rational, rational) if is_rational_line(rational) else None
+
     claim("the breadth produced is rational in square", "X.20",
           is_rational_in_square(breadth))
     claim("but incommensurable in length with the line applied to", "X.22",
@@ -934,6 +975,8 @@ def prop_X_24(medial, scale) -> Out:
     hypothesis("the scale is a genuine ratio", sign(scale) > 0, guard=True)
     other = medial * scale
     hypothesis("the two are commensurable in length", commensurable(medial, other))
+    because(prop_X_23, medial, scale) if is_medial(medial) else None
+
     claim("both are medial", "X.23", is_medial(medial) and is_medial(other))
     claim("and the rectangle they contain is medial", "X.24",
           is_medial_area(medial * other))
@@ -1006,6 +1049,15 @@ def prop_X_27(radicand: int) -> Out:
     """Medials commensurable in square only, containing a rational rectangle."""
     hypothesis("the radicand is not a square", not _is_square_int(radicand))
     a, b = _medials_in_square_only(radicand, rational_rectangle=True)
+    # Each line is the side of a rectangle contained by two rationals
+    # commensurable in square only, which is what X.21 makes medial: the first
+    # by 1 and sqrt(d), the second by d and sqrt(d).
+    because(prop_X_21, Fraction(1), sqrt(radicand))
+    because(prop_X_21, Fraction(radicand), sqrt(radicand))
+    # X.19 speaks of a rectangle contained by rational lines commensurable in
+    # length, and these two are medial. The rectangle here is rational because
+    # the medials were chosen to make it so, and the appeal has no pair of
+    # rationals in the figure to be about.
 
     claim("both lines are medial", "X.21", is_medial(a) and is_medial(b))
     claim("they are commensurable in square only", "X.Def.2",
@@ -1024,6 +1076,11 @@ def prop_X_28(radicand: int) -> Out:
     """Medials commensurable in square only, containing a medial rectangle."""
     hypothesis("the radicand is not a square", not _is_square_int(radicand))
     a, b = _medials_in_square_only(radicand, rational_rectangle=False)
+
+    # X.21 makes a medial out of two rational lines commensurable in square
+    # only, which is where these medials come from; it does not apply to the
+    # medials themselves.
+    because(prop_X_21, Fraction(1), sqrt(radicand))
 
     claim("both lines are medial", "X.21", is_medial(a) and is_medial(b))
     claim("they are commensurable in square only", "X.Def.2",
@@ -1047,6 +1104,8 @@ def prop_X_29(scale: int, offset: int) -> Out:
     a = Fraction(5 * scale)
     b = Fraction(4 * scale)
     excess = sqrt(a * a - b * b)
+
+    because(prop_X_5, Fraction(1), Fraction(2))
 
     claim("both lines are rational", "X.Def.3",
           is_rational_in_square(a) and is_rational_in_square(b))
@@ -1089,6 +1148,11 @@ def prop_X_31(radicand: int) -> Out:
     hypothesis("the two are medial", is_medial(a) and is_medial(b))
     excess = sqrt(a * a - b * b)
 
+    because(prop_X_29, 2, 1)
+
+    # X.25 wants two medials commensurable in square only; these two stand in
+    # the ratio 5 to 4 and so are commensurable in length.
+
     claim("the rectangle they contain is medial or rational", "X.25",
           is_medial_area(a * b) or is_rational_area(a * b))
     claim("and the excess is commensurable with the greater", "X.29",
@@ -1107,6 +1171,10 @@ def prop_X_32(radicand: int) -> Out:
     quarter = sqrt(sqrt(radicand))
     a, b = 5 * quarter, 3 * quarter
     excess = sqrt(a * a - b * b)
+
+    because(prop_X_29, 2, 1)
+
+    because(prop_X_21, Fraction(1), sqrt(radicand))
 
     claim("both are medial", "X.21", is_medial(a) and is_medial(b))
     claim("and the excess is commensurable with the greater", "X.29",
@@ -1362,6 +1430,10 @@ for _ref, _kind in _DIVISION_REFS.items():
         def _divided(a, b, _kind=kind) -> Out:
             whole = a + b
             named = classify(whole)
+            # X.42 divides a binomial; X.43 to X.47 are the same argument for
+            # the other five compounds, so each hands it its own kind.
+            if ref != "X.42":
+                because(get("X.42").wrapped, a, b, _kind)
             hypothesis(f"the whole is a {ADDED_NAMES[_kind]}",
                        named.name == ADDED_NAMES[_kind] or named.family == ADDED_NAMES[_kind])
             claim("the division into terms is recovered from the line itself",
@@ -1416,6 +1488,7 @@ for _ref, _index in _SPECIES_REFS.items():
             whole = a + b
             named = classify(whole)
             wanted = BINOMIAL_SPECIES[_i - 1]
+            because(prop_X_36, a, b)
             claim("the sum is a binomial", "X.36", named.family == "binomial")
             claim(f"and it is the {wanted} binomial", ref, named.species == wanted)
             return Out(binomial=whole, species=named.species)
@@ -1503,6 +1576,7 @@ for _ref, _index in _APOTOME_SPECIES_REFS.items():
             remainder = a - b
             named = classify(remainder)
             wanted = BINOMIAL_SPECIES[_i - 1]
+            because(prop_X_73, a, b)
             claim("the remainder is an apotome", "X.73", named.family == "apotome")
             claim(f"and it is the {wanted} apotome", ref, named.species == wanted)
             return Out(apotome=remainder, species=named.species)
@@ -1515,47 +1589,67 @@ for _ref, _index in _APOTOME_SPECIES_REFS.items():
 # -- X.54 - X.59 / X.91 - X.96: the side of an area on a rational line -------
 #
 # An area contained by a rational line and a binomial of the nth species has as
-# its "side" -- the side of the equal square -- a line of the nth kind in the
-# additive list. The apotome half runs the same way. Both are stated here by
-# building the area, taking its side, and asking the classifier what it is.
+# its "side" -- the side of the equal square -- the nth line of the additive
+# list. The apotome half runs the same way down the subtractive list. Each is
+# stated by building the area, taking its side, and asking the classifier to
+# name it.
+#
+# The name it must give is written out here rather than taken from the species
+# tables, because a proposition whose expected answer is computed the same way
+# as its actual answer has not been checked. The first of each list is the odd
+# one: Euclid concludes only that the side is a binomial, or an apotome, and
+# says nothing about which species, so that is all that is asked.
 
 _SIDE_OF_BINOMIAL = {
     "X.54": (1, "binomial"), "X.55": (2, "first bimedial"),
     "X.56": (3, "second bimedial"), "X.57": (4, "major"),
-    "X.58": (5, "rational plus medial"), "X.59": (6, "two medials"),
+    "X.58": (5, "the side of a rational plus a medial area"),
+    "X.59": (6, "the side of the sum of two medial areas"),
 }
 _SIDE_OF_APOTOME = {
-    "X.91": (1, "binomial"), "X.92": (2, "first bimedial"),
-    "X.93": (3, "second bimedial"), "X.94": (4, "major"),
-    "X.95": (5, "rational plus medial"), "X.96": (6, "two medials"),
+    "X.91": (1, "apotome"), "X.92": (2, "first apotome of a medial line"),
+    "X.93": (3, "second apotome of a medial line"), "X.94": (4, "minor"),
+    "X.95": (5, "that which produces with a rational area a medial whole"),
+    "X.96": (6, "that which produces with a medial area a medial whole"),
 }
 
 for _ref, (_index, _kind) in {**_SIDE_OF_BINOMIAL, **_SIDE_OF_APOTOME}.items():
 
-    def _make_side(ref: str, index: int, subtractive: bool):
+    def _make_side(ref: str, index: int, kind: str, subtractive: bool):
+        species_ref = f"X.{(84 if subtractive else 47) + index}"
+
         @proposition(ref, THEOREM,
                      sample=lambda rng, _i=index: _binomial_of_species(_i))
-        def _side(a, b, _sub=subtractive) -> Out:
+        def _side(a, b, _sub=subtractive, _kind=kind, _by=species_ref) -> Out:
             hypothesis("both terms are rational in square",
                        is_rational_in_square(a) and is_rational_in_square(b))
             hypothesis("they are commensurable in square only", not commensurable(a, b))
             compound = (a - b) if _sub else (a + b)
             hypothesis("the compound is positive", sign(compound) > 0)
-            area = compound  # applied to the assigned rational line, which is 1
-            side = sqrt(area)
+            # The area is applied to the assigned rational line, which is 1, so
+            # the area and the compound are one magnitude. This step used to
+            # compare them and cite X.20 for it, which asserted nothing: what
+            # the proposition stands on is which species the compound is, and
+            # that is what X.48-53 and X.85-90 determine.
+            because(get(_by).wrapped, a, b)
+            named_compound = classify(compound)
+            claim(f"the area is contained by a rational line and the "
+                  f"{BINOMIAL_SPECIES[index - 1]} "
+                  f"{'apotome' if _sub else 'binomial'}", _by,
+                  named_compound.family == ("apotome" if _sub else "binomial")
+                  and named_compound.species == BINOMIAL_SPECIES[index - 1])
 
-            claim("the area is contained by a rational line and the compound",
-                  "X.20", area == compound * 1)
+            side = sqrt(compound)
             claim("the side of the equal square is irrational", ref,
                   not isinstance(side, Fraction))
-            claim("and the classifier names it as one of the thirteen", ref,
-                  classify(side).name in SPECIES
-                  or classify(side).family in ("binomial", "apotome", "medial-based"))
+            named = classify(side)
+            claim(f"and it is the line called {_kind}", ref,
+                  named.family == _kind if index == 1 else named.name == _kind)
             return Out(side=side)
         _side.__name__ = f"prop_{ref.replace('.', '_')}"
         return _side
 
-    _make_side(_ref, _index, subtractive=_ref in _SIDE_OF_APOTOME)
+    _make_side(_ref, _index, _kind, subtractive=_ref in _SIDE_OF_APOTOME)
 
 
 # -- X.60 - X.65 / X.97 - X.102: the square on each, applied to a rational ---
@@ -1572,24 +1666,35 @@ _SQUARE_ON_SUBTRACTED = {"X.97": 1, "X.98": 2, "X.99": 3, "X.100": 4,
 for _ref, _index in {**_SQUARE_ON_ADDED, **_SQUARE_ON_SUBTRACTED}.items():
 
     def _make_square(ref: str, index: int, subtractive: bool):
+        source_ref = f"X.{(90 if subtractive else 53) + index}"
+
         @proposition(ref, THEOREM,
                      sample=lambda rng, _i=index: _binomial_of_species(_i))
-        def _square(a, b, _sub=subtractive, _i=index) -> Out:
+        def _square(a, b, _sub=subtractive, _i=index, _by=source_ref) -> Out:
             hypothesis("both terms are rational in square",
                        is_rational_in_square(a) and is_rational_in_square(b))
             hypothesis("they are commensurable in square only", not commensurable(a, b))
             compound = (a - b) if _sub else (a + b)
             hypothesis("the compound is positive", sign(compound) > 0)
-            breadth = compound * compound  # applied to the assigned line, 1
+            # The line this proposition is about is the irrational one, the side
+            # of the area on the compound, which X.54-59 and X.91-96 named. The
+            # square was being taken on the compound itself, so the breadth came
+            # back as the square of a binomial and the conclusion had to be
+            # weakened to "one of the compound irrationals" to hold at all.
+            because(get(_by).wrapped, a, b)
+            irrational = sqrt(compound)  # the side that proposition produces
+            breadth = irrational * irrational  # applied to the assigned line, 1
 
-            named = classify(breadth) if sign(breadth) > 0 else None
-            claim("the square applied to a rational line gives a breadth", "X.20",
-                  breadth == compound * compound)
-            claim("and the breadth is itself one of the compound irrationals", ref,
-                  named is not None and named.family in
-                  ("binomial", "apotome", "medial-based", "rational", "medial"))
+            claim("the line is the irrational the earlier proposition named", _by,
+                  not isinstance(irrational, Fraction))
+            named = classify(breadth)
+            claim(f"the square applied to a rational line gives as breadth the "
+                  f"{BINOMIAL_SPECIES[_i - 1]} "
+                  f"{'apotome' if _sub else 'binomial'}", ref,
+                  named.family == ("apotome" if _sub else "binomial")
+                  and named.species == BINOMIAL_SPECIES[_i - 1])
             claim("taking the side of that square returns the line", ref,
-                  sqrt(breadth) == compound)
+                  sqrt(breadth) == irrational)
             return Out(breadth=breadth)
         _square.__name__ = f"prop_{ref.replace('.', '_')}"
         return _square
@@ -1628,6 +1733,7 @@ for _ref, _kind in {**_COMMENSURABLE_ADDED, **_COMMENSURABLE_SUBTRACTED}.items()
                        named.name == wanted or named.family == wanted)
 
             other = compound * scale
+            because(prop_X_12, compound, compound, scale)
             claim("the second line is commensurable with the first", "X.12",
                   commensurable(compound, other))
             other_named = classify(other)
@@ -1735,6 +1841,8 @@ def prop_X_111(scale) -> Out:
     binomial = scale + sqrt(2)
     apotome = scale - sqrt(2)
     hypothesis("the apotome is positive", sign(apotome) > 0)
+    because(prop_X_36, scale, sqrt(2)) if not commensurable(scale, sqrt(2)) else None
+
     claim("one is a binomial and the other an apotome", "X.36",
           classify(binomial).family == "binomial"
           and classify(apotome).family == "apotome")
@@ -1752,6 +1860,12 @@ def prop_X_112(scale) -> Out:
     binomial = 3 + sqrt(2)
     square = scale * scale
     breadth = square / binomial
+    # The breadth is to the scale as the scale is to the binomial, and VI.16 is
+    # the proposition about four lines standing so.
+    _lines = (breadth, scale, scale, binomial)
+    because(prop_VI_16, *[Point(x, level) for level, side in enumerate(_lines)
+                          for x in (0, side)])
+
     claim("the breadth is the square divided by the binomial", "VI.16",
           breadth * binomial == square)
     claim("and it is an apotome, the terms of the binomial being reversed in sign",
@@ -1766,6 +1880,12 @@ def prop_X_113(scale) -> Out:
     apotome = 3 - sqrt(2)
     square = scale * scale
     breadth = square / apotome
+    # The breadth is to the scale as the scale is to the apotome, and VI.16 is
+    # the proposition about four lines standing so.
+    _lines = (breadth, scale, scale, apotome)
+    because(prop_VI_16, *[Point(x, level) for level, side in enumerate(_lines)
+                          for x in (0, side)])
+
     claim("the breadth is the square divided by the apotome", "VI.16",
           breadth * apotome == square)
     claim("and it is a binomial", "X.113", classify(breadth).family == "binomial")

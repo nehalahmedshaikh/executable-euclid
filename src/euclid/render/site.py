@@ -75,8 +75,18 @@ def _legibility(trace: Trace) -> float:
     return shape * separation
 
 
-def _sample_trace(entry: Proposition, seed: int = 3, tries: int = 40) -> Optional[Trace]:
-    """The clearest figure among many valid ones."""
+def _sample_trace(entry: Proposition, seed: int = 3, tries: int = 120) -> Optional[Trace]:
+    """The clearest figure among many valid ones.
+
+    Forty tries was enough while figures were small.  Carrying out citations made
+    the densest ones denser -- I.44 draws thirty-eight points now, where it drew
+    twenty-nine -- and forty configurations of those no longer contained a legible
+    one: I.44 scored 0.30 and I.45 0.21, both under the threshold this is for.
+    At a hundred and twenty they score 0.59 and 0.63, and at three hundred they
+    score the same, so the readable configurations were there and the search was
+    stopping short of them. The early exit below means only a figure that never
+    reaches 0.75 pays for the higher cap.
+    """
     if entry.sample is None:
         return None
     from ..elements import samples

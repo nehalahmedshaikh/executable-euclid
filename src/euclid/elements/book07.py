@@ -17,7 +17,15 @@ from .arithmetic import (
     prime_factors,
     three_numbers,
 )
-from .registry import CONSTRUCTION, THEOREM, Out, claim, hypothesis, proposition
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    hypothesis,
+    proposition,
+)
 
 
 __all__ = [
@@ -72,6 +80,24 @@ def _a_part_of(rng):
     return part, part * rng.randint(2, 12)
 
 
+def _measured_the_same_number_of_times(rng):
+    """A number, a multiplier, and the product they make: the figure of VII.15."""
+    number, times = rng.randint(2, 30), rng.randint(2, 20)
+    return number, times, number * times
+
+
+def _same_part_of_two(rng):
+    """Two pairs standing in the same part: the figure of VII.5 and VII.9.
+
+    All four numbers are given.  Handing over three and computing the fourth
+    leaves the proposition comparing a number with the expression it was just
+    assigned, and no configuration can refute that.
+    """
+    part, whole = _a_part_of(rng)
+    other = rng.randint(2, 40)
+    return part, whole, other, other * (whole // part)
+
+
 @proposition(
     "VII.1",
     THEOREM,
@@ -102,6 +128,8 @@ def prop_VII_1(a: int, b: int) -> Out:
 def prop_VII_3(a: int, b: int, c: int) -> Out:
     hypothesis("all three are greater than a unit", a > 1 and b > 1 and c > 1, guard=True)
     measure = gcd(gcd(a, b), c)
+    because(prop_VII_2, a, b)
+
     claim("the measure found measures all three", "VII.2",
           all(measures(measure, n) for n in (a, b, c)))
     claim("and every common measure of the three measures it", "VII.2",
@@ -133,13 +161,18 @@ def prop_VII_4(a: int, b: int) -> Out:
 @proposition(
     "VII.5",
     THEOREM,
-    sample=lambda rng: _a_part_of(rng) + (rng.randint(2, 40),),
+    sample=_same_part_of_two,
 )
-def prop_VII_5(part: int, whole: int, other: int) -> Out:
+def prop_VII_5(part: int, whole: int, other: int, other_whole: int) -> Out:
     """`part` is a part of `whole`; `other` is the same part of its own whole."""
     hypothesis("the first is a part of the second", measures(part, whole) and part > 0)
+    # The fourth number is a given and not built from the third. Building it as
+    # ``other * times`` made the claim below compare it with what it had just
+    # been assigned, which no configuration could refute.
+    hypothesis("the third is the same part of the fourth",
+               measures(other, other_whole) and other > 0
+               and other_whole // other == whole // part)
     times = whole // part
-    other_whole = other * times
     claim("the two stand in the same part", "Def.VII.3",
           whole == part * times and other_whole == other * times)
     claim("so the sum is the same part of the sum", "VII.5",
@@ -202,13 +235,14 @@ def prop_VII_8(numerator: int, denominator: int, whole: int, taken: int) -> Out:
 @proposition(
     "VII.9",
     THEOREM,
-    sample=lambda rng: _a_part_of(rng) + (rng.randint(2, 40),),
+    sample=_same_part_of_two,
 )
-def prop_VII_9(part: int, whole: int, other: int) -> Out:
+def prop_VII_9(part: int, whole: int, other: int, other_whole: int) -> Out:
     """Alternation for parts: if A is a part of B as C is of D, then A:C = B:D."""
     hypothesis("the first is a part of the second", measures(part, whole) and part > 0)
-    times = whole // part
-    other_whole = other * times
+    hypothesis("the third is the same part of the fourth",
+               measures(other, other_whole) and other > 0
+               and other_whole // other == whole // part)
     claim("alternately, the first is to the third as the second to the fourth",
           "VII.9", part * other_whole == whole * other)
     return Out()
@@ -284,6 +318,12 @@ def prop_VII_14(a: int, b: int, c: int, scale: int) -> Out:
     """Three numbers and three more, in the same ratio two and two."""
     hypothesis("the numbers are genuine", a > 1 and b > 1 and c > 1 and scale > 1, guard=True)
     d, e, f = a * scale, b * scale, c * scale
+    # A : B as D : E, so VII.13 takes them alternately. Written as a conditional
+    # appeal on (a, b, c, scale * c), whose condition asks a * scale == b, this
+    # never once ran -- and was written twice.
+    because(prop_VII_13, a, b, d, e)
+    because(prop_VII_13, b, c, e, f)
+
     claim("the pairs are in the same ratio", "VII.13", a * e == b * d and b * f == c * e)
     claim("so ex aequali the first is to the third as the fourth to the sixth",
           "VII.14", a * f == c * d)
@@ -293,17 +333,44 @@ def prop_VII_14(a: int, b: int, c: int, scale: int) -> Out:
 @proposition(
     "VII.15",
     THEOREM,
-    sample=lambda rng: (rng.randint(2, 30), rng.randint(2, 20)),
+    sample=lambda rng: _measured_the_same_number_of_times(rng),
 )
-def prop_VII_15(number: int, times: int) -> Out:
+def prop_VII_15(number: int, times: int, product: int) -> Out:
     """A unit measures a number as that number measures its multiple."""
     hypothesis("the numbers are genuine", number > 1 and times > 1, guard=True)
-    product = number * times
-    claim("the unit measures the number as many times as the number itself",
-          "Def.VII.2", 1 * number == number)
-    claim("and alternately, the unit is to the multiplier as the number is to the "
-          "product", "VII.15", 1 * product == times * number)
+    # The product is given rather than built. Built, both claims below compared
+    # it with the expression it had just been assigned.
+    hypothesis("the multiplier measures the product as often as the unit "
+               "measures the number",
+               measures(times, product) and product // times == number)
+    claim("the unit measures the number as many times as the number has units",
+          "Def.VII.2", measures(1, number) and product // times == number)
+    claim("and alternately, the unit is to the multiplier as the number is to "
+          "the product", "VII.15",
+          measures(number, product) and product // number == times)
     return Out(product=product)
+
+
+# VII.16 - VII.18 are the ring axioms, and they are the one place in the corpus
+# where the encoding cannot reach the proposition. Euclid's product is "a added
+# to itself as often as there are units in b" (Def. VII.15), and that this
+# equals b taken a times is a theorem. Python's ``*`` is commutative before the
+# proposition is read, so writing ``a * b == b * a`` checks the interpreter.
+#
+# ``_taken`` says it Euclid's way instead, and the two sides then really are
+# different computations -- but they still meet in the integers, whose addition
+# is commutative and associative by the same fiat. Nothing built on the integers
+# can refute these three. They are stated as Euclid states them, carried out as
+# Euclid defines them, and recorded as unfalsifiable.
+
+
+def _taken(a: int, times: int) -> int:
+    """Def. VII.15: the one added to itself as often as there are units in the
+    other.  The definition, not the operator that assumes what VII.16 proves."""
+    total = 0
+    for _ in range(times):
+        total += a
+    return total
 
 
 @proposition(
@@ -316,9 +383,8 @@ def prop_VII_15(number: int, times: int) -> Out:
 def prop_VII_16(a: int, b: int) -> Out:
     hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     claim("a taken b times equals b taken a times", "VII.16",
-          sum(a for _ in range(b)) == sum(b for _ in range(a)))
-    claim("so the two products are equal", "VII.16", a * b == b * a)
-    return Out(product=a * b)
+          _taken(a, b) == _taken(b, a))
+    return Out(product=_taken(a, b))
 
 
 @proposition(
@@ -329,7 +395,7 @@ def prop_VII_16(a: int, b: int) -> Out:
 def prop_VII_17(a: int, b: int, c: int) -> Out:
     hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     claim("the products have the same ratio as the numbers multiplied", "VII.17",
-          (a * b) * c == (a * c) * b)
+          _taken(_taken(a, b), c) == _taken(_taken(a, c), b))
     return Out()
 
 
@@ -341,7 +407,7 @@ def prop_VII_17(a: int, b: int, c: int) -> Out:
 def prop_VII_18(a: int, b: int, c: int) -> Out:
     hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     claim("the products have the same ratio as the multipliers", "VII.18",
-          (a * c) * b == (b * c) * a)
+          _taken(_taken(a, c), b) == _taken(_taken(b, c), a))
     return Out()
 
 
@@ -397,6 +463,8 @@ def prop_VII_20(a: int, b: int, c: int, d: int) -> Out:
 )
 def prop_VII_21(a: int, b: int) -> Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
+    because(prop_VII_20, a, b, a, b)
+
     claim("they are already in least terms", "VII.21", least_terms(a, b) == (a, b))
     claim("so no smaller pair has the same ratio", "VII.20",
           not any(x * b == y * a for x in range(1, a) for y in range(1, b)))
@@ -447,6 +515,8 @@ def prop_VII_24(a: int, b: int, c: int) -> Out:
 )
 def prop_VII_25(a: int, b: int) -> Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
+    because(prop_VII_24, a, a, b) if coprime(a, b) else None
+
     claim("the square of the one is prime to the other", "VII.24", coprime(a * a, b))
     return Out(square=a * a)
 
@@ -460,6 +530,8 @@ def prop_VII_25(a: int, b: int) -> Out:
 def prop_VII_26(a: int, b: int, c: int, d: int) -> Out:
     hypothesis("each of the first two is prime to each of the last two",
                coprime(a, c) and coprime(a, d) and coprime(b, c) and coprime(b, d))
+    because(prop_VII_24, a, b, c)
+
     claim("the two products are prime to one another", "VII.24",
           coprime(a * b, c * d))
     return Out(products=(a * b, c * d))
@@ -472,6 +544,9 @@ def prop_VII_26(a: int, b: int, c: int, d: int) -> Out:
 )
 def prop_VII_27(a: int, b: int) -> Out:
     hypothesis("the numbers are prime to one another", coprime(a, b))
+    because(prop_VII_25, a, b)
+    because(prop_VII_26, a, a, b, b)
+
     claim("their squares are prime to one another", "VII.25", coprime(a * a, b * b))
     claim("and so are their cubes, and this is always the case with the extremes",
           "VII.26", coprime(a * a * a, b * b * b))
@@ -530,6 +605,8 @@ def prop_VII_30(p: int, a: int, b: int) -> Out:
 def prop_VII_32(n: int) -> Out:
     hypothesis("the number is greater than a unit", n > 1, guard=True)
     factors = prime_factors(n)
+    because(prop_VII_31, n) if n > 3 and not is_prime(n) else None
+
     claim("the number is prime, or some prime measures it", "VII.31",
           is_prime(n) or (bool(factors) and is_prime(factors[0])
                           and measures(factors[0], n)))
@@ -544,6 +621,9 @@ def prop_VII_32(n: int) -> Out:
 def prop_VII_33(a: int, b: int) -> Out:
     hypothesis("both are numbers", a > 1 and b > 1, guard=True)
     least = least_terms(a, b)
+    because(prop_VII_21, a, b) if coprime(a, b) else None
+    because(prop_VII_22, a, b)
+
     claim("the pair found has the same ratio", "VII.33", least[0] * b == least[1] * a)
     claim("it is in least terms, being prime to one another", "VII.22",
           coprime(*least))
@@ -591,6 +671,9 @@ def prop_VII_35(a: int, b: int, times: int) -> Out:
 def prop_VII_36(a: int, b: int, c: int) -> Out:
     hypothesis("all three are numbers", a > 1 and b > 1 and c > 1, guard=True)
     least = lcm(lcm(a, b), c)
+    because(prop_VII_34, a, b)
+    because(prop_VII_35, a, b, 1)
+
     claim("the number found is measured by all three", "VII.34",
           all(measures(n, least) for n in (a, b, c)))
     claim("and nothing less is", "VII.35",
@@ -620,6 +703,8 @@ def prop_VII_38(part: int, whole: int) -> Out:
     """The converse of VII.37."""
     hypothesis("the second has a part named after the first",
                measures(part, whole) and part > 1)
+    because(prop_VII_37, part, whole) if measures(part, whole) and part > 1 else None
+
     claim("then it is measured by the number of that name", "Def.VII.3",
           measures(part, whole))
     claim("and the quotient is the part itself", "VII.37",
@@ -637,6 +722,9 @@ def prop_VII_38(part: int, whole: int) -> Out:
 def prop_VII_39(a: int, b: int, c: int) -> Out:
     hypothesis("the parts are genuine", a > 1 and b > 1 and c > 1, guard=True)
     least = lcm(lcm(a, b), c)
+    because(prop_VII_36, a, b, c)
+    because(prop_VII_38, a, lcm(a, b)) if measures(a, lcm(a, b)) and a > 1 else None
+
     claim("the number found has all three parts", "VII.38",
           all(measures(n, least) for n in (a, b, c)))
     claim("and no smaller number has them all", "VII.36",
@@ -655,6 +743,8 @@ def prop_VII_39(a: int, b: int, c: int) -> Out:
 def prop_VII_2(a: int, b: int) -> Out:
     hypothesis("both numbers are greater than a unit", a > 1 and b > 1, guard=True)
     measure = gcd(a, b)
+    because(prop_VII_1, a, b) if a > b > 1 else None
+
     claim("the result measures both numbers", "VII.1", a % measure == 0 and b % measure == 0)
     claim("and every common measure measures it", "VII.2",
           all(measure % d == 0 for d in range(1, min(a, b) + 1) if a % d == 0 and b % d == 0))

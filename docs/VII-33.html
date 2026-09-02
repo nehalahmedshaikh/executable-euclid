@@ -6,6 +6,9 @@
 def prop_VII_33(a: int, b: int) -&gt; Out:
     hypothesis("both are numbers", a &gt; 1 and b &gt; 1, guard=True)
     least = least_terms(a, b)
+    because(prop_VII_21, a, b) if coprime(a, b) else None
+    because(prop_VII_22, a, b)
+
     claim("the pair found has the same ratio", "VII.33", least[0] * b == least[1] * a)
     claim("it is in least terms, being prime to one another", "VII.22",
           coprime(*least))

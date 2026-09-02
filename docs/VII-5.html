@@ -1,13 +1,18 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VII.5 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book VII &middot; Proposition 5</p><h1>VII.5</h1><blockquote>If a number be a part of a number, and another be the same part of another, the sum will also be the same part of the sum that the one is of the one.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the first is a part of the second<span class="cite">given</span></li><li class="">the two stand in the same part<span class="cite">by Def.VII.3</span></li><li class="">so the sum is the same part of the sum<span class="cite">by <a href="VII-5.html">VII.5</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> Def.VII.3</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VII.5 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book VII &middot; Proposition 5</p><h1>VII.5</h1><blockquote>If a number be a part of a number, and another be the same part of another, the sum will also be the same part of the sum that the one is of the one.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the first is a part of the second<span class="cite">given</span></li><li class="hyp">the third is the same part of the fourth<span class="cite">given</span></li><li class="">the two stand in the same part<span class="cite">by Def.VII.3</span></li><li class="">so the sum is the same part of the sum<span class="cite">by <a href="VII-5.html">VII.5</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> Def.VII.3</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><p class="note">Nothing. It draws no intersections and reads nothing off the picture.</p><h2>The proposition as code</h2><pre>@proposition(
     "VII.5",
     THEOREM,
-    sample=lambda rng: _a_part_of(rng) + (rng.randint(2, 40),),
+    sample=_same_part_of_two,
 )
-def prop_VII_5(part: int, whole: int, other: int) -&gt; Out:
+def prop_VII_5(part: int, whole: int, other: int, other_whole: int) -&gt; Out:
     """`part` is a part of `whole`; `other` is the same part of its own whole."""
     hypothesis("the first is a part of the second", measures(part, whole) and part &gt; 0)
+    # The fourth number is a given and not built from the third. Building it as
+    # ``other * times`` made the claim below compare it with what it had just
+    # been assigned, which no configuration could refute.
+    hypothesis("the third is the same part of the fourth",
+               measures(other, other_whole) and other &gt; 0
+               and other_whole // other == whole // part)
     times = whole // part
-    other_whole = other * times
     claim("the two stand in the same part", "Def.VII.3",
           whole == part * times and other_whole == other * times)
     claim("so the sum is the same part of the sum", "VII.5",

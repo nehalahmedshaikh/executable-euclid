@@ -8,6 +8,8 @@ def prop_IX_10(ratio: int, count: int) -&gt; Out:
     hypothesis("the progression is genuine", ratio &gt; 1 and count &gt;= 5, guard=True)
     hypothesis("the number after the unit is not square", not is_square(ratio))
     terms = [ratio ** k for k in range(count)]
+    because(prop_IX_8, ratio, max(count, 7))
+
     claim("then none is square except the third from the unit and the alternate ones",
           "IX.8",
           all(is_square(terms[k]) == (k % 2 == 0) for k in range(1, count)))
