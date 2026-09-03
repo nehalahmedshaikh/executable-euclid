@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>XI.2 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book XI &middot; Proposition 2</p><h1>XI.2</h1><blockquote>If two straight lines cut one another, they are in one plane, and every triangle is in one plane.<span class="src">Heath, 1908</span></blockquote><p class="note">Also unsound in Euclid: the proof assumes the very thing about planes that XI.1 was meant to establish.</p><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the two straight lines cut one another at O<span class="cite">given</span></li><li class="">the two lines lie in one plane<span class="cite">by XI.Def.7</span></li><li class="">and so does the whole triangle they make<span class="cite">by <a href="XI-2.html">XI.2</a></span></li><li class="">the plane is the only one holding all three, being determined by them<span class="cite">by XI.Def.7</span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> XI.Def.7</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a plane is described, and XI Def. 1-2; no postulate describes a plane (&times;2)<span class="cite">solid</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "XI.2",
+    THEOREM,
+    sample=samples3.cutting_lines,
+    note="Also unsound in Euclid: the proof assumes the very thing about planes "
+    "that XI.1 was meant to establish.",
+)
+def prop_XI_2(o: Point3, a: Point3, b: Point3) -&gt; Out:
+    """Two straight lines that cut one another are in one plane."""
+    # Euclid's own condition -- "if two straight lines cut one another" -- and
+    # not a guard of ours: two lines through O are one line exactly when the
+    # three points are in a straight line.
+    hypothesis("the two straight lines cut one another at O",
+               not collinear3(o, a, b))
+    surface = plane_through(o, a, b, "their plane")
+    line3(o, a)
+    line3(o, b)
+    line3(a, b, "the triangle is closed")
+
+    claim("the two lines lie in one plane", "XI.Def.7",
+          on_plane(o, surface) and on_plane(a, surface) and on_plane(b, surface))
+    claim("and so does the whole triangle they make", "XI.2",
+          all(on_plane(Point3(a.x + (b.x - a.x) * Fraction(k, 4),
+                              a.y + (b.y - a.y) * Fraction(k, 4),
+                              a.z + (b.z - a.z) * Fraction(k, 4)), surface)
+              for k in range(5)))
+    claim("the plane is the only one holding all three, being determined by them",
+          "XI.Def.7", plane_through(o, a, b) == surface)
+    return Out(plane=surface)
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

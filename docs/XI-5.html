@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>XI.5 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book XI &middot; Proposition 5</p><h1>XI.5</h1><blockquote>If a straight line be set up at right angles to three straight lines which meet one another, at their common point of section, the three straight lines are in one plane.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">OA and OB are not in a straight line<span class="cite">given</span></li><li class="hyp">the line is at right angles to all three<span class="cite">given</span></li><li class="">the third line is at right angles to OC as well<span class="cite">by XI.Def.3</span></li><li class="">and the three lines are in one plane<span class="cite">by <a href="XI-5.html">XI.5</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> XI.Def.3</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a plane is described, and XI Def. 1-2; no postulate describes a plane<span class="cite">solid</span></li></ul><h2>The proposition as code</h2><pre>@proposition(
+    "XI.5",
+    THEOREM,
+    sample=samples3.right_angled_at_origin,
+)
+def prop_XI_5(o: Point3, a: Point3, b: Point3, c: Point3) -&gt; Out:
+    """A line at right angles to three concurrent lines puts those three in one
+    plane."""
+    hypothesis("OA and OB are not in a straight line", not collinear3(o, a, b))
+    hypothesis("the line is at right angles to all three",
+               dot3(vector_between(o, c), vector_between(o, a)) == 0
+               and dot3(vector_between(o, c), vector_between(o, b)) == 0)
+    # The third line of Euclid's figure is any other perpendicular to OC at O,
+    # and the proposition is that it cannot escape the plane of the first two.
+    third = posit3(Point3(o.x + (a.x - o.x) + (b.x - o.x),
+                          o.y + (a.y - o.y) + (b.y - o.y),
+                          o.z + (a.z - o.z) + (b.z - o.z)), "D")
+    surface = plane_through(o, a, b, "the plane of the three")
+    line3(o, c, "the perpendicular")
+
+    claim("the third line is at right angles to OC as well", "XI.Def.3",
+          dot3(vector_between(o, c), vector_between(o, third)) == 0)
+    claim("and the three lines are in one plane", "XI.5",
+          on_plane(a, surface) and on_plane(b, surface) and on_plane(third, surface))
+    return Out(plane=surface)
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

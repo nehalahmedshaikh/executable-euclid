@@ -22,7 +22,7 @@ I.47  In right-angled triangles the square on the side subtending the right angl
   15 lines and circles drawn, 12 steps, all checked exactly.
 ```
 
-**Books I to X are complete: 390 propositions.** The generated site is at
+**Books I to X are complete, and Book XI is under way: 425 propositions.** The generated site is at
 [**nehalahmedshaikh.github.io/executable-euclid**](https://nehalahmedshaikh.github.io/executable-euclid/).
 
 ---
@@ -75,16 +75,17 @@ with the command that reproduces it, graded by how strong the claim is.
 | **VIII** | **27 / 27** | continued proportions, squares and cubes |
 | **IX** | **36 / 36** | primes, parity, perfect numbers |
 | **X** | **115 / 115** | incommensurables, the thirteen irrationals |
-| XI | 0 / 39 | solid geometry |
+| XI | **23 / 39** | solid geometry |
 | XII | 0 / 18 | the method of exhaustion |
 | XIII | **12 / 18** | the golden section, the pentagon, the regular solids |
 
-**402 propositions**, 1615 checked steps on one figure apiece and 14057 counting the propositions they carry out. Book XIII divides at its twelfth
-proposition: everything before that is plane geometry and is done, and
-everything after it, with Books XI and XII, is solid and waits on a kernel that
-leaves the plane. Books V and VII to X argue about numbers and magnitudes, so
-they draw nothing, as Euclid draws nothing there; what they check is exact all
-the same.
+**425 propositions**, 1712 checked steps on one figure apiece and 14187 counting the propositions they carry out. Book XI is where Euclid stops having postulates: the five
+are postulates of the plane, and Book XI opens with definitions and then argues,
+so every construction in space is recorded as licensed by nothing and the
+assumption ledger counts what that costs. XI.3 carries two such debts and XI.4
+one, where I.47 carries none. Books V and VII to X argue about numbers and
+magnitudes, so they draw nothing, as Euclid draws nothing there; what they check
+is exact all the same.
 
 ## What "checked" means
 
@@ -96,25 +97,25 @@ inference* is a separate question, and the machine is silent on it.
 **Dependencies are two different things, and only one is an observation.** 457
 edges are **executed**: the step carries out the proposition it appeals to, on
 its own points, so that proposition's hypotheses are enforced against this figure
-and its conclusions checked on it. 20 are **cited** — a reference written beside
+and its conclusions checked on it. 23 are **cited** — a reference written beside
 a step, following Heath's margins, checked for naming a proposition that exists
 and for not naming a later one. That is all a citation is checked for, because
 `claim` records its warrant without consulting it, so a cited step could name the
-wrong result and stay green. **96% of the graph is executed**, and every edge
-that is not carries its reason in the source beside it. Fourteen of the twenty
-are reductios and the like, where the figure the citation names is the one the
-proposition disproves, so there is nothing to carry out; the remaining six are
-appeals not yet built. *"148 propositions depend on I.1"* reads Euclid's own
+wrong result and stay green. **95% of the graph is executed**, and every edge
+that is not carries its reason in the source beside it. Fourteen of the
+twenty-three are reductios and the like, where the figure the citation names is
+the one the proposition disproves, so there is nothing to carry out; the rest
+are appeals not yet built. *"148 propositions depend on I.1"* reads Euclid's own
 cross-references back.
 
-**The necessity analysis is empirical.** Each of the 754 hypotheses Euclid
+**The necessity analysis is empirical.** Each of the 804 hypotheses Euclid
 states is bent in turn and the conclusion watched. Coverage is 100% in that every
 one of them carries a verdict, and that figure is worth nothing on its own: a
 separating configuration — one that breaks the hypothesis and leaves its
-neighbours standing — was found for 54% of them. The rest are **implied**, which
+neighbours standing — was found for 51% of them. The rest are **implied**, which
 says the others may entail them and is the honest reading of a hypothesis that
 cannot be broken alone. A hypothesis that survives being broken is reported as a
-candidate, with the number of configurations behind it, and 346 implied verdicts
+candidate, with the number of configurations behind it, and 395 implied verdicts
 are evidence of the same weak kind.
 
 **Certified and actually tested are not the same.** A claim that cannot come out

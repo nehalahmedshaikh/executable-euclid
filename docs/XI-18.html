@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>XI.18 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book XI &middot; Proposition 18</p><h1>XI.18</h1><blockquote>If a straight line be at right angles to any plane, all the planes through it will also be at right angles to the same plane.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the three points describe a plane<span class="cite">given</span></li><li class="hyp">D is off that plane<span class="cite">given</span></li><li class="hyp">the line is at right angles to the plane<span class="cite">given</span></li><li class="">each of those planes holds the whole perpendicular<span class="cite">by XI.Def.7</span></li><li class="">and each is at right angles to the given plane<span class="cite">by <a href="XI-18.html">XI.18</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Rests on:</strong> XI.Def.7</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a plane is described, and XI Def. 1-2; no postulate describes a plane (&times;3)<span class="cite">solid</span></li></ul><h2>The proposition as code</h2><pre>@proposition("XI.18", THEOREM, sample=samples3.plane_and_point)
+def prop_XI_18(a: Point3, b: Point3, c: Point3, d: Point3) -&gt; Out:
+    """Every plane through a perpendicular is perpendicular to the same plane."""
+    hypothesis("the three points describe a plane", not collinear3(a, b, c))
+    hypothesis("D is off that plane", not coplanar(a, b, c, d))
+    surface = plane_through(a, b, c, "the given plane")
+    normal = surface.normal()
+    top = posit3(Point3(a.x + normal[0], a.y + normal[1], a.z + normal[2]), "H")
+    upright = line3(a, top, "the perpendicular")
+    hypothesis("the line is at right angles to the plane",
+               _perpendicular_to_plane(upright, surface))
+
+    through = [plane_through(a, top, point, label)
+               for point, label in ((b, "the plane through B"),
+                                    (c, "the plane through C"))]
+    claim("each of those planes holds the whole perpendicular", "XI.Def.7",
+          all(on_plane(a, plane) and on_plane(top, plane) for plane in through))
+    claim("and each is at right angles to the given plane", "XI.18",
+          all(dot3(plane.normal(), normal) == 0 for plane in through))
+    return Out(planes=tuple(through))
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

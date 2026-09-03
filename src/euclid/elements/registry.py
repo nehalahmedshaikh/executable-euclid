@@ -39,6 +39,7 @@ from typing import Any, Callable, Optional
 
 from ..kernel.field import Context, Surd, active_context
 from ..plane.objects import Point
+from ..solid.objects import Point3
 from ..plane.trace import (
     Claim,
     Move,
@@ -314,11 +315,12 @@ def _register_given(name: str, value: Any) -> Any:
     Parameter names become point labels, so ``def prop_I_1(a, b)`` yields the
     points A and B in the diagram without the body having to say so.
     """
-    if isinstance(value, Point):
+    if isinstance(value, (Point, Point3)):
         labelled = value.named(name.strip("_").upper())
         broadcast_move(Move("free", labelled.label, obj=labelled, note="given"))
         return labelled
-    if isinstance(value, (list, tuple)) and value and all(isinstance(v, Point) for v in value):
+    if (isinstance(value, (list, tuple)) and value
+            and all(isinstance(v, (Point, Point3)) for v in value)):
         labelled = [
             _register_given(f"{name}{index + 1}", point) for index, point in enumerate(value)
         ]
@@ -531,6 +533,8 @@ def _tower_in(value: Any):
         return value.tower
     if isinstance(value, Point):
         return _tower_in(value.x) or _tower_in(value.y)
+    if isinstance(value, Point3):
+        return _tower_in(value.x) or _tower_in(value.y) or _tower_in(value.z)
     if isinstance(value, (list, tuple)):
         for item in value:
             found = _tower_in(item)

@@ -14,6 +14,7 @@ from . import book07  # noqa: F401
 from . import book08  # noqa: F401
 from . import book09  # noqa: F401
 from . import book10  # noqa: F401
+from . import book11  # noqa: F401
 from . import book13  # noqa: F401
 from .registry import (
     BOOK_TITLES,

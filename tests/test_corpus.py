@@ -225,7 +225,7 @@ def test_no_proposition_overwrites_a_given():
 # be encoded up to its stated number with no holes; a book absent from it must
 # be empty or complete. The dict is emptied when the last book lands, and an
 # entry that reaches the book's full size is a stale one.
-IN_PROGRESS = {"XIII": 12}
+IN_PROGRESS = {"XI": 23, "XIII": 12}
 
 
 @pytest.mark.parametrize("book", [b for b in BOOK_ORDER if b in BOOK_SIZES])

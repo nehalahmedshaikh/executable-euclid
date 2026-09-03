@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>XI.13 — Executable Euclid</title><link rel="stylesheet" href="style.css"></head><body><div class="bar"><nav class="top"><a href="index.html">Overview</a><a href="findings.html">Findings</a><a href="graph.html">Dependencies</a><a href="minimal.html">Minimal Elements</a><a href="ledger.html">What Euclid assumes</a><a href="optimizer.html">Shortest constructions</a><a href="book-x.html">Book X</a><a href="text.html">Text and figures</a></nav></div><div class="wrap"><p class="kicker">Book XI &middot; Proposition 13</p><h1>XI.13</h1><blockquote>From the same point two straight lines cannot be set up at right angles to the same plane on the same side.<span class="src">Heath, 1908</span></blockquote><h2>Every step, checked</h2><ul class="claims"><li class="hyp">the three points describe a plane<span class="cite">given</span></li><li class="">no other line from the same point is at right angles to the plane<span class="cite">by <a href="XI-13.html">XI.13</a></span></li><li class="">and each of those lines is on the same side as the first<span class="cite">by <a href="XI-13.html">XI.13</a></span></li></ul><h2>What it needs, and what needs it</h2><p><strong>Needs:</strong> nothing earlier.</p><p><strong>Depth:</strong> 0 steps of argument above the first principles. <strong>Parallel postulate:</strong> not needed.</p><h2>What it takes on trust</h2><ul class="claims"><li>a plane is described, and XI Def. 1-2; no postulate describes a plane<span class="cite">solid</span></li></ul><h2>The proposition as code</h2><pre>@proposition("XI.13", THEOREM, sample=samples3.three_in_space)
+def prop_XI_13(a: Point3, b: Point3, c: Point3) -&gt; Out:
+    """Two perpendiculars cannot stand at one point on one side of a plane."""
+    hypothesis("the three points describe a plane", not collinear3(a, b, c))
+    surface = plane_through(a, b, c, "the given plane")
+    normal = surface.normal()
+    top = posit3(Point3(a.x + normal[0], a.y + normal[1], a.z + normal[2]), "D")
+    line3(a, top, "the perpendicular")
+
+    # The proposition denies a second one, so what is checked is the denial:
+    # every other line drawn from A leans, and only the normal direction meets
+    # the whole plane squarely.
+    others = [Point3(top.x + (b.x - a.x) * Fraction(k, 4),
+                     top.y + (b.y - a.y) * Fraction(k, 4),
+                     top.z + (b.z - a.z) * Fraction(k, 4))
+              for k in range(1, 5)]
+    claim("no other line from the same point is at right angles to the plane",
+          "XI.13",
+          not any(_perpendicular_to_plane(Line3.through(a, other), surface)
+                  for other in others))
+    claim("and each of those lines is on the same side as the first", "XI.13",
+          all(same_side_of_plane(other, top, surface) for other in others))
+    return Out(perpendicular=Line3.through(a, top))
+</pre><footer><p>The diagrams record constructions that ran, so they do not resemble Euclid's composed figures. A cross-reference is either a call that was recorded as it happened or a name written beside the step by hand. <a href="graph.html">Which is which &rarr;</a></p><p>Every proposition statement here is Thomas L. Heath, <i>The Thirteen Books of Euclid's Elements</i> (Cambridge University Press, 1908). Public domain. <a href="text.html">Where the text comes from &rarr;</a></p></footer></div></body></html>

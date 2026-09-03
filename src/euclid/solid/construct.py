@@ -119,8 +119,12 @@ def _common_point(first: Plane, second: Plane, direction: tuple) -> Point3:
     """
     n1, n2 = first.normal(), second.normal()
     across = dot3(direction, direction)
-    left = cross3(direction, n2)
-    right = cross3(n1, direction)
+    # The order of each cross product is the whole of this: reversing one
+    # negates the point, and a point through the origin is its own negative --
+    # which is why two planes through the origin verified it and nothing else
+    # would have.
+    left = cross3(n2, direction)
+    right = cross3(direction, n1)
     return Point3((first.d * left[0] + second.d * right[0]) / across,
                   (first.d * left[1] + second.d * right[1]) / across,
                   (first.d * left[2] + second.d * right[2]) / across)

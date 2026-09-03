@@ -1,5 +1,5 @@
 {
-  "corpus": 402,
+  "corpus": 425,
   "method": "Every number here was computed by running the corpus. Depth is exact. The necessity and mutation figures are empirical: one given is bent, and what survives the bending is a candidate, not a theorem.",
   "depth": {
     "ceilings": {
@@ -13,6 +13,7 @@
       "VIII": 1,
       "IX": 1,
       "X": 32,
+      "XI": 1,
       "XIII": 8
     },
     "first_appearances": {
@@ -23,7 +24,7 @@
       "32": "X.115"
     },
     "histogram": {
-      "1": 223,
+      "1": 246,
       "2": 89,
       "4": 69,
       "8": 19,
@@ -59,27 +60,30 @@
   },
   "necessity": {
     "trials": 48,
-    "propositions": 402,
-    "hypotheses": 754,
-    "judged": 754,
-    "separated": 408,
+    "propositions": 425,
+    "hypotheses": 804,
+    "judged": 804,
+    "separated": 409,
     "coverage": 1.0,
-    "separated_share": 0.5411,
-    "implied": 346,
+    "separated_share": 0.5087,
+    "implied": 395,
     "needed": 276,
-    "well_defined": 43,
-    "surviving_guards": 58,
+    "well_defined": 44,
+    "surviving_guards": 57,
     "truncated": [
-      "I.10",
       "I.12",
       "I.16",
       "I.17",
       "I.18",
       "I.20",
       "I.21",
+      "I.32",
+      "I.38",
       "I.42",
+      "I.43",
       "I.44",
       "I.45",
+      "I.46",
       "I.47",
       "I.48",
       "I.5",
@@ -93,14 +97,21 @@
       "II.5",
       "II.6",
       "II.9",
+      "III.1",
+      "III.10",
       "III.14",
       "III.15",
       "III.2",
       "III.20",
-      "III.33",
+      "III.23",
+      "III.3",
       "III.35",
       "III.36",
       "III.37",
+      "III.4",
+      "III.7",
+      "III.8",
+      "III.9",
       "IV.10",
       "IV.11",
       "IV.12",
@@ -115,7 +126,6 @@
       "IX.17",
       "IX.36",
       "VI.13",
-      "VI.27",
       "VI.3",
       "VI.30",
       "VI.31",
@@ -165,6 +175,11 @@
         "configurations": 22
       },
       {
+        "ref": "X.107",
+        "text": "the line is of the kind in question",
+        "configurations": 18
+      },
+      {
         "ref": "IX.16",
         "text": "the numbers are prime to one another",
         "configurations": 17
@@ -180,6 +195,11 @@
         "configurations": 16
       },
       {
+        "ref": "X.70",
+        "text": "the line is of the kind in question",
+        "configurations": 16
+      },
+      {
         "ref": "X.69",
         "text": "the line is of the kind in question",
         "configurations": 15
@@ -190,19 +210,9 @@
         "configurations": 14
       },
       {
-        "ref": "X.70",
-        "text": "the line is of the kind in question",
-        "configurations": 14
-      },
-      {
         "ref": "X.106",
         "text": "the line is of the kind in question",
         "configurations": 14
-      },
-      {
-        "ref": "X.107",
-        "text": "the line is of the kind in question",
-        "configurations": 12
       },
       {
         "ref": "II.1",
@@ -240,9 +250,14 @@
         "configurations": 9
       },
       {
+        "ref": "I.21",
+        "text": "D lies inside the triangle ABC",
+        "configurations": 8
+      },
+      {
         "ref": "II.9",
         "text": "D cuts AB",
-        "configurations": 5
+        "configurations": 6
       },
       {
         "ref": "X.1",
@@ -255,11 +270,6 @@
         "configurations": 5
       },
       {
-        "ref": "II.10",
-        "text": "B lies between A and D",
-        "configurations": 4
-      },
-      {
         "ref": "X.31",
         "text": "the two are medial",
         "configurations": 4
@@ -268,6 +278,11 @@
         "ref": "X.72",
         "text": "both areas are medial",
         "configurations": 3
+      },
+      {
+        "ref": "II.10",
+        "text": "B lies between A and D",
+        "configurations": 2
       },
       {
         "ref": "V.5",
@@ -280,8 +295,8 @@
         "configurations": 2
       },
       {
-        "ref": "II.13",
-        "text": "the perpendicular falls within CB",
+        "ref": "III.15",
+        "text": "the points lie on the circle",
         "configurations": 1
       },
       {
@@ -298,11 +313,11 @@
   },
   "mutation": {
     "trials": 48,
-    "propositions": 402,
-    "claims": 905,
-    "live": 425,
-    "coverage": 0.4696,
-    "unreached": 23,
+    "propositions": 425,
+    "claims": 954,
+    "live": 432,
+    "coverage": 0.4528,
+    "unreached": 20,
     "unfalsified": [
       {
         "ref": "I.1",
@@ -334,7 +349,7 @@
         "by": [
           "I.4"
         ],
-        "bends": 48
+        "bends": 18
       },
       {
         "ref": "I.10",
@@ -342,7 +357,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 48
+        "bends": 18
       },
       {
         "ref": "I.10",
@@ -350,7 +365,7 @@
         "by": [
           "Def.4"
         ],
-        "bends": 48
+        "bends": 18
       },
       {
         "ref": "I.11",
@@ -358,7 +373,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 21
+        "bends": 9
       },
       {
         "ref": "I.11",
@@ -366,7 +381,7 @@
         "by": [
           "I.1"
         ],
-        "bends": 21
+        "bends": 9
       },
       {
         "ref": "I.11",
@@ -374,7 +389,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 21
+        "bends": 9
       },
       {
         "ref": "I.12",
@@ -382,7 +397,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 20
+        "bends": 5
       },
       {
         "ref": "I.12",
@@ -390,7 +405,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 20
+        "bends": 5
       },
       {
         "ref": "I.12",
@@ -398,7 +413,7 @@
         "by": [
           "Def.10"
         ],
-        "bends": 20
+        "bends": 5
       },
       {
         "ref": "I.12",
@@ -406,7 +421,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 20
+        "bends": 5
       },
       {
         "ref": "I.14",
@@ -422,7 +437,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 41
+        "bends": 40
       },
       {
         "ref": "I.16",
@@ -430,7 +445,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 41
+        "bends": 40
       },
       {
         "ref": "I.16",
@@ -438,7 +453,7 @@
         "by": [
           "I.4"
         ],
-        "bends": 41
+        "bends": 40
       },
       {
         "ref": "I.16",
@@ -446,7 +461,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 41
+        "bends": 40
       },
       {
         "ref": "I.16",
@@ -454,7 +469,7 @@
         "by": [
           "I.15"
         ],
-        "bends": 41
+        "bends": 40
       },
       {
         "ref": "I.17",
@@ -462,7 +477,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 21
+        "bends": 19
       },
       {
         "ref": "I.17",
@@ -470,7 +485,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 21
+        "bends": 19
       },
       {
         "ref": "I.17",
@@ -478,7 +493,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 21
+        "bends": 19
       },
       {
         "ref": "I.18",
@@ -488,7 +503,7 @@
           "I.5",
           "I.16"
         ],
-        "bends": 10
+        "bends": 12
       },
       {
         "ref": "I.2",
@@ -537,7 +552,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 9
+        "bends": 10
       },
       {
         "ref": "I.20",
@@ -546,7 +561,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 9
+        "bends": 10
       },
       {
         "ref": "I.20",
@@ -555,7 +570,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 9
+        "bends": 10
       },
       {
         "ref": "I.22",
@@ -651,7 +666,7 @@
         "by": [
           "I.31"
         ],
-        "bends": 24
+        "bends": 32
       },
       {
         "ref": "I.42",
@@ -659,7 +674,7 @@
         "by": [
           "I.38"
         ],
-        "bends": 24
+        "bends": 32
       },
       {
         "ref": "I.42",
@@ -667,7 +682,7 @@
         "by": [
           "I.23"
         ],
-        "bends": 24
+        "bends": 32
       },
       {
         "ref": "I.42",
@@ -675,7 +690,7 @@
         "by": [
           "I.41"
         ],
-        "bends": 24
+        "bends": 32
       },
       {
         "ref": "I.44",
@@ -685,7 +700,7 @@
           "I.23",
           "I.42"
         ],
-        "bends": 3
+        "bends": 4
       },
       {
         "ref": "I.44",
@@ -693,7 +708,7 @@
         "by": [
           "I.31"
         ],
-        "bends": 3
+        "bends": 4
       },
       {
         "ref": "I.44",
@@ -701,7 +716,7 @@
         "by": [
           "I.15"
         ],
-        "bends": 3
+        "bends": 4
       },
       {
         "ref": "I.44",
@@ -709,7 +724,7 @@
         "by": [
           "I.43"
         ],
-        "bends": 3
+        "bends": 4
       },
       {
         "ref": "I.44",
@@ -717,7 +732,7 @@
         "by": [
           "C.N.1"
         ],
-        "bends": 3
+        "bends": 4
       },
       {
         "ref": "I.45",
@@ -793,27 +808,11 @@
       },
       {
         "ref": "I.47",
-        "text": "the parallel through B meets AC within it, and the far side beyond",
-        "by": [
-          "I.31"
-        ],
-        "bends": 19
-      },
-      {
-        "ref": "I.47",
         "text": "the squares are described on the three sides, each falling away from the triangle",
         "by": [
           "I.46"
         ],
-        "bends": 19
-      },
-      {
-        "ref": "I.47",
-        "text": "therefore the square on AC equals the squares on AB and BC together",
-        "by": [
-          "C.N.2"
-        ],
-        "bends": 19
+        "bends": 24
       },
       {
         "ref": "I.9",
@@ -821,7 +820,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 41
+        "bends": 33
       },
       {
         "ref": "I.9",
@@ -829,7 +828,7 @@
         "by": [
           "I.1"
         ],
-        "bends": 41
+        "bends": 33
       },
       {
         "ref": "I.9",
@@ -837,7 +836,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 41
+        "bends": 33
       },
       {
         "ref": "I.9",
@@ -845,7 +844,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 41
+        "bends": 33
       },
       {
         "ref": "II.10",
@@ -853,7 +852,7 @@
         "by": [
           "I.11"
         ],
-        "bends": 7
+        "bends": 6
       },
       {
         "ref": "II.10",
@@ -862,7 +861,7 @@
           "I.47",
           "II.4"
         ],
-        "bends": 7
+        "bends": 6
       },
       {
         "ref": "II.11",
@@ -870,7 +869,7 @@
         "by": [
           "Post.1"
         ],
-        "bends": 13
+        "bends": 11
       },
       {
         "ref": "II.11",
@@ -878,7 +877,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 13
+        "bends": 11
       },
       {
         "ref": "II.11",
@@ -887,7 +886,7 @@
           "II.6",
           "I.47"
         ],
-        "bends": 13
+        "bends": 11
       },
       {
         "ref": "II.12",
@@ -895,7 +894,7 @@
         "by": [
           "I.12"
         ],
-        "bends": 4
+        "bends": 5
       },
       {
         "ref": "II.13",
@@ -903,7 +902,7 @@
         "by": [
           "I.12"
         ],
-        "bends": 4
+        "bends": 3
       },
       {
         "ref": "II.13",
@@ -912,7 +911,7 @@
           "I.47",
           "II.7"
         ],
-        "bends": 4
+        "bends": 3
       },
       {
         "ref": "II.14",
@@ -928,7 +927,7 @@
         "by": [
           "I.46"
         ],
-        "bends": 40
+        "bends": 37
       },
       {
         "ref": "II.5",
@@ -936,7 +935,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 21
+        "bends": 23
       },
       {
         "ref": "II.5",
@@ -944,7 +943,7 @@
         "by": [
           "I.46"
         ],
-        "bends": 21
+        "bends": 23
       },
       {
         "ref": "II.6",
@@ -952,7 +951,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 25
+        "bends": 24
       },
       {
         "ref": "II.6",
@@ -961,7 +960,7 @@
           "II.5",
           "I.46"
         ],
-        "bends": 25
+        "bends": 24
       },
       {
         "ref": "II.7",
@@ -977,7 +976,7 @@
         "by": [
           "I.11"
         ],
-        "bends": 8
+        "bends": 6
       },
       {
         "ref": "II.9",
@@ -986,7 +985,7 @@
           "I.47",
           "II.4"
         ],
-        "bends": 8
+        "bends": 6
       },
       {
         "ref": "III.1",
@@ -995,7 +994,7 @@
           "I.10",
           "I.11"
         ],
-        "bends": 48
+        "bends": 41
       },
       {
         "ref": "III.13",
@@ -1019,7 +1018,7 @@
         "by": [
           "I.47"
         ],
-        "bends": 6
+        "bends": 5
       },
       {
         "ref": "III.16",
@@ -1211,7 +1210,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 48
+        "bends": 44
       },
       {
         "ref": "III.30",
@@ -1219,7 +1218,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 45
+        "bends": 40
       },
       {
         "ref": "III.32",
@@ -1235,7 +1234,7 @@
         "by": [
           "III.21"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "III.33",
@@ -1243,7 +1242,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "III.34",
@@ -1268,7 +1267,7 @@
           "II.6",
           "I.47"
         ],
-        "bends": 5
+        "bends": 8
       },
       {
         "ref": "III.36",
@@ -1276,7 +1275,7 @@
         "by": [
           "III.18"
         ],
-        "bends": 5
+        "bends": 8
       },
       {
         "ref": "III.37",
@@ -1284,7 +1283,7 @@
         "by": [
           "III.16"
         ],
-        "bends": 5
+        "bends": 9
       },
       {
         "ref": "III.37",
@@ -1292,7 +1291,7 @@
         "by": [
           "III.18"
         ],
-        "bends": 5
+        "bends": 9
       },
       {
         "ref": "III.37",
@@ -1300,7 +1299,7 @@
         "by": [
           "III.36"
         ],
-        "bends": 5
+        "bends": 9
       },
       {
         "ref": "III.4",
@@ -1348,7 +1347,7 @@
         "by": [
           "I.24"
         ],
-        "bends": 48
+        "bends": 47
       },
       {
         "ref": "III.8",
@@ -1356,7 +1355,7 @@
         "by": [
           "I.20"
         ],
-        "bends": 48
+        "bends": 47
       },
       {
         "ref": "III.8",
@@ -1364,7 +1363,7 @@
         "by": [
           "I.20"
         ],
-        "bends": 48
+        "bends": 47
       },
       {
         "ref": "III.8",
@@ -1372,7 +1371,7 @@
         "by": [
           "I.24"
         ],
-        "bends": 48
+        "bends": 47
       },
       {
         "ref": "IV.1",
@@ -1396,7 +1395,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 6
+        "bends": 10
       },
       {
         "ref": "IV.10",
@@ -1405,7 +1404,7 @@
           "II.11",
           "III.32"
         ],
-        "bends": 6
+        "bends": 10
       },
       {
         "ref": "IV.10",
@@ -1413,7 +1412,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 6
+        "bends": 10
       },
       {
         "ref": "IV.11",
@@ -1533,7 +1532,7 @@
         "by": [
           "III.16"
         ],
-        "bends": 12
+        "bends": 18
       },
       {
         "ref": "IV.3",
@@ -1541,7 +1540,7 @@
         "by": [
           "III.32"
         ],
-        "bends": 12
+        "bends": 18
       },
       {
         "ref": "IV.4",
@@ -2070,7 +2069,7 @@
         "by": [
           "III.31"
         ],
-        "bends": 8
+        "bends": 11
       },
       {
         "ref": "VI.16",
@@ -2182,7 +2181,7 @@
         "by": [
           "VI.23"
         ],
-        "bends": 40
+        "bends": 48
       },
       {
         "ref": "VI.27",
@@ -2190,7 +2189,7 @@
         "by": [
           "II.5"
         ],
-        "bends": 40
+        "bends": 48
       },
       {
         "ref": "VI.30",
@@ -2198,7 +2197,7 @@
         "by": [
           "II.11"
         ],
-        "bends": 24
+        "bends": 38
       },
       {
         "ref": "VI.30",
@@ -2206,7 +2205,7 @@
         "by": [
           "VI.17"
         ],
-        "bends": 24
+        "bends": 38
       },
       {
         "ref": "VI.30",
@@ -2214,7 +2213,7 @@
         "by": [
           "Def.22"
         ],
-        "bends": 24
+        "bends": 38
       },
       {
         "ref": "VI.30",
@@ -2222,7 +2221,7 @@
         "by": [
           "VI.17"
         ],
-        "bends": 24
+        "bends": 38
       },
       {
         "ref": "VI.31",
@@ -2230,7 +2229,7 @@
         "by": [
           "VI.20"
         ],
-        "bends": 25
+        "bends": 32
       },
       {
         "ref": "VI.31",
@@ -2238,7 +2237,7 @@
         "by": [
           "VI.4"
         ],
-        "bends": 25
+        "bends": 32
       },
       {
         "ref": "VI.32",
@@ -2278,7 +2277,7 @@
         "by": [
           "I.12"
         ],
-        "bends": 21
+        "bends": 32
       },
       {
         "ref": "VI.9",
@@ -2910,7 +2909,7 @@
         "by": [
           "X.107"
         ],
-        "bends": 17
+        "bends": 24
       },
       {
         "ref": "X.107",
@@ -2918,7 +2917,7 @@
         "by": [
           "X.12"
         ],
-        "bends": 18
+        "bends": 25
       },
       {
         "ref": "X.108",
@@ -3374,7 +3373,7 @@
         "by": [
           "X.41"
         ],
-        "bends": 41
+        "bends": 48
       },
       {
         "ref": "X.42",
@@ -3638,7 +3637,7 @@
         "by": [
           "X.70"
         ],
-        "bends": 18
+        "bends": 24
       },
       {
         "ref": "X.71",
@@ -3873,13 +3872,365 @@
         "bends": 27
       },
       {
+        "ref": "XI.1",
+        "text": "and the line is not merely touching it at the two named points",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.1",
+        "text": "every point of the line lies in the plane of reference, so no part of it is elevated above",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.10",
+        "text": "so the angles they contain are equal",
+        "by": [
+          "XI.10"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.10",
+        "text": "the arms are parallel, each to each",
+        "by": [
+          "XI.Def.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.11",
+        "text": "and the line drawn is at right angles to the plane",
+        "by": [
+          "XI.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.11",
+        "text": "so it is at right angles to every line of the plane through the foot",
+        "by": [
+          "XI.Def.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.11",
+        "text": "the foot lies in the given plane",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.12",
+        "text": "and it is at right angles to the plane",
+        "by": [
+          "XI.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.12",
+        "text": "the line stands on the given point of the plane",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.13",
+        "text": "and each of those lines is on the same side as the first",
+        "by": [
+          "XI.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.13",
+        "text": "no other line from the same point is at right angles to the plane",
+        "by": [
+          "XI.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.14",
+        "text": "and being two planes and not one, they nowhere meet",
+        "by": [
+          "XI.Def.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.14",
+        "text": "the one line is at right angles to both planes",
+        "by": [
+          "XI.Def.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.14",
+        "text": "therefore the planes are parallel",
+        "by": [
+          "XI.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.15",
+        "text": "so the planes through them are parallel",
+        "by": [
+          "XI.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.15",
+        "text": "the arms are parallel, each to each",
+        "by": [
+          "XI.Def.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.16",
+        "text": "and the two sections are parallel to one another",
+        "by": [
+          "XI.16"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.16",
+        "text": "each common section is a straight line",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.17",
+        "text": "and the two are cut in the same ratio",
+        "by": [
+          "XI.17"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.17",
+        "text": "each line is cut by the middle plane",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.18",
+        "text": "and each is at right angles to the given plane",
+        "by": [
+          "XI.18"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.18",
+        "text": "each of those planes holds the whole perpendicular",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.19",
+        "text": "and it is at right angles to the given plane",
+        "by": [
+          "XI.19"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.19",
+        "text": "their common section is a straight line",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.2",
+        "text": "and so does the whole triangle they make",
+        "by": [
+          "XI.2"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.2",
+        "text": "the plane is the only one holding all three, being determined by them",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.2",
+        "text": "the two lines lie in one plane",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.20",
+        "text": "any two of the three plane angles, taken together, are greater than the remaining one",
+        "by": [
+          "XI.20"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.21",
+        "text": "and the three together are less than four right angles",
+        "by": [
+          "XI.21"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.21",
+        "text": "each plane angle is less than two right angles",
+        "by": [
+          "XI.Def.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.22",
+        "text": "and a triangle can be made of the three joins",
+        "by": [
+          "XI.22"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.22",
+        "text": "the joins are the bases of the three triangles on equal arms",
+        "by": [
+          "I.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.23",
+        "text": "and it is a genuine solid angle, its arms not in one plane",
+        "by": [
+          "XI.Def.11"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.23",
+        "text": "the solid angle constructed is contained by the three given angles",
+        "by": [
+          "XI.23"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.3",
+        "text": "and every point of it lies in both planes",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.3",
+        "text": "the common section is a straight line",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.3",
+        "text": "the two points the planes share lie on it",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.5",
+        "text": "and the three lines are in one plane",
+        "by": [
+          "XI.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.6",
+        "text": "and being distinct lines, they never meet",
+        "by": [
+          "XI.Def.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.6",
+        "text": "both are at right angles to the plane",
+        "by": [
+          "XI.Def.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.6",
+        "text": "therefore they are parallel",
+        "by": [
+          "XI.6"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.7",
+        "text": "and the joining line lies in it throughout",
+        "by": [
+          "XI.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.8",
+        "text": "so the second is at right angles to the same plane",
+        "by": [
+          "XI.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.8",
+        "text": "the first is at right angles to the plane",
+        "by": [
+          "XI.Def.3"
+        ],
+        "bends": 48
+      },
+      {
         "ref": "XIII.1",
         "text": "D lies on BA produced, with AD half of AB",
         "by": [
           "Post.2",
           "I.10"
         ],
-        "bends": 16
+        "bends": 25
       },
       {
         "ref": "XIII.1",
@@ -3887,7 +4238,7 @@
         "by": [
           "II.6"
         ],
-        "bends": 16
+        "bends": 25
       },
       {
         "ref": "XIII.12",
@@ -3895,7 +4246,7 @@
         "by": [
           "IV.15"
         ],
-        "bends": 14
+        "bends": 19
       },
       {
         "ref": "XIII.12",
@@ -3903,7 +4254,7 @@
         "by": [
           "I.47"
         ],
-        "bends": 14
+        "bends": 19
       },
       {
         "ref": "XIII.2",
@@ -3911,7 +4262,7 @@
         "by": [
           "Post.2"
         ],
-        "bends": 10
+        "bends": 16
       },
       {
         "ref": "XIII.2",
@@ -3919,7 +4270,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 10
+        "bends": 16
       },
       {
         "ref": "XIII.3",
@@ -3927,7 +4278,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 5
+        "bends": 8
       },
       {
         "ref": "XIII.3",
@@ -3935,7 +4286,7 @@
         "by": [
           "II.6"
         ],
-        "bends": 5
+        "bends": 8
       },
       {
         "ref": "XIII.4",
@@ -3943,7 +4294,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 31
+        "bends": 43
       },
       {
         "ref": "XIII.4",
@@ -3951,7 +4302,7 @@
         "by": [
           "II.7"
         ],
-        "bends": 31
+        "bends": 43
       },
       {
         "ref": "XIII.5",
@@ -3959,7 +4310,7 @@
         "by": [
           "Post.2"
         ],
-        "bends": 32
+        "bends": 43
       },
       {
         "ref": "XIII.5",
@@ -3967,7 +4318,7 @@
         "by": [
           "VI.30"
         ],
-        "bends": 32
+        "bends": 43
       },
       {
         "ref": "XIII.5",
@@ -3975,7 +4326,31 @@
         "by": [
           "Def.3"
         ],
-        "bends": 32
+        "bends": 43
+      },
+      {
+        "ref": "XIII.8",
+        "text": "AC is cut at H in extreme and mean ratio",
+        "by": [
+          "VI.30"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "XIII.8",
+        "text": "and its greater segment equals the side of the pentagon",
+        "by": [
+          "Def.3"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "XIII.8",
+        "text": "the diagonals meet within the pentagon",
+        "by": [
+          "Post.1"
+        ],
+        "bends": 1
       }
     ]
   },
@@ -4270,7 +4645,25 @@
         "X.4",
         "X.5",
         "X.6",
-        "X.9"
+        "X.9",
+        "XI.1",
+        "XI.11",
+        "XI.12",
+        "XI.13",
+        "XI.14",
+        "XI.15",
+        "XI.16",
+        "XI.17",
+        "XI.18",
+        "XI.19",
+        "XI.2",
+        "XI.3",
+        "XI.4",
+        "XI.5",
+        "XI.6",
+        "XI.7",
+        "XI.8",
+        "XI.9"
       ],
       "measuring_only": [
         "I.13",
@@ -4287,7 +4680,8 @@
         "IV.2",
         "IV.3",
         "VI.33",
-        "VI.7"
+        "VI.7",
+        "XI.10"
       ],
       "discharged_luckily": [
         "I.22",
@@ -4406,6 +4800,9 @@
         "X.35",
         "X.71",
         "X.72",
+        "XI.20",
+        "XI.22",
+        "XI.23",
         "XIII.1",
         "XIII.10",
         "XIII.11",
@@ -4440,7 +4837,8 @@
         "VII.29",
         "VII.30",
         "VII.31",
-        "VII.8"
+        "VII.8",
+        "XI.21"
       ],
       "untestable": [
         "X.100",
@@ -4527,12 +4925,12 @@
       ]
     },
     "counts": {
-      "rational": 161,
-      "measuring_only": 15,
+      "rational": 179,
+      "measuring_only": 16,
       "discharged_luckily": 17,
       "needs_continuity": 66,
-      "needs_magnitude": 38,
-      "configuration_dependent": 24,
+      "needs_magnitude": 41,
+      "configuration_dependent": 25,
       "untestable": 81
     },
     "witnesses": [
