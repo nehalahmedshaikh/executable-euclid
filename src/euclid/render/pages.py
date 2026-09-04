@@ -479,7 +479,7 @@ def _findings_page(graph, stats, search_rows) -> str:
         "is evidence, and it says how much. Nothing here is read off the citations "
         'written beside each step. <a href="graph.html">Which edges are which.</a></p>',
         '<p class="note">All of it is measured over <em>this encoding</em> of the '
-        "<em>Elements</em>, and the encoding is 390 functions written by hand. Heath's "
+        "<em>Elements</em>, and the encoding is written by hand. Heath's "
         "words are parsed and never retyped; turning them into hypotheses and claims is "
         "authored, and that is the part to doubt. Exact arithmetic catches a claim that "
         "is <em>false</em> the moment it runs. A hypothesis that is merely <em>narrower</em> "
@@ -490,14 +490,6 @@ def _findings_page(graph, stats, search_rows) -> str:
     ]
     for heading, text in findings:
         body.append(f'<div class="finding"><h3>{heading}</h3>{text}</div>')
-    body.append(
-        '<div class="finding"><h3>Still open</h3>'
-        f"<p>All {len(HEATH)} propositions of the thirteen books are here as text; "
-        f"{len(all_propositions())} of them have been written out as programs. What is "
-        "left is solid geometry: Books XI and XII, and Book XIII from its thirteenth "
-        "proposition on. Book XIII's first twelve are plane lemmas about the golden "
-        "section and the pentagon, and they are done.</p></div>"
-    )
     return _page("Findings — Executable Euclid", "".join(body), here="findings.html")
 
 
@@ -604,7 +596,7 @@ def _ledger_page(ledgers) -> str:
         sum(len(item.of_kind("order")) for item in ledgers),
         sum(len(item.of_kind("case")) for item in ledgers),
     )
-    # Most propositions assume nothing, so listing all 390 produced a table that
+    # Most propositions assume nothing, so listing every proposition produced a table that
     # was four-fifths empty cells and read as broken rather than sparse. Only the
     # rows with something in them are drawn, and the count of the rest is stated.
     owing = [item for item in ledgers if not item.is_clean]

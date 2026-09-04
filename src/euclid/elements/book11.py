@@ -25,7 +25,18 @@ from ..solid.construct import (
     plane_through,
     posit3,
 )
-from ..solid.objects import Line3, Plane, Point3, vector_between
+from ..solid.objects import Line3, Plane, Point3, midpoint_of, vector_between
+from ..solid.solids import (
+    Solid,
+    content,
+    edge_lengths,
+    frame_on,
+    height_over,
+    parallelepiped,
+    parallelogram_area,
+    prism,
+    unit,
+)
 from ..solid.predicates import (
     collinear3,
     coplanar,
@@ -44,6 +55,7 @@ from .registry import (
     CONSTRUCTION,
     THEOREM,
     Out,
+    because,
     claim,
     hypothesis,
     proposition,
@@ -740,3 +752,593 @@ def prop_XI_23(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
     claim("and it is a genuine solid angle, its arms not in one plane", "XI.Def.11",
           not coplanar(corner, *arms))
     return Out(corner=corner, arms=tuple(arms), angles=made)
+
+
+# ---------------------------------------------------------------------------
+# XI.24 - XI.39: the parallelepipedal solids
+#
+# From here the book is about content, and content is got the way Euclid gets
+# it: by cutting a figure into pieces and adding them up.  Nothing in this
+# section is told what a volume is.  See :mod:`euclid.solid.solids`.
+# ---------------------------------------------------------------------------
+
+
+def _built(solid: Solid) -> Solid:
+    """Post a solid's vertices and join its edges, so the figure is the solid."""
+    for vertex in solid.vertices:
+        posit3(vertex)
+    for start, end in solid.edges():
+        line3(solid.vertices[start], solid.vertices[end])
+    return solid
+
+
+def _is_parallelogram(points: tuple) -> bool:
+    """Four points in order, opposite sides equal and parallel (I.34's figure)."""
+    if len(points) != 4:
+        return False
+    one = vector_between(points[0], points[1])
+    other = vector_between(points[3], points[2])
+    across = vector_between(points[1], points[2])
+    back = vector_between(points[0], points[3])
+    return one == other and across == back
+
+
+def _same_figure(first: tuple, second: tuple) -> bool:
+    """Two four-sided faces equal: sides and diagonals alike, so I.8 applies."""
+    pairs = ((0, 1), (1, 2), (2, 3), (3, 0), (0, 2), (1, 3))
+    return all(len2(first[i], first[j]) == len2(second[i], second[j])
+               for i, j in pairs)
+
+
+def _base_area(corner: Point3, first: Point3, second: Point3):
+    return parallelogram_area(vector_between(corner, first),
+                              vector_between(corner, second))
+
+
+def _triangle_area(corner: Point3, first: Point3, second: Point3):
+    """Half the parallelogram on the same two sides, which is I.34's figure."""
+    return _base_area(corner, first, second) / 2
+
+
+def _along(corner: Point3, towards: Point3, part) -> Point3:
+    step = vector_between(corner, towards)
+    return Point3(corner.x + part * step[0], corner.y + part * step[1],
+                  corner.z + part * step[2])
+
+
+def _arm_at(corner: Point3, direction: tuple, reach) -> Point3:
+    return Point3(corner.x + reach * direction[0], corner.y + reach * direction[1],
+                  corner.z + reach * direction[2])
+
+
+@proposition("XI.24", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_24(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """A solid contained by parallel planes has opposite faces equal and
+    parallelogrammic."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    solid = _built(parallelepiped(o, a, b, c, "the solid"))
+    faces = [solid.face_points(index) for index in range(6)]
+    planes = [solid.face_plane(index) for index in range(6)]
+    opposite = ((0, 1), (2, 3), (4, 5))
+
+    claim("the solid is contained by planes parallel two and two", "XI.14",
+          all(parallel_planes(planes[here], planes[there])
+              and planes[here] != planes[there] for here, there in opposite))
+    claim("the opposite sides of each face are parallel, so each is a "
+          "parallelogram", "XI.16",
+          all(_is_parallelogram(face) for face in faces))
+    claim("and the opposite faces are equal to one another", "I.34",
+          all(_same_figure(faces[here], faces[there]) for here, there in opposite))
+    return Out(solid=solid, faces=tuple(faces))
+
+
+@proposition("XI.25", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_25(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """A parallelepiped cut by a plane parallel to the opposite planes: as the
+    base is to the base, so is the solid to the solid."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    because(prop_XI_24, o, a, b, c)
+    # The cutting plane is set a third of the way along the first arm, which is
+    # a ratio Euclid may take at will: what the proposition asserts holds of
+    # every such cut, and the necessity sweep bends this one.
+    part = Fraction(1, 3)
+    cut = posit3(_along(o, a, part), "K")
+    over = posit3(cut + (b - o), "L")
+    above = posit3(cut + (c - o), "M")
+
+    nearer = _built(parallelepiped(o, cut, b, c, "the nearer solid"))
+    beyond = _built(parallelepiped(cut, a, over, above, "the further solid"))
+    cutter = plane_through(cut, over, above, "the cutting plane")
+
+    claim("the cutting plane is parallel to the two opposite planes", "XI.15",
+          parallel_planes(cutter, nearer.face_plane(4))
+          and parallel_planes(cutter, beyond.face_plane(5)))
+    here, there = _base_area(o, cut, b), _base_area(cut, a, over)
+    claim("as the base is to the base, so is the solid to the solid", "XI.25",
+          here * content(beyond) == there * content(nearer))
+    return Out(nearer=nearer, beyond=beyond, cut=cut, bases=(here, there))
+
+
+def _solid_angle_of(corner: Point3, arms: tuple) -> tuple:
+    return (angle_at3(arms[0], corner, arms[1]),
+            angle_at3(arms[1], corner, arms[2]),
+            angle_at3(arms[0], corner, arms[2]))
+
+
+def _arms_making(corner: Point3, direction: tuple, angles: tuple) -> tuple:
+    """Three arms of unit length from a corner, containing the given angles.
+
+    The first runs along the direction given, which is what "on a given straight
+    line, and at a given point on it" asks for.  The second is laid in the plane
+    the first two of the frame span, and the third is fixed by its cosines with
+    both -- so the figure is determined by the angles and by nothing else, and
+    the two square roots it takes are the only extensions the construction
+    needs.
+    """
+    first, second, third = frame_on(direction)
+    twelve, twenty_three, thirteen = angles
+    across = sqrt(1 - twelve.cos * twelve.cos)
+    arm_b = tuple(twelve.cos * first[i] + across * second[i] for i in range(3))
+    along = thirteen.cos
+    sideways = (twenty_three.cos - twelve.cos * thirteen.cos) / across
+    upward = sqrt(1 - along * along - sideways * sideways)
+    arm_c = tuple(along * first[i] + sideways * second[i] + upward * third[i]
+                  for i in range(3))
+    return (_arm_at(corner, first, Fraction(1)),
+            _arm_at(corner, arm_b, Fraction(1)),
+            _arm_at(corner, arm_c, Fraction(1)))
+
+
+@proposition("XI.26", CONSTRUCTION, sample=samples3.two_corners)
+def prop_XI_26(o: Point3, a: Point3, b: Point3, c: Point3,
+               d: Point3, e: Point3, f: Point3, g: Point3) -> Out:
+    """On a given straight line, and at a given point on it, construct a solid
+    angle equal to a given solid angle."""
+    hypothesis("the arms of the given angle are not in one plane",
+               not coplanar(o, a, b, c))
+    hypothesis("the given straight line has two distinct ends", d != e)
+    given = _solid_angle_of(o, (a, b, c))
+    hypothesis("no two of the given plane angles are together a straight angle",
+               all(sign(1 - angle.cos * angle.cos) > 0 for angle in given),
+               guard=True)
+    for arm in (a, b, c):
+        line3(o, arm)
+    line3(d, e, "the given straight line")
+
+    because(prop_XI_23, o, a, b, c)
+    arms = tuple(posit3(point, name) for point, name in
+                 zip(_arms_making(d, vector_between(d, e), given), ("P", "Q", "R")))
+    for arm in arms:
+        line3(d, arm)
+    made = _solid_angle_of(d, arms)
+
+    claim("the first arm is set up along the given straight line, at the given "
+          "point on it", "XI.Def.11",
+          on_line3(arms[0], Line3.through(d, e))
+          and sign(dot3(vector_between(d, arms[0]), vector_between(d, e))) > 0)
+    claim("the angle constructed is contained by plane angles equal to the "
+          "given ones", "XI.26", made == given)
+    claim("and it is a solid angle, its arms not in one plane", "XI.23",
+          not coplanar(d, *arms))
+    return Out(corner=d, arms=arms, angles=made)
+
+
+@proposition("XI.27", CONSTRUCTION, sample=samples3.two_corners)
+def prop_XI_27(o: Point3, a: Point3, b: Point3, c: Point3,
+               d: Point3, e: Point3, f: Point3, g: Point3) -> Out:
+    """On a given straight line describe a parallelepiped similar and similarly
+    situated to a given one."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    hypothesis("the given straight line has two distinct ends", d != e)
+    given = _built(parallelepiped(o, a, b, c, "the given solid"))
+    reach = len2(o, a)
+    # Similar means the edges in one ratio, so the scale is fixed by the given
+    # line against the edge it answers to. Both are squared, and the quotient of
+    # two squares is the square of the quotient, so one root gives the ratio.
+    scale = sqrt(len2(d, e) / reach)
+
+    corner = posit3(d, "")
+    arms = []
+    for point, name in ((a, "P"), (b, "Q"), (c, "R")):
+        step = vector_between(o, point)
+        arms.append(posit3(Point3(d.x + scale * step[0], d.y + scale * step[1],
+                                  d.z + scale * step[2]), name))
+    described = _built(parallelepiped(d, *arms, "the solid described"))
+
+    claim("the solid is described on the given straight line", "XI.26",
+          len2(d, arms[0]) == len2(d, e))
+    claim("its edges are to the edges of the given solid in one ratio", "VI.Def.1",
+          all(side == scale * scale * given_side for side, given_side in
+              zip(edge_lengths(described), edge_lengths(given))))
+    claim("and the solid angles at the answering corners are equal, so it is "
+          "similarly situated", "XI.Def.9",
+          _solid_angle_of(d, tuple(arms)) == _solid_angle_of(o, (a, b, c)))
+    return Out(described=described, given=given, scale=scale)
+
+
+@proposition("XI.28", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_28(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """A parallelepiped cut by a plane through the diagonals of the opposite
+    faces is bisected by that plane."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    solid = _built(parallelepiped(o, a, b, c, "the solid"))
+    whole = content(solid)
+    across = vector_between(o, c)
+
+    near, far = solid.vertices[2], solid.vertices[6]
+    line3(o, near, "the diagonal of the base")
+    line3(solid.vertices[4], far, "the diagonal of the opposite face")
+    cutter = plane_through(o, near, far, "the cutting plane")
+
+    first = _built(prism((o, a, near), across, "the first prism"))
+    second = _built(prism((o, near, b), across, "the second prism"))
+
+    claim("the plane is carried through the diagonals of the opposite faces",
+          "XI.3",
+          on_plane(o, cutter) and on_plane(near, cutter)
+          and on_plane(solid.vertices[4], cutter) and on_plane(far, cutter))
+    claim("the two prisms it makes are equal to one another", "I.34",
+          content(first) == content(second))
+    claim("so the solid is bisected by the plane", "XI.28",
+          content(first) + content(second) == whole
+          and 2 * content(first) == whole)
+    return Out(prisms=(first, second), plane=cutter)
+
+
+@proposition("XI.29", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_29(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Parallelepipeds on the same base and of the same height, whose standing
+    sides end on the same straight lines, are equal."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    # The second stands on the same base and reaches the same plane, its top
+    # slid along the line the first solid's top edge lies in. That is what "the
+    # extremities of the sides which stand up are on the same straight lines"
+    # says, and it is the only freedom the figure has.
+    slide = vector_between(o, a)
+    leaned = posit3(Point3(c.x + slide[0], c.y + slide[1], c.z + slide[2]), "M")
+    second = _built(parallelepiped(o, a, b, leaned, "the second solid"))
+    line3(c, leaned, "the line the tops end on")
+
+    claim("the two solids stand on the same base", "XI.24",
+          _same_figure(first.face_points(0), second.face_points(0)))
+    claim("their tops are in one plane, so they are of the same height", "XI.14",
+          parallel_planes(first.face_plane(1), first.face_plane(0))
+          and second.face_plane(1) == first.face_plane(1))
+    claim("and the solids are equal to one another", "XI.29",
+          content(first) == content(second))
+    return Out(solids=(first, second))
+
+
+@proposition("XI.30", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_30(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Parallelepipeds on the same base and of the same height, whose standing
+    sides do not end on the same straight lines, are equal."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    # Slid across both arms of the base, so the top runs in neither of the lines
+    # XI.29 leaves it in: the same plane is reached by a different route.
+    one, other = vector_between(o, a), vector_between(o, b)
+    leaned = posit3(Point3(c.x + one[0] + other[0], c.y + one[1] + other[1],
+                           c.z + one[2] + other[2]), "M")
+    second = _built(parallelepiped(o, a, b, leaned, "the second solid"))
+
+    because(prop_XI_29, o, a, b, c)
+
+    claim("the two solids stand on the same base and reach the same plane",
+          "XI.29",
+          _same_figure(first.face_points(0), second.face_points(0))
+          and second.face_plane(1) == first.face_plane(1))
+    claim("the tops do not lie in the same straight lines", "XI.Def.10",
+          not on_line3(leaned, Line3.through(c, first.vertices[5]))
+          and not on_line3(leaned, Line3.through(c, first.vertices[7])))
+    claim("and the solids are equal to one another", "XI.30",
+          content(first) == content(second))
+    return Out(solids=(first, second))
+
+
+@proposition("XI.31", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_31(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Parallelepipeds on equal bases and of the same height are equal."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    # A second base in the same plane, of the same area but not the same figure:
+    # one side doubled and the other halved leaves the parallelogram on them
+    # equal to the first, which is I.35 and I.36 done with the arms themselves.
+    stretched = posit3(_along(o, a, Fraction(2)), "P")
+    shrunk = posit3(_along(o, b, Fraction(1, 2)), "Q")
+    second = _built(parallelepiped(o, stretched, shrunk, c, "the second solid"))
+
+    because(prop_XI_30, o, a, b, c)
+
+    claim("the two bases are equal, and are not the same figure", "I.35",
+          _base_area(o, a, b) == _base_area(o, stretched, shrunk)
+          and not _same_figure(first.face_points(0), second.face_points(0)))
+    claim("the bases are in one plane and the tops in one plane, so the heights "
+          "are the same", "XI.14",
+          first.face_plane(0) == second.face_plane(0)
+          and first.face_plane(1) == second.face_plane(1))
+    claim("and the solids are equal to one another", "XI.31",
+          content(first) == content(second))
+    return Out(solids=(first, second))
+
+
+@proposition("XI.32", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_32(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Parallelepipeds of the same height are to one another as their bases."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    wider = posit3(_along(o, a, Fraction(5, 2)), "P")
+    second = _built(parallelepiped(o, wider, b, c, "the second solid"))
+
+    because(prop_XI_31, o, a, b, c)
+
+    here, there = _base_area(o, a, b), _base_area(o, wider, b)
+    claim("the two solids are of the same height", "XI.14",
+          first.face_plane(0) == second.face_plane(0)
+          and first.face_plane(1) == second.face_plane(1))
+    claim("as the base is to the base, so is the solid to the solid", "XI.32",
+          here * content(second) == there * content(first))
+    return Out(solids=(first, second), bases=(here, there))
+
+
+@proposition("XI.33", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_33(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Similar parallelepipeds are to one another in the triplicate ratio of
+    their corresponding sides."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    scale = Fraction(3, 2)
+    arms = tuple(posit3(_along(o, point, scale), name)
+                 for point, name in ((a, "P"), (b, "Q"), (c, "R")))
+    second = _built(parallelepiped(o, *arms, "the second solid"))
+
+    because(prop_XI_27, o, a, b, c, o, a, b, c)
+
+    side, answering = length3(o, a), length3(o, arms[0])
+    claim("the solids are similar, their edges in one ratio and their solid "
+          "angles equal", "XI.Def.9",
+          all(other == scale * scale * one for one, other in
+              zip(edge_lengths(first), edge_lengths(second)))
+          and _solid_angle_of(o, (a, b, c)) == _solid_angle_of(o, arms))
+    claim("as the solid is to the solid, so is the cube on the side to the cube "
+          "on the answering side", "XI.33",
+          content(first) * answering * answering * answering
+          == content(second) * side * side * side)
+    return Out(solids=(first, second), sides=(side, answering))
+
+
+@proposition("XI.34", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_34(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """In equal parallelepipeds the bases are reciprocally proportional to the
+    heights, and conversely."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    first = _built(parallelepiped(o, a, b, c, "the first solid"))
+    # A second solid equal to the first, its base twice as wide and its height
+    # halved: the reciprocation the proposition is about, made rather than found.
+    wider = posit3(_along(o, a, Fraction(2)), "P")
+    lower = posit3(_along(o, c, Fraction(1, 2)), "R")
+    second = _built(parallelepiped(o, wider, b, lower, "the second solid"))
+
+    because(prop_XI_32, o, a, b, c)
+
+    bases = (_base_area(o, a, b), _base_area(o, wider, b))
+    heights = (height_over(c, first.face_plane(0)),
+               height_over(lower, second.face_plane(0)))
+    claim("the two solids are equal", "XI.31", content(first) == content(second))
+    claim("so as the base is to the base, so is the height to the height "
+          "reciprocally", "XI.34",
+          bases[0] * heights[0] == bases[1] * heights[1])
+    # The converse is the same equation read the other way, and Euclid states
+    # both halves, so both are checked.
+    claim("and solids whose bases are reciprocally proportional to their "
+          "heights are equal", "XI.34",
+          content(first) == bases[0] * heights[0]
+          and content(second) == bases[1] * heights[1])
+    return Out(solids=(first, second), bases=bases, heights=heights)
+
+
+@proposition("XI.35", THEOREM, sample=samples3.two_corners)
+def prop_XI_35(o: Point3, a: Point3, b: Point3, c: Point3,
+               d: Point3, e: Point3, f: Point3, g: Point3) -> Out:
+    """Two equal plane angles, with elevated lines making equal angles with
+    their sides: the elevated lines make equal angles with the joins from the
+    feet of the perpendiculars."""
+    hypothesis("the elevated line is out of the plane of the given angle",
+               not coplanar(o, a, b, c))
+    hypothesis("the second angle's arms have two distinct ends", d != e)
+    for arm in (a, b, c):
+        line3(o, arm)
+
+    base = plane_through(o, a, b, "the plane of the given angle")
+    foot = posit3(_foot_on_plane(c, base), "L")
+    hypothesis("the elevated line is not itself at right angles to the plane, "
+               "so there is a join from the foot to the vertex", o != foot)
+    line3(c, foot, "the perpendicular")
+    line3(o, foot, "the join from the foot")
+    because(prop_XI_11, o, a, b, c)
+
+    # The second figure is set up from the angles alone, by XI.26's frame: the
+    # plane angle and the two the elevated line makes with its sides. Nothing
+    # of the first figure's coordinates crosses over, so the equality claimed
+    # at the end is a conclusion and not a restatement.
+    flat = angle_at3(a, o, b)
+    with_first, with_second = angle_at3(a, o, c), angle_at3(b, o, c)
+    hypothesis("no two of the three angles are together a straight angle",
+               all(sign(1 - angle.cos * angle.cos) > 0
+                   for angle in (flat, with_first, with_second)),
+               guard=True)
+    arms = tuple(posit3(point, name) for point, name in
+                 zip(_arms_making(d, vector_between(d, e),
+                                  (flat, with_second, with_first)), ("P", "Q", "M")))
+    for arm in arms:
+        line3(d, arm)
+    second_base = plane_through(d, arms[0], arms[1], "the plane of the second angle")
+    second_foot = posit3(_foot_on_plane(arms[2], second_base), "N")
+    line3(arms[2], second_foot, "the second perpendicular")
+    line3(d, second_foot, "the second join")
+
+    claim("the two plane angles are equal", "I.Def.8",
+          angle_at3(arms[0], d, arms[1]) == flat)
+    claim("and the elevated lines contain equal angles with their sides", "XI.26",
+          angle_at3(arms[0], d, arms[2]) == with_first
+          and angle_at3(arms[1], d, arms[2]) == with_second)
+    claim("therefore the elevated lines contain equal angles with the joins",
+          "XI.35",
+          angle_at3(c, o, foot) == angle_at3(arms[2], d, second_foot))
+    return Out(feet=(foot, second_foot),
+               angles=(angle_at3(c, o, foot), angle_at3(arms[2], d, second_foot)))
+
+
+@proposition("XI.36", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_36(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """If three straight lines be proportional, the parallelepiped on them is
+    equal to the equilateral one on the mean which is equiangular with it."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    ratio = Fraction(3, 2)
+    # Three lines in proportion, taken as one length, that length by the ratio,
+    # and by the ratio again: the mean is the square root of the extremes'
+    # rectangle exactly, and every one of the three stays rational.
+    lines = (Fraction(1), ratio, ratio * ratio)
+    hypothesis("the three straight lines are proportional",
+               lines[1] * lines[1] == lines[0] * lines[2])
+
+    directions = tuple(unit(vector_between(o, point)) for point in (a, b, c))
+    unequal = _built(parallelepiped(
+        o, *[posit3(_arm_at(o, step, reach), name)
+             for step, reach, name in zip(directions, lines, ("P", "Q", "R"))],
+        "the solid on the three lines"))
+    square = _built(parallelepiped(
+        o, *[_arm_at(o, step, lines[1]) for step in directions],
+        "the equilateral solid on the mean"))
+
+    because(prop_XI_34, o, a, b, c)
+
+    claim("the second solid is equilateral", "XI.Def.9",
+          len2(o, square.vertices[1]) == len2(o, square.vertices[3])
+          == len2(o, square.vertices[4]))
+    claim("and it is equiangular with the first", "XI.Def.9",
+          _solid_angle_of(o, tuple(square.vertices[index] for index in (1, 3, 4)))
+          == _solid_angle_of(o, tuple(unequal.vertices[index] for index in (1, 3, 4))))
+    claim("therefore the two solids are equal", "XI.36",
+          content(unequal) == content(square))
+    return Out(solids=(unequal, square), lines=lines)
+
+
+@proposition("XI.37", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_37(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Four proportional straight lines carry similar parallelepipeds that are
+    proportional, and conversely."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    ratio, apart = Fraction(3, 2), Fraction(5, 4)
+    lines = (Fraction(1), ratio, apart, apart * ratio)
+    hypothesis("the four straight lines are proportional",
+               lines[0] * lines[3] == lines[1] * lines[2])
+
+    directions = tuple(unit(vector_between(o, point)) for point in (a, b, c))
+
+    def described(reach):
+        return parallelepiped(o, *[_arm_at(o, step, reach) for step in directions])
+
+    solids = [described(reach) for reach in lines]
+    _built(solids[0])
+    _built(solids[3])
+    contents = [content(solid) for solid in solids]
+
+    because(prop_XI_33, o, a, b, c)
+
+    claim("the four solids are similar and similarly described", "XI.Def.9",
+          all(_solid_angle_of(o, tuple(solid.vertices[i] for i in (1, 3, 4)))
+              == _solid_angle_of(o, tuple(solids[0].vertices[i] for i in (1, 3, 4)))
+              for solid in solids[1:]))
+    claim("as the first solid is to the second, so is the third to the fourth",
+          "XI.37", contents[0] * contents[3] == contents[1] * contents[2])
+    # The converse is checked where it can fail: a fourth line that is not the
+    # fourth proportional, and the solid on it, which the proportion must then
+    # refuse. Each content is the cube on its line times one and the same
+    # figure, so a proportion between the solids is one between the cubes.
+    astray = lines[3] * Fraction(6, 5)
+    claim("and a solid on any other line breaks the proportion, so solids "
+          "proportional give lines proportional", "XI.37",
+          lines[0] * astray != lines[1] * lines[2]
+          and contents[0] * content(described(astray)) != contents[1] * contents[2])
+    return Out(solids=tuple(solids), lines=lines)
+
+
+@proposition("XI.38", THEOREM, sample=samples3.cube_corner)
+def prop_XI_38(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """In a cube, the common section of the planes through the bisected sides of
+    opposite faces, and the diameter, bisect one another."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    hypothesis("the solid is a cube, its edges equal and at right angles",
+               len2(o, a) == len2(o, b) and len2(o, b) == len2(o, c)
+               and dot3(vector_between(o, a), vector_between(o, b)) == 0
+               and dot3(vector_between(o, b), vector_between(o, c)) == 0
+               and dot3(vector_between(o, a), vector_between(o, c)) == 0)
+    cube = _built(parallelepiped(o, a, b, c, "the cube"))
+    corners = cube.vertices
+
+    # Each plane is carried through the points bisecting the sides of one pair
+    # of opposite faces. Two such planes are taken, as Euclid takes them.
+    first = plane_through(midpoint_of(corners[0], corners[1]),
+                          midpoint_of(corners[3], corners[2]),
+                          midpoint_of(corners[4], corners[5]),
+                          "the first plane through the points of section")
+    second = plane_through(midpoint_of(corners[0], corners[3]),
+                           midpoint_of(corners[1], corners[2]),
+                           midpoint_of(corners[4], corners[7]),
+                           "the second such plane")
+    section = meet_planes(first, second)
+    diameter = line3(corners[0], corners[6], "the diameter of the cube")
+
+    # Where the common section leaves the cube, and where the diameter does:
+    # the two segments whose bisection is the thing asserted.
+    ends = (meet_line_plane(section, cube.face_plane(0)),
+            meet_line_plane(section, cube.face_plane(1)))
+    middle = posit3(midpoint_of(*ends), "S")
+
+    claim("the common section of the two planes is a straight line", "XI.3",
+          isinstance(section, Line3))
+    claim("it meets the diameter", "XI.Def.7", on_line3(middle, diameter))
+    claim("and the two bisect one another", "XI.38",
+          middle == midpoint_of(corners[0], corners[6])
+          and len2(ends[0], middle) == len2(middle, ends[1]))
+    return Out(section=section, diameter=diameter, middle=middle)
+
+
+@proposition("XI.39", THEOREM, sample=samples3.corner_and_arms)
+def prop_XI_39(o: Point3, a: Point3, b: Point3, c: Point3) -> Out:
+    """Two prisms of equal height, one on a parallelogram and one on a triangle
+    double of it, are equal."""
+    hypothesis("the three arms are not in one plane", not coplanar(o, a, b, c))
+    # Both prisms are triangular, and both are taken as standing on the same
+    # plane -- the one the first and third arms span. The first rests on a
+    # parallelogram face of it, the second on a triangular one, which is the
+    # whole of what the proposition compares.
+    ground = plane_through(o, a, c, "the plane both stand on")
+    on_parallelogram = _built(prism((o, a, b), vector_between(o, c),
+                                    "the prism on the parallelogram"))
+    on_triangle = _built(prism((o, a, c), vector_between(o, b),
+                               "the prism on the triangle"))
+
+    because(prop_XI_28, o, a, b, c)
+
+    flat = _base_area(o, a, c)
+    triangle = flat / 2
+    claim("both prisms stand on that plane, the one on a parallelogram in it "
+          "and the other on a triangle", "XI.Def.13",
+          on_plane(o, ground) and on_plane(a, ground) and on_plane(c, ground)
+          and on_plane(on_parallelogram.vertices[4], ground))
+    claim("they are of the same height, the edge the first rises to and the "
+          "face the second is carried to standing off the plane alike",
+          "XI.Def.13",
+          height_over(on_parallelogram.vertices[2], ground)
+          == height_over(on_parallelogram.vertices[5], ground)
+          == height_over(on_triangle.vertices[4], ground))
+    claim("the parallelogram is double of the triangle, being cut by the "
+          "diagonal into it and its equal", "I.41",
+          triangle == _triangle_area(a, on_parallelogram.vertices[4], c)
+          and flat == triangle + _triangle_area(a, on_parallelogram.vertices[4], c))
+    claim("therefore the prisms are equal to one another", "XI.39",
+          content(on_parallelogram) == content(on_triangle))
+    return Out(prisms=(on_parallelogram, on_triangle))

@@ -27,7 +27,9 @@ meaningless.  What is being watched is which of its own checks noticed.
 from __future__ import annotations
 
 import random
+import signal
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from fractions import Fraction
 from typing import Iterator
@@ -69,6 +71,31 @@ def ran_every_trial(ref: str) -> bool:
 # outside this set is a bug in the encoding, not an outcome, and is discarded.
 _BROKEN = (GeometryError, BadConfiguration, ValueError, ZeroDivisionError,
            IndexError, ArithmeticError)
+
+
+class _BudgetExpired(Exception):
+    """One bent run exceeded the sweep budget on a POSIX worker."""
+
+
+def _expire_budget(_signum, _frame):
+    raise _BudgetExpired
+
+
+@contextmanager
+def _deadline(seconds: float | None):
+    """Interrupt one runaway bend where interval timers are available."""
+    if seconds is None or not hasattr(signal, "setitimer"):
+        yield
+        return
+    previous_handler = signal.signal(signal.SIGALRM, _expire_budget)
+    previous_timer = signal.setitimer(signal.ITIMER_REAL, max(seconds, 0.001))
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        if previous_timer[0] > 0:
+            signal.setitimer(signal.ITIMER_REAL, *previous_timer)
 
 
 @dataclass
@@ -131,7 +158,9 @@ def bend_sweep(
     its first false step, and on the heavy constructions of Book IV that is ten
     seconds a bend -- IV.13 alone was a quarter of the corpus sweep.  Every count
     this module feeds is a count of bends actually run, so a truncated sweep
-    reports less evidence rather than the same evidence more cheaply.
+    reports less evidence rather than the same evidence more cheaply. On POSIX,
+    an interval timer also stops a single bend that overruns the whole budget;
+    platforms without interval timers retain the predictive boundary check.
     """
     if entry.sample is None:
         return
@@ -181,7 +210,13 @@ def bend_sweep(
             try:
                 with relaxed_hypotheses() as violations, surveyed_claims():
                     try:
-                        entry.wrapped(*arguments)
+                        remaining = (budget - (time.monotonic() - started)
+                                     if trial >= 0 else None)
+                        with _deadline(remaining):
+                            entry.wrapped(*arguments)
+                    except _BudgetExpired:
+                        _COMPLETED[entry.ref] = False
+                        return
                     except _BROKEN:
                         collapsed = True
                     except Exception:  # pragma: no cover - anything else is a bug

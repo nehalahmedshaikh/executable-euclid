@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from fractions import Fraction
 
-from ..kernel.field import sqrt
+from ..kernel.field import sign, sqrt
 from ..plane.angles import angle_at, length
 from ..plane.construct import circle, line, meet, outline, posit, result
 from ..plane.objects import Circle, Point, midpoint_of
@@ -30,7 +30,11 @@ from ..plane.predicates import (
     on_circle,
     on_line,
 )
+from ..solid.construct import line3, posit3, sphere_through
+from ..solid.objects import Point3
+from ..solid.predicates import len2 as space_len2, on_sphere
 from . import samples
+from . import samples3
 from .book01_foundations import prop_I_4, prop_I_5, prop_I_10
 from .book01_parallels import prop_I_47
 from .book02 import prop_II_6, prop_II_7
@@ -38,8 +42,23 @@ from .book03 import prop_III_30
 from .book10 import prop_X_21, prop_X_73
 from .book04 import prop_IV_11, prop_IV_15
 from .book06 import prop_VI_30
-from .book10 import classify, commensurable, is_rational_in_square
-from .registry import THEOREM, Out, because, claim, get, hypothesis, proposition
+from .book10 import (
+    classify,
+    commensurable,
+    is_rational_in_square,
+    is_rational_line,
+    prop_X_73,
+)
+from .registry import (
+    CONSTRUCTION,
+    THEOREM,
+    Out,
+    because,
+    claim,
+    get,
+    hypothesis,
+    proposition,
+)
 
 
 def _along(origin: Point, towards: Point, part) -> Point:
@@ -473,3 +492,303 @@ def prop_XIII_12(o: Point, a: Point) -> Out:
     claim("the square on its side is triple of the square on the radius",
           "I.47", len2(triangle[0], triangle[1]) == 3 * len2(o, a))
     return Out(triangle=triangle)
+
+
+# ---------------------------------------------------------------------------
+# XIII.13 - XIII.18: the five regular solids
+#
+# Each is set out by its vertices, and what makes it the figure Euclid describes
+# is checked rather than declared: every vertex on the sphere, every edge equal
+# to every other, and the same number of edges meeting at each corner.  The
+# edges are not listed by hand either -- they are the joins at the least
+# distance, which is what an edge of a regular solid is.
+#
+# Book X does the last two.  Against the sphere's diameter, taken as the
+# rational line, the side of the icosahedron and the side of the dodecahedron
+# are irrational, and `classify` names which irrational in the vocabulary that
+# X.36-41 and X.73-78 set up.
+# ---------------------------------------------------------------------------
+
+def _phi():
+    """The greater segment of a line of length one cut in extreme and mean ratio.
+
+    Computed afresh at every call and never kept in a module constant: a
+    constructible number belongs to the field tower that built it, each
+    proposition runs in its own, and a value carried across from another cannot
+    be combined with the figure in hand.
+    """
+    return (1 + sqrt(Fraction(5))) / 2
+
+
+def _cyclic(x, y, z) -> tuple:
+    """A triple and its two turnings, which is how the last two solids are set out."""
+    return ((x, y, z), (y, z, x), (z, x, y))
+
+
+def _tetrahedron() -> tuple:
+    return ((1, 1, 1), (1, -1, -1), (-1, 1, -1), (-1, -1, 1))
+
+
+def _octahedron() -> tuple:
+    return tuple((0,) * axis + (way,) + (0,) * (2 - axis)
+                 for axis in range(3) for way in (1, -1))
+
+
+def _cube() -> tuple:
+    return tuple((x, y, z) for x in (1, -1) for y in (1, -1) for z in (1, -1))
+
+
+def _icosahedron() -> tuple:
+    phi = _phi()
+    return tuple(turned for y in (1, -1) for z in (phi, -phi)
+                 for turned in _cyclic(Fraction(0), Fraction(y), z))
+
+
+def _dodecahedron() -> tuple:
+    phi = _phi()
+    corners = [(Fraction(x), Fraction(y), Fraction(z))
+               for x in (1, -1) for y in (1, -1) for z in (1, -1)]
+    for y in (1, -1):
+        for z in (phi, -phi):
+            corners.extend(_cyclic(Fraction(0), y / phi, z))
+    return tuple(corners)
+
+
+def _reach2(model: tuple):
+    """The square on the radius of the sphere the model figure is set out in."""
+    first = model[0]
+    return first[0] * first[0] + first[1] * first[1] + first[2] * first[2]
+
+
+def _edges_of(corners: tuple) -> tuple:
+    """The joins at the least distance: the edges of a regular figure.
+
+    Two vertices of a regular solid are joined exactly when nothing else is
+    nearer, and comparing squared distances decides that exactly -- so no list
+    of edges is written down and none can be written down wrong.
+    """
+    pairs = [(i, j) for i in range(len(corners)) for j in range(i + 1, len(corners))]
+    least = None
+    for i, j in pairs:
+        span = space_len2(corners[i], corners[j])
+        if least is None or sign(span - least) < 0:
+            least = span
+    return tuple((i, j) for i, j in pairs
+                 if space_len2(corners[i], corners[j]) == least)
+
+
+def _figure(o: Point3, a: Point3, model: tuple, label: str) -> tuple:
+    """Set a regular figure out in the sphere about *o* through *a*, and draw it.
+
+    One ratio, applied to every vertex, so the shape is unchanged and every
+    vertex lands on the surface.  That ratio is a single square root of a
+    quotient already in hand, which is the whole cost of comprehending a figure
+    in a sphere.
+    """
+    scale = sqrt(space_len2(o, a) / _reach2(model))
+    corners = tuple(posit3(Point3(o.x + scale * corner[0],
+                                  o.y + scale * corner[1],
+                                  o.z + scale * corner[2]))
+                    for corner in model)
+    edges = _edges_of(corners)
+    for start, end in edges:
+        line3(corners[start], corners[end], label)
+    return corners, edges
+
+
+def _at_each_corner(corners: tuple, edges: tuple) -> set:
+    return {sum(1 for start, end in edges if index in (start, end))
+            for index in range(len(corners))}
+
+
+def _edge2(corners: tuple, edges: tuple):
+    return space_len2(corners[edges[0][0]], corners[edges[0][1]])
+
+
+@proposition("XIII.13", CONSTRUCTION, sample=samples3.sphere_about)
+def prop_XIII_13(o: Point3, a: Point3) -> Out:
+    """Construct a pyramid in a given sphere, and prove the square on the
+    diameter is one and a half times the square on the side."""
+    hypothesis("the sphere has a positive radius", o != a)
+    globe = sphere_through(o, a, "the given sphere")
+    line3(o, a, "the radius")
+    corners, edges = _figure(o, a, _tetrahedron(), "an edge of the pyramid")
+
+    side2, across = _edge2(corners, edges), 4 * space_len2(o, a)
+    claim("every vertex of the pyramid is on the sphere, so it is comprehended "
+          "in it", "XI.Def.14", all(on_sphere(corner, globe) for corner in corners))
+    claim("it is contained by four equal and equilateral triangles, three edges "
+          "meeting at each corner", "XI.Def.25",
+          len(corners) == 4 and len(edges) == 6
+          and _at_each_corner(corners, edges) == {3}
+          and all(space_len2(corners[i], corners[j]) == side2 for i, j in edges))
+    claim("and the square on the diameter of the sphere is one and a half times "
+          "the square on the side of the pyramid", "XIII.13",
+          2 * across == 3 * side2)
+    return Out(pyramid=corners, side2=side2, diameter2=across)
+
+
+@proposition("XIII.14", CONSTRUCTION, sample=samples3.sphere_about)
+def prop_XIII_14(o: Point3, a: Point3) -> Out:
+    """Construct an octahedron in a sphere, and prove the square on the diameter
+    is double the square on the side."""
+    hypothesis("the sphere has a positive radius", o != a)
+    globe = sphere_through(o, a, "the given sphere")
+    line3(o, a, "the radius")
+    corners, edges = _figure(o, a, _octahedron(), "an edge of the octahedron")
+
+    because(prop_XIII_13, o, a)
+
+    side2, across = _edge2(corners, edges), 4 * space_len2(o, a)
+    claim("every vertex of the octahedron is on the sphere", "XI.Def.14",
+          all(on_sphere(corner, globe) for corner in corners))
+    claim("it is contained by eight equal and equilateral triangles, four edges "
+          "meeting at each corner", "XI.Def.26",
+          len(corners) == 6 and len(edges) == 12
+          and _at_each_corner(corners, edges) == {4}
+          and all(space_len2(corners[i], corners[j]) == side2 for i, j in edges))
+    claim("and the square on the diameter of the sphere is double the square on "
+          "the side of the octahedron", "XIII.14", across == 2 * side2)
+    return Out(octahedron=corners, side2=side2, diameter2=across)
+
+
+@proposition("XIII.15", CONSTRUCTION, sample=samples3.sphere_about)
+def prop_XIII_15(o: Point3, a: Point3) -> Out:
+    """Construct a cube in a sphere, and prove the square on the diameter is
+    triple the square on the side."""
+    hypothesis("the sphere has a positive radius", o != a)
+    globe = sphere_through(o, a, "the given sphere")
+    line3(o, a, "the radius")
+    corners, edges = _figure(o, a, _cube(), "an edge of the cube")
+
+    because(prop_XIII_14, o, a)
+
+    side2, across = _edge2(corners, edges), 4 * space_len2(o, a)
+    claim("every vertex of the cube is on the sphere", "XI.Def.14",
+          all(on_sphere(corner, globe) for corner in corners))
+    claim("it is contained by six equal squares, three edges meeting at each "
+          "corner", "XI.Def.25",
+          len(corners) == 8 and len(edges) == 12
+          and _at_each_corner(corners, edges) == {3}
+          and all(space_len2(corners[i], corners[j]) == side2 for i, j in edges))
+    claim("and the square on the diameter of the sphere is triple the square on "
+          "the side of the cube", "XIII.15", across == 3 * side2)
+    return Out(cube=corners, side2=side2, diameter2=across)
+
+
+@proposition("XIII.16", CONSTRUCTION, sample=samples3.sphere_about)
+def prop_XIII_16(o: Point3, a: Point3) -> Out:
+    """Construct an icosahedron in a sphere, and prove its side is the
+    irrational straight line called minor."""
+    hypothesis("the sphere has a positive radius", o != a)
+    hypothesis("the diameter of the sphere is rational, being the line every "
+               "other is named against",
+               is_rational_line(sqrt(4 * space_len2(o, a))))
+    globe = sphere_through(o, a, "the given sphere")
+    line3(o, a, "the radius")
+    corners, edges = _figure(o, a, _icosahedron(), "an edge of the icosahedron")
+
+    because(prop_XIII_15, o, a)
+
+    side2, across = _edge2(corners, edges), 4 * space_len2(o, a)
+    side = sqrt(side2 / across)
+    named = classify(side)
+    # X.76 makes the minor out of two lines incommensurable in square whose
+    # squares add to a rational area and whose rectangle is medial. The two are
+    # the terms the side itself divides into, so the appeal is carried out on
+    # the figure's own magnitudes and not on a pair chosen to suit it.
+    because(get("X.76").wrapped, named.terms[0], -named.terms[1])
+
+    claim("every vertex of the icosahedron is on the sphere", "XI.Def.14",
+          all(on_sphere(corner, globe) for corner in corners))
+    claim("it is contained by twenty equal and equilateral triangles, five "
+          "edges meeting at each corner", "XI.Def.27",
+          len(corners) == 12 and len(edges) == 30
+          and _at_each_corner(corners, edges) == {5}
+          and all(space_len2(corners[i], corners[j]) == side2 for i, j in edges))
+    claim("and the side of the icosahedron is the irrational straight line "
+          "called minor", "X.76", named.name == "minor")
+    claim("it is of the fourth degree over the rationals, so neither a rational "
+          "line nor a medial one", "X.73", named.algebraic_degree == 4)
+    return Out(icosahedron=corners, side2=side2, side=side, name=named.name)
+
+
+@proposition("XIII.17", CONSTRUCTION, sample=samples3.sphere_about)
+def prop_XIII_17(o: Point3, a: Point3) -> Out:
+    """Construct a dodecahedron in a sphere, and prove its side is the
+    irrational straight line called apotome."""
+    hypothesis("the sphere has a positive radius", o != a)
+    hypothesis("the diameter of the sphere is rational, being the line every "
+               "other is named against",
+               is_rational_line(sqrt(4 * space_len2(o, a))))
+    globe = sphere_through(o, a, "the given sphere")
+    line3(o, a, "the radius")
+    corners, edges = _figure(o, a, _dodecahedron(), "an edge of the dodecahedron")
+
+    because(prop_XIII_16, o, a)
+
+    side2, across = _edge2(corners, edges), 4 * space_len2(o, a)
+    side = sqrt(side2 / across)
+    named = classify(side)
+    because(prop_X_73, named.terms[0], -named.terms[1])
+
+    claim("every vertex of the dodecahedron is on the sphere", "XI.Def.14",
+          all(on_sphere(corner, globe) for corner in corners))
+    claim("it is contained by twelve equal and equilateral pentagons, three "
+          "edges meeting at each corner", "XI.Def.28",
+          len(corners) == 20 and len(edges) == 30
+          and _at_each_corner(corners, edges) == {3}
+          and all(space_len2(corners[i], corners[j]) == side2 for i, j in edges))
+    claim("and the side of the dodecahedron is the irrational straight line "
+          "called apotome", "X.73", named.family == "apotome")
+    claim("its two terms are rational lines commensurable in square only",
+          "X.73",
+          len(named.terms) == 2
+          and all(is_rational_in_square(term) for term in
+                  (named.terms[0], -named.terms[1]))
+          and not commensurable(named.terms[0], -named.terms[1]))
+    return Out(dodecahedron=corners, side2=side2, side=side, name=named.name)
+
+
+def _regular_solids() -> tuple:
+    """The pairs a regular solid can be made of, and there are five.
+
+    A face has three sides at least and three faces meet at a solid angle at
+    least; by XI.21 the plane angles at that angle fall short of four right
+    angles, and the angle of a regular figure on ``p`` sides is
+    ``(p - 2) / p`` of two right angles, so ``q (p - 2) / p < 2``.  Written
+    without the fraction that is ``(p - 2)(q - 2) < 4``, and it has five answers.
+    """
+    return tuple((p, q) for p in range(3, 12) for q in range(3, 12)
+                 if (p - 2) * (q - 2) < 4)
+
+
+@proposition("XIII.18", THEOREM, sample=samples3.sphere_about)
+def prop_XIII_18(o: Point3, a: Point3) -> Out:
+    """Set out the sides of the five figures and compare them with one another."""
+    hypothesis("the sphere has a positive radius", o != a)
+    hypothesis("the diameter of the sphere is rational",
+               is_rational_line(sqrt(4 * space_len2(o, a))))
+    line3(o, a, "the radius of the sphere all five are comprehended in")
+
+    sides = (because(prop_XIII_13, o, a).side2,
+             because(prop_XIII_14, o, a).side2,
+             because(prop_XIII_15, o, a).side2,
+             because(prop_XIII_16, o, a).side2,
+             because(prop_XIII_17, o, a).side2)
+    across = 4 * space_len2(o, a)
+
+    claim("the side of the pyramid is greater than the side of the octahedron, "
+          "and that than the side of the cube", "XIII.15",
+          sign(sides[0] - sides[1]) > 0 and sign(sides[1] - sides[2]) > 0)
+    claim("the side of the cube is greater than the side of the icosahedron, "
+          "and that than the side of the dodecahedron", "XIII.17",
+          sign(sides[2] - sides[3]) > 0 and sign(sides[3] - sides[4]) > 0)
+    claim("the first three have to the diameter a ratio a number can name, and "
+          "the last two have not", "X.73",
+          all(isinstance(span / across, Fraction) for span in sides[:3])
+          and not any(isinstance(span / across, Fraction) for span in sides[3:]))
+    claim("and there is no sixth figure", "XI.21",
+          len(_regular_solids()) == 5
+          and set(_regular_solids()) == {(3, 3), (3, 4), (3, 5), (4, 3), (5, 3)})
+    return Out(sides=sides, diameter2=across, figures=_regular_solids())

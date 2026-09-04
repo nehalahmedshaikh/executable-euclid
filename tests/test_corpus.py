@@ -225,7 +225,7 @@ def test_no_proposition_overwrites_a_given():
 # be encoded up to its stated number with no holes; a book absent from it must
 # be empty or complete. The dict is emptied when the last book lands, and an
 # entry that reaches the book's full size is a stale one.
-IN_PROGRESS = {"XI": 23, "XIII": 12}
+IN_PROGRESS: dict = {}
 
 
 @pytest.mark.parametrize("book", [b for b in BOOK_ORDER if b in BOOK_SIZES])
@@ -256,6 +256,12 @@ def corpus():
     """
     return {entry.ref: (entry, certify(entry.ref, trials=8))
             for entry in all_propositions()}
+
+
+def test_every_proposition_certifies(corpus):
+    failures = {ref: report.failures for ref, (_, report) in corpus.items()
+                if report.failures}
+    assert not failures
 
 
 def test_every_proposition_makes_at_least_one_claim(corpus):

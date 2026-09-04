@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from fractions import Fraction
 from pathlib import Path
@@ -230,8 +231,15 @@ def cmd_measure(args) -> int:
         from .measure.record import RECORDED_TRIALS
 
         strength = args.trials if args.trials is not None else RECORDED_TRIALS
-        print(f"running the corpus at {strength} trials; this takes several minutes")
-        payload = write_findings(trials=strength)
+        print(
+            f"running the corpus at {strength} trials on {args.jobs} "
+            f"{'process' if args.jobs == 1 else 'processes'}"
+        )
+        payload = write_findings(
+            trials=strength, jobs=args.jobs,
+            progress=lambda stage: print(f"finished: {stage}", flush=True),
+            resume=args.resume,
+        )
         print(f"wrote {FINDINGS_PATH.name}: {payload['corpus']} propositions measured")
         return 0
 
@@ -404,6 +412,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="recompute and record findings.json, which the site reads")
     p.add_argument("--trials", type=int, default=None,
                    help="how hard to try; --write records at 48 unless told otherwise")
+    p.add_argument("--jobs", type=int, default=min(4, os.cpu_count() or 1),
+                   help="parallel processes for --write (default: up to 4)")
+    p.add_argument("--resume", action="store_true",
+                   help="reuse completed stages from an interrupted --write")
     p.set_defaults(func=cmd_measure)
 
     p = subs.add_parser("gap", help="constructible numbers Book X cannot name")

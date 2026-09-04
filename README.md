@@ -22,7 +22,7 @@ I.47  In right-angled triangles the square on the side subtending the right angl
   15 lines and circles drawn, 12 steps, all checked exactly.
 ```
 
-**Books I to X are complete, and Book XI is under way: 425 propositions.** The generated site is at
+**The complete Elements is executable.** The generated site is at
 [**nehalahmedshaikh.github.io/executable-euclid**](https://nehalahmedshaikh.github.io/executable-euclid/).
 
 ---
@@ -63,29 +63,15 @@ with the command that reproduces it, graded by how strong the claim is.
 
 ## What is covered
 
-| Book | Encoded | |
-|---|---|---|
-| **I** | **48 / 48** | congruence, parallels, area, Pythagoras |
-| **II** | **14 / 14** | geometric algebra, the golden section |
-| **III** | **37 / 37** | circles, tangents, the power of a point |
-| **IV** | **16 / 16** | inscribed and circumscribed figures |
-| **V** | **25 / 25** | Eudoxus on proportion |
-| **VI** | **33 / 33** | similar figures, application of areas |
-| **VII** | **39 / 39** | the Euclidean algorithm, primes, proportion |
-| **VIII** | **27 / 27** | continued proportions, squares and cubes |
-| **IX** | **36 / 36** | primes, parity, perfect numbers |
-| **X** | **115 / 115** | incommensurables, the thirteen irrationals |
-| XI | **23 / 39** | solid geometry |
-| XII | 0 / 18 | the method of exhaustion |
-| XIII | **12 / 18** | the golden section, the pentagon, the regular solids |
+The executable corpus covers every book in full. The generated site's
+index is the authoritative coverage report; it derives its totals directly from
+the proposition registry rather than repeating them here.
 
-**425 propositions**, 1712 checked steps on one figure apiece and 14187 counting the propositions they carry out. Book XI is where Euclid stops having postulates: the five
-are postulates of the plane, and Book XI opens with definitions and then argues,
-so every construction in space is recorded as licensed by nothing and the
-assumption ledger counts what that costs. XI.3 carries two such debts and XI.4
-one, where I.47 carries none. Books V and VII to X argue about numbers and
-magnitudes, so they draw nothing, as Euclid draws nothing there; what they check
-is exact all the same.
+Book XI is where Euclid stops having postulates: the five are postulates of the
+plane, and Book XI opens with definitions and then argues. Constructions in space
+therefore expose assumptions in the ledger that planar constructions do not.
+Books V and VII to X argue about ratios, numbers, and magnitudes, so they draw
+nothing, as Euclid draws nothing there; what they check is exact all the same.
 
 ## What "checked" means
 
@@ -94,33 +80,21 @@ tested exactly against the figure that was built. So a conclusion is confirmed
 true of the figure. Whether it *follows from the postulates by Euclid's rules of
 inference* is a separate question, and the machine is silent on it.
 
-**Dependencies are two different things, and only one is an observation.** 457
-edges are **executed**: the step carries out the proposition it appeals to, on
-its own points, so that proposition's hypotheses are enforced against this figure
-and its conclusions checked on it. 23 are **cited** — a reference written beside
-a step, following Heath's margins, checked for naming a proposition that exists
-and for not naming a later one. That is all a citation is checked for, because
-`claim` records its warrant without consulting it, so a cited step could name the
-wrong result and stay green. **95% of the graph is executed**, and every edge
-that is not carries its reason in the source beside it. Fourteen of the
-twenty-three are reductios and the like, where the figure the citation names is
-the one the proposition disproves, so there is nothing to carry out; the rest
-are appeals not yet built. *"148 propositions depend on I.1"* reads Euclid's own
-cross-references back.
+**Dependencies are recorded in two forms.** An executed edge carries out the
+proposition it appeals to on the current figure, enforcing its hypotheses and
+checking its conclusions. A cited edge records Heath's marginal reference and
+checks only that it names an existing, earlier proposition. The generated graph
+reports the current provenance and dependency totals directly from those records.
 
-**The necessity analysis is empirical.** Each of the 804 hypotheses Euclid
-states is bent in turn and the conclusion watched. Coverage is 100% in that every
-one of them carries a verdict, and that figure is worth nothing on its own: a
-separating configuration — one that breaks the hypothesis and leaves its
-neighbours standing — was found for 51% of them. The rest are **implied**, which
-says the others may entail them and is the honest reading of a hypothesis that
-cannot be broken alone. A hypothesis that survives being broken is reported as a
-candidate, with the number of configurations behind it, and 395 implied verdicts
-are evidence of the same weak kind.
+**The necessity analysis is empirical.** It bends each stated hypothesis and
+watches the conclusion. A separating configuration is evidence; failure to find
+one may mean the remaining hypotheses imply the one being bent. The generated
+findings page is the authoritative report of trial strength, coverage, candidates,
+and implied verdicts.
 
 **Certified and actually tested are not the same.** A claim that cannot come out
 false, or a hypothesis no sampled figure can satisfy, passes every run while
-checking nothing, and twenty-eight claims did: Book X applied an area to the
+checking nothing, and some claims did: Book X applied an area to the
 rational line, gave the result a second name, and compared the two names.
 [`tests/test_corpus.py`](tests/test_corpus.py) follows each name back to what it
 was assigned, and sorts sums and products, before comparing the two sides of a
@@ -132,8 +106,7 @@ corpus and reports the ones that no bend of it made false.
 ## Where the words come from
 
 Proposition statements are Thomas L. Heath's 1908 translation, out of copyright,
-parsed from a local epub by [`tools/fetch_heath.py`](tools/fetch_heath.py) — one
-source, all thirteen books, **465 enunciations**. The scanning errors found so
+parsed from a local epub by [`tools/fetch_heath.py`](tools/fetch_heath.py) — one source for the complete corpus. The scanning errors found so
 far are corrected and listed, with the method that caught them, on the
 [text page](https://nehalahmedshaikh.github.io/executable-euclid/text.html).
 
@@ -141,8 +114,12 @@ far are corrected and listed, with the method that caught them, on the
 
 Python 3.11 or newer. **No dependencies at all.**
 
+On Linux and macOS, create an isolated environment first:
+
 ```console
-$ pip install -e ".[dev]"
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ python -m pip install -e ".[dev]"
 $ pytest
 $ euclid list I
 $ euclid run I.47              # construct it and check every step
@@ -150,8 +127,13 @@ $ euclid why I.47              # what it rests on
 $ euclid ngon 17               # constructible; 7 is not, and it says why
 $ euclid classify "sqrt(3)+sqrt(5)"   # Book X's name for a magnitude
 $ euclid measure --depth       # algebraic degree, book by book
-$ euclid site --out docs       # rebuild the website
+$ euclid site --out docs       # build the website locally (docs/ is ignored)
 ```
+
+On Windows, create the same environment with `py -m venv .venv` and activate it
+with `.venv\Scripts\Activate.ps1`. GitHub Actions builds the site once, audits
+that exact output, and deploys it to GitHub Pages; generated HTML is not kept in
+Git.
 
 ## How it is put together
 
@@ -168,7 +150,7 @@ src/euclid/
   search/    the shortest-construction search and its instruction sets
   render/    diagrams from records, and the website
 tools/       fetch_heath.py — parses the translation from a local epub
-docs/        the generated website
+docs/        a local website build (generated and ignored)
 ```
 
 ## Licence

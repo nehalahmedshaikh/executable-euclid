@@ -1,7 +1,7 @@
 """The measurements, computed once and written down.
 
 Running the whole corpus to answer one question takes minutes -- the depth
-profile executes all 390 propositions, and the necessity analysis executes each
+profile executes the full corpus, and the necessity analysis executes each
 of them once per configuration it perturbs. Doing that inside a site build would
 make the build unusable and CI worse.
 
@@ -16,9 +16,12 @@ was computed from, so a stale one can be spotted.
 
 from __future__ import annotations
 
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import hashlib
 import json
+import pickle
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from ..elements.registry import all_propositions
 from .depth import ceilings, depth_profile, first_appearances
@@ -40,18 +43,84 @@ FINDINGS_PATH = Path(__file__).with_name("findings.json")
 RECORDED_TRIALS = 48
 
 
-def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -> dict:
+def _source_fingerprint() -> str:
+    root = Path(__file__).resolve().parents[3]
+    digest = hashlib.sha256()
+    for source in sorted((root / "src" / "euclid").rglob("*.py")):
+        digest.update(str(source.relative_to(root)).encode())
+        digest.update(source.read_bytes())
+    return digest.hexdigest()
+
+
+def _save_checkpoint(path: Path, trials: int, fingerprint: str, results: dict) -> None:
+    """Atomically preserve completed stages so Ctrl-C can be resumed safely."""
+    temporary = path.with_suffix(".tmp")
+    temporary.write_bytes(pickle.dumps({"trials": trials, "fingerprint": fingerprint, "results": results}))
+    temporary.replace(path)
+
+
+def write_findings(
+    trials: int = RECORDED_TRIALS,
+    path: Optional[Path] = None,
+    jobs: int = 1,
+    progress: Optional[Callable[[str], None]] = None,
+    resume: bool = False,
+) -> dict:
     """Compute every measurement and write it down.
 
     The necessity trials are worth paying for: each proposition has a plan of
     perturbations roughly quadratic in its number of points, and a trial spends
     one of them, so coverage climbs with the count -- 36% at sixteen, 45% at
     forty-eight.
+
+    The expensive stages are independent and deterministic, so ``jobs``
+    executes them in separate processes. The single-job path is retained for
+    callers that need to avoid child processes.
     """
+    if jobs < 1:
+        raise ValueError("jobs must be at least one")
     path = path or FINDINGS_PATH
-    profile = depth_profile()
-    report = necessity_report(trials=trials)
-    claims = mutation_report(trials=trials)
+    checkpoint = Path(".euclid-cache") / f"findings-{trials}.pickle"
+    fingerprint = _source_fingerprint()
+    results = {}
+    if resume and checkpoint.exists():
+        saved = pickle.loads(checkpoint.read_bytes())
+        if saved.get("trials") == trials and saved.get("fingerprint") == fingerprint:
+            results = saved.get("results", {})
+            if progress is not None:
+                for name in results:
+                    progress(f"cached {name}")
+    stages = [
+        ("algebraic depth", depth_profile, ()),
+        ("hypothesis necessity", necessity_report, (None, trials)),
+        ("claim mutation", mutation_report, (None, trials)),
+        ("construction searches", _constructions, ()),
+        ("field ladder", _fields, ()),
+    ]
+    checkpoint.parent.mkdir(exist_ok=True)
+    remaining = [stage for stage in stages if stage[0] not in results]
+    if jobs == 1:
+        for name, function, arguments in remaining:
+            results[name] = function(*arguments)
+            _save_checkpoint(checkpoint, trials, fingerprint, results)
+            if progress is not None:
+                progress(name)
+    else:
+        with ProcessPoolExecutor(max_workers=jobs) as pool:
+            pending = {
+                pool.submit(function, *arguments): name
+                for name, function, arguments in remaining
+            }
+            for future in as_completed(pending):
+                name = pending[future]
+                results[name] = future.result()
+                _save_checkpoint(checkpoint, trials, fingerprint, results)
+                if progress is not None:
+                    progress(name)
+
+    profile = results["algebraic depth"]
+    report = results["hypothesis necessity"]
+    claims = results["claim mutation"]
     gaps = taxonomy_gaps(limit=6)
     named, unnamed = named_count()
 
@@ -101,8 +170,8 @@ def write_findings(trials: int = RECORDED_TRIALS, path: Optional[Path] = None) -
                 for i in sorted(claims.unfalsified, key=lambda x: (x.ref, x.text))
             ],
         },
-        "constructions": _constructions(),
-        "fields": _fields(),
+        "constructions": results["construction searches"],
+        "fields": results["field ladder"],
         "book_x_gaps": {
             "candidates_named": named,
             "candidates_unnamed": unnamed,

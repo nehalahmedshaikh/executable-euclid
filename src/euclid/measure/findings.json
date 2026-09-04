@@ -1,5 +1,5 @@
 {
-  "corpus": 425,
+  "corpus": 465,
   "method": "Every number here was computed by running the corpus. Depth is exact. The necessity and mutation figures are empirical: one given is bent, and what survives the bending is a candidate, not a theorem.",
   "depth": {
     "ceilings": {
@@ -13,7 +13,8 @@
       "VIII": 1,
       "IX": 1,
       "X": 32,
-      "XI": 1,
+      "XI": 8,
+      "XII": 4,
       "XIII": 8
     },
     "first_appearances": {
@@ -24,10 +25,10 @@
       "32": "X.115"
     },
     "histogram": {
-      "1": 246,
-      "2": 89,
-      "4": 69,
-      "8": 19,
+      "1": 257,
+      "2": 105,
+      "4": 78,
+      "8": 23,
       "32": 1
     },
     "deepest": [
@@ -60,30 +61,27 @@
   },
   "necessity": {
     "trials": 48,
-    "propositions": 425,
-    "hypotheses": 804,
-    "judged": 804,
-    "separated": 409,
+    "propositions": 465,
+    "hypotheses": 868,
+    "judged": 868,
+    "separated": 415,
     "coverage": 1.0,
-    "separated_share": 0.5087,
-    "implied": 395,
+    "separated_share": 0.4781,
+    "implied": 453,
     "needed": 276,
     "well_defined": 44,
     "surviving_guards": 57,
     "truncated": [
+      "I.11",
       "I.12",
       "I.16",
       "I.17",
       "I.18",
       "I.20",
       "I.21",
-      "I.32",
-      "I.38",
       "I.42",
-      "I.43",
       "I.44",
       "I.45",
-      "I.46",
       "I.47",
       "I.48",
       "I.5",
@@ -98,19 +96,17 @@
       "II.6",
       "II.9",
       "III.1",
-      "III.10",
       "III.14",
       "III.15",
       "III.2",
       "III.20",
-      "III.23",
       "III.3",
+      "III.30",
+      "III.33",
       "III.35",
       "III.36",
       "III.37",
-      "III.4",
       "III.7",
-      "III.8",
       "III.9",
       "IV.10",
       "IV.11",
@@ -120,25 +116,49 @@
       "IV.16",
       "IV.3",
       "IV.4",
+      "IV.5",
       "IV.8",
       "IV.9",
       "IX.13",
       "IX.17",
       "IX.36",
       "VI.13",
+      "VI.27",
+      "VI.28",
+      "VI.29",
       "VI.3",
       "VI.30",
       "VI.31",
       "VI.8",
       "VII.33",
       "X.107",
+      "X.115",
       "X.41",
       "X.47",
       "X.70",
+      "X.78",
+      "X.84",
+      "XI.26",
+      "XI.35",
+      "XI.36",
+      "XI.37",
+      "XII.10",
+      "XII.11",
+      "XII.12",
+      "XII.13",
+      "XII.14",
+      "XII.15",
+      "XII.16",
+      "XII.17",
+      "XII.18",
+      "XII.2",
       "XIII.1",
       "XIII.10",
       "XIII.11",
       "XIII.12",
+      "XIII.16",
+      "XIII.17",
+      "XIII.18",
       "XIII.2",
       "XIII.3",
       "XIII.4",
@@ -149,6 +169,16 @@
       "XIII.9"
     ],
     "candidates": [
+      {
+        "ref": "XI.38",
+        "text": "the solid is a cube, its edges equal and at right angles",
+        "configurations": 48
+      },
+      {
+        "ref": "XII.1",
+        "text": "the four points are on one circle about the centre",
+        "configurations": 48
+      },
       {
         "ref": "X.39",
         "text": "the sum of the squares on them is rational",
@@ -175,11 +205,6 @@
         "configurations": 22
       },
       {
-        "ref": "X.107",
-        "text": "the line is of the kind in question",
-        "configurations": 18
-      },
-      {
         "ref": "IX.16",
         "text": "the numbers are prime to one another",
         "configurations": 17
@@ -191,11 +216,6 @@
       },
       {
         "ref": "X.67",
-        "text": "the line is of the kind in question",
-        "configurations": 16
-      },
-      {
-        "ref": "X.70",
         "text": "the line is of the kind in question",
         "configurations": 16
       },
@@ -213,6 +233,11 @@
         "ref": "X.106",
         "text": "the line is of the kind in question",
         "configurations": 14
+      },
+      {
+        "ref": "X.70",
+        "text": "the line is of the kind in question",
+        "configurations": 12
       },
       {
         "ref": "II.1",
@@ -255,9 +280,19 @@
         "configurations": 8
       },
       {
+        "ref": "X.107",
+        "text": "the line is of the kind in question",
+        "configurations": 8
+      },
+      {
+        "ref": "XIII.16",
+        "text": "the diameter of the sphere is rational, being the line every other is named against",
+        "configurations": 8
+      },
+      {
         "ref": "II.9",
         "text": "D cuts AB",
-        "configurations": 6
+        "configurations": 5
       },
       {
         "ref": "X.1",
@@ -275,14 +310,14 @@
         "configurations": 4
       },
       {
-        "ref": "X.72",
-        "text": "both areas are medial",
+        "ref": "II.10",
+        "text": "B lies between A and D",
         "configurations": 3
       },
       {
-        "ref": "II.10",
-        "text": "B lies between A and D",
-        "configurations": 2
+        "ref": "X.72",
+        "text": "both areas are medial",
+        "configurations": 3
       },
       {
         "ref": "V.5",
@@ -295,8 +330,18 @@
         "configurations": 2
       },
       {
-        "ref": "III.15",
-        "text": "the points lie on the circle",
+        "ref": "XIII.17",
+        "text": "the diameter of the sphere is rational, being the line every other is named against",
+        "configurations": 2
+      },
+      {
+        "ref": "XIII.18",
+        "text": "the diameter of the sphere is rational",
+        "configurations": 2
+      },
+      {
+        "ref": "II.13",
+        "text": "the perpendicular falls within CB",
         "configurations": 1
       },
       {
@@ -308,16 +353,21 @@
         "ref": "X.110",
         "text": "both are medial areas",
         "configurations": 1
+      },
+      {
+        "ref": "XII.2",
+        "text": "the four points are on one circle about the centre",
+        "configurations": 1
       }
     ]
   },
   "mutation": {
     "trials": 48,
-    "propositions": 425,
-    "claims": 954,
-    "live": 432,
-    "coverage": 0.4528,
-    "unreached": 20,
+    "propositions": 465,
+    "claims": 1075,
+    "live": 430,
+    "coverage": 0.4,
+    "unreached": 66,
     "unfalsified": [
       {
         "ref": "I.1",
@@ -349,7 +399,7 @@
         "by": [
           "I.4"
         ],
-        "bends": 18
+        "bends": 43
       },
       {
         "ref": "I.10",
@@ -357,7 +407,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 18
+        "bends": 43
       },
       {
         "ref": "I.10",
@@ -365,7 +415,7 @@
         "by": [
           "Def.4"
         ],
-        "bends": 18
+        "bends": 43
       },
       {
         "ref": "I.11",
@@ -373,7 +423,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 9
+        "bends": 18
       },
       {
         "ref": "I.11",
@@ -381,7 +431,7 @@
         "by": [
           "I.1"
         ],
-        "bends": 9
+        "bends": 18
       },
       {
         "ref": "I.11",
@@ -389,7 +439,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 9
+        "bends": 18
       },
       {
         "ref": "I.12",
@@ -397,7 +447,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 5
+        "bends": 20
       },
       {
         "ref": "I.12",
@@ -405,7 +455,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 5
+        "bends": 20
       },
       {
         "ref": "I.12",
@@ -413,7 +463,7 @@
         "by": [
           "Def.10"
         ],
-        "bends": 5
+        "bends": 20
       },
       {
         "ref": "I.12",
@@ -421,7 +471,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 5
+        "bends": 20
       },
       {
         "ref": "I.14",
@@ -437,7 +487,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "I.16",
@@ -445,7 +495,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "I.16",
@@ -453,7 +503,7 @@
         "by": [
           "I.4"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "I.16",
@@ -461,7 +511,7 @@
         "by": [
           "C.N.5"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "I.16",
@@ -469,7 +519,7 @@
         "by": [
           "I.15"
         ],
-        "bends": 40
+        "bends": 39
       },
       {
         "ref": "I.17",
@@ -477,7 +527,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 19
+        "bends": 20
       },
       {
         "ref": "I.17",
@@ -485,7 +535,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 19
+        "bends": 20
       },
       {
         "ref": "I.17",
@@ -493,7 +543,7 @@
         "by": [
           "I.16"
         ],
-        "bends": 19
+        "bends": 20
       },
       {
         "ref": "I.18",
@@ -503,7 +553,7 @@
           "I.5",
           "I.16"
         ],
-        "bends": 12
+        "bends": 10
       },
       {
         "ref": "I.2",
@@ -552,7 +602,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 10
+        "bends": 8
       },
       {
         "ref": "I.20",
@@ -561,7 +611,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 10
+        "bends": 8
       },
       {
         "ref": "I.20",
@@ -570,7 +620,7 @@
           "I.5",
           "I.19"
         ],
-        "bends": 10
+        "bends": 8
       },
       {
         "ref": "I.22",
@@ -666,7 +716,7 @@
         "by": [
           "I.31"
         ],
-        "bends": 32
+        "bends": 23
       },
       {
         "ref": "I.42",
@@ -674,7 +724,7 @@
         "by": [
           "I.38"
         ],
-        "bends": 32
+        "bends": 23
       },
       {
         "ref": "I.42",
@@ -682,7 +732,7 @@
         "by": [
           "I.23"
         ],
-        "bends": 32
+        "bends": 23
       },
       {
         "ref": "I.42",
@@ -690,7 +740,7 @@
         "by": [
           "I.41"
         ],
-        "bends": 32
+        "bends": 23
       },
       {
         "ref": "I.44",
@@ -700,7 +750,7 @@
           "I.23",
           "I.42"
         ],
-        "bends": 4
+        "bends": 2
       },
       {
         "ref": "I.44",
@@ -708,7 +758,7 @@
         "by": [
           "I.31"
         ],
-        "bends": 4
+        "bends": 2
       },
       {
         "ref": "I.44",
@@ -716,7 +766,7 @@
         "by": [
           "I.15"
         ],
-        "bends": 4
+        "bends": 2
       },
       {
         "ref": "I.44",
@@ -724,7 +774,7 @@
         "by": [
           "I.43"
         ],
-        "bends": 4
+        "bends": 2
       },
       {
         "ref": "I.44",
@@ -732,39 +782,7 @@
         "by": [
           "C.N.1"
         ],
-        "bends": 4
-      },
-      {
-        "ref": "I.45",
-        "text": "and each is in the given angle",
-        "by": [
-          "I.44"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "I.45",
-        "text": "the first parallelogram equals the triangle ABC",
-        "by": [
-          "I.42"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "I.45",
-        "text": "the second, applied to its side, equals the triangle ACD",
-        "by": [
-          "I.44"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "I.45",
-        "text": "together they equal the whole figure",
-        "by": [
-          "C.N.2"
-        ],
-        "bends": 1
+        "bends": 2
       },
       {
         "ref": "I.46",
@@ -808,11 +826,27 @@
       },
       {
         "ref": "I.47",
+        "text": "the parallel through B meets AC within it, and the far side beyond",
+        "by": [
+          "I.31"
+        ],
+        "bends": 16
+      },
+      {
+        "ref": "I.47",
         "text": "the squares are described on the three sides, each falling away from the triangle",
         "by": [
           "I.46"
         ],
-        "bends": 24
+        "bends": 16
+      },
+      {
+        "ref": "I.47",
+        "text": "therefore the square on AC equals the squares on AB and BC together",
+        "by": [
+          "C.N.2"
+        ],
+        "bends": 16
       },
       {
         "ref": "I.9",
@@ -820,7 +854,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 33
+        "bends": 38
       },
       {
         "ref": "I.9",
@@ -828,7 +862,7 @@
         "by": [
           "I.1"
         ],
-        "bends": 33
+        "bends": 38
       },
       {
         "ref": "I.9",
@@ -836,7 +870,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 33
+        "bends": 38
       },
       {
         "ref": "I.9",
@@ -844,7 +878,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 33
+        "bends": 38
       },
       {
         "ref": "II.10",
@@ -852,7 +886,7 @@
         "by": [
           "I.11"
         ],
-        "bends": 6
+        "bends": 5
       },
       {
         "ref": "II.10",
@@ -861,7 +895,7 @@
           "I.47",
           "II.4"
         ],
-        "bends": 6
+        "bends": 5
       },
       {
         "ref": "II.11",
@@ -869,7 +903,7 @@
         "by": [
           "Post.1"
         ],
-        "bends": 11
+        "bends": 9
       },
       {
         "ref": "II.11",
@@ -877,7 +911,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 11
+        "bends": 9
       },
       {
         "ref": "II.11",
@@ -886,7 +920,7 @@
           "II.6",
           "I.47"
         ],
-        "bends": 11
+        "bends": 9
       },
       {
         "ref": "II.12",
@@ -894,7 +928,7 @@
         "by": [
           "I.12"
         ],
-        "bends": 5
+        "bends": 3
       },
       {
         "ref": "II.13",
@@ -927,7 +961,7 @@
         "by": [
           "I.46"
         ],
-        "bends": 37
+        "bends": 32
       },
       {
         "ref": "II.5",
@@ -935,7 +969,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 23
+        "bends": 18
       },
       {
         "ref": "II.5",
@@ -943,7 +977,7 @@
         "by": [
           "I.46"
         ],
-        "bends": 23
+        "bends": 18
       },
       {
         "ref": "II.6",
@@ -951,7 +985,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 24
+        "bends": 21
       },
       {
         "ref": "II.6",
@@ -960,7 +994,7 @@
           "II.5",
           "I.46"
         ],
-        "bends": 24
+        "bends": 21
       },
       {
         "ref": "II.7",
@@ -976,7 +1010,7 @@
         "by": [
           "I.11"
         ],
-        "bends": 6
+        "bends": 5
       },
       {
         "ref": "II.9",
@@ -985,7 +1019,7 @@
           "I.47",
           "II.4"
         ],
-        "bends": 6
+        "bends": 5
       },
       {
         "ref": "III.1",
@@ -994,7 +1028,7 @@
           "I.10",
           "I.11"
         ],
-        "bends": 41
+        "bends": 45
       },
       {
         "ref": "III.13",
@@ -1210,7 +1244,7 @@
         "by": [
           "I.8"
         ],
-        "bends": 44
+        "bends": 47
       },
       {
         "ref": "III.30",
@@ -1218,7 +1252,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 40
+        "bends": 36
       },
       {
         "ref": "III.32",
@@ -1234,7 +1268,7 @@
         "by": [
           "III.21"
         ],
-        "bends": 39
+        "bends": 37
       },
       {
         "ref": "III.33",
@@ -1242,7 +1276,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 39
+        "bends": 37
       },
       {
         "ref": "III.34",
@@ -1267,7 +1301,7 @@
           "II.6",
           "I.47"
         ],
-        "bends": 8
+        "bends": 4
       },
       {
         "ref": "III.36",
@@ -1275,7 +1309,7 @@
         "by": [
           "III.18"
         ],
-        "bends": 8
+        "bends": 4
       },
       {
         "ref": "III.37",
@@ -1283,7 +1317,7 @@
         "by": [
           "III.16"
         ],
-        "bends": 9
+        "bends": 5
       },
       {
         "ref": "III.37",
@@ -1291,7 +1325,7 @@
         "by": [
           "III.18"
         ],
-        "bends": 9
+        "bends": 5
       },
       {
         "ref": "III.37",
@@ -1299,7 +1333,7 @@
         "by": [
           "III.36"
         ],
-        "bends": 9
+        "bends": 5
       },
       {
         "ref": "III.4",
@@ -1395,7 +1429,7 @@
         "by": [
           "I.3"
         ],
-        "bends": 10
+        "bends": 5
       },
       {
         "ref": "IV.10",
@@ -1404,7 +1438,7 @@
           "II.11",
           "III.32"
         ],
-        "bends": 10
+        "bends": 5
       },
       {
         "ref": "IV.10",
@@ -1412,63 +1446,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 10
-      },
-      {
-        "ref": "IV.11",
-        "text": "and equiangular",
-        "by": [
-          "III.27"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.11",
-        "text": "every vertex lies on the given circle",
-        "by": [
-          "Def.15"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.11",
-        "text": "stepping the chord round the circle reaches five distinct points",
-        "by": [
-          "Post.3"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.11",
-        "text": "the diagonal exceeds the side in extreme and mean ratio",
-        "by": [
-          "II.11"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.11",
-        "text": "the pentagon is equilateral",
-        "by": [
-          "Def.19"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.14",
-        "text": "so one circle passes through all five",
-        "by": [
-          "Def.15"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.14",
-        "text": "the centre is equally distant from every vertex",
-        "by": [
-          "I.6"
-        ],
-        "bends": 1
+        "bends": 5
       },
       {
         "ref": "IV.15",
@@ -1532,7 +1510,7 @@
         "by": [
           "III.16"
         ],
-        "bends": 18
+        "bends": 10
       },
       {
         "ref": "IV.3",
@@ -1540,39 +1518,7 @@
         "by": [
           "III.32"
         ],
-        "bends": 18
-      },
-      {
-        "ref": "IV.4",
-        "text": "each perpendicular meets its side at right angles",
-        "by": [
-          "I.12"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.4",
-        "text": "so the circle on that radius touches all three sides",
-        "by": [
-          "III.16"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.4",
-        "text": "the centre lies on the bisector of each angle",
-        "by": [
-          "I.9"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "IV.4",
-        "text": "the perpendiculars from it to the three sides are equal",
-        "by": [
-          "I.26"
-        ],
-        "bends": 1
+        "bends": 10
       },
       {
         "ref": "IV.5",
@@ -1580,7 +1526,7 @@
         "by": [
           "Def.15"
         ],
-        "bends": 48
+        "bends": 40
       },
       {
         "ref": "IV.5",
@@ -1589,7 +1535,7 @@
           "I.10",
           "I.11"
         ],
-        "bends": 48
+        "bends": 40
       },
       {
         "ref": "IV.6",
@@ -1733,7 +1679,7 @@
         "by": [
           "IX.35"
         ],
-        "bends": 5
+        "bends": 4
       },
       {
         "ref": "IX.5",
@@ -2069,7 +2015,7 @@
         "by": [
           "III.31"
         ],
-        "bends": 11
+        "bends": 6
       },
       {
         "ref": "VI.16",
@@ -2181,7 +2127,7 @@
         "by": [
           "VI.23"
         ],
-        "bends": 48
+        "bends": 38
       },
       {
         "ref": "VI.27",
@@ -2189,7 +2135,7 @@
         "by": [
           "II.5"
         ],
-        "bends": 48
+        "bends": 38
       },
       {
         "ref": "VI.30",
@@ -2197,7 +2143,7 @@
         "by": [
           "II.11"
         ],
-        "bends": 38
+        "bends": 25
       },
       {
         "ref": "VI.30",
@@ -2205,7 +2151,7 @@
         "by": [
           "VI.17"
         ],
-        "bends": 38
+        "bends": 25
       },
       {
         "ref": "VI.30",
@@ -2213,7 +2159,7 @@
         "by": [
           "Def.22"
         ],
-        "bends": 38
+        "bends": 25
       },
       {
         "ref": "VI.30",
@@ -2221,7 +2167,7 @@
         "by": [
           "VI.17"
         ],
-        "bends": 38
+        "bends": 25
       },
       {
         "ref": "VI.31",
@@ -2229,7 +2175,7 @@
         "by": [
           "VI.20"
         ],
-        "bends": 32
+        "bends": 24
       },
       {
         "ref": "VI.31",
@@ -2237,7 +2183,7 @@
         "by": [
           "VI.4"
         ],
-        "bends": 32
+        "bends": 24
       },
       {
         "ref": "VI.32",
@@ -2277,7 +2223,7 @@
         "by": [
           "I.12"
         ],
-        "bends": 32
+        "bends": 19
       },
       {
         "ref": "VI.9",
@@ -2445,7 +2391,7 @@
         "by": [
           "VII.21"
         ],
-        "bends": 4
+        "bends": 3
       },
       {
         "ref": "VII.33",
@@ -2453,7 +2399,7 @@
         "by": [
           "VII.22"
         ],
-        "bends": 4
+        "bends": 3
       },
       {
         "ref": "VII.33",
@@ -2461,7 +2407,7 @@
         "by": [
           "VII.33"
         ],
-        "bends": 4
+        "bends": 3
       },
       {
         "ref": "VII.34",
@@ -2909,7 +2855,7 @@
         "by": [
           "X.107"
         ],
-        "bends": 24
+        "bends": 14
       },
       {
         "ref": "X.107",
@@ -2917,7 +2863,7 @@
         "by": [
           "X.12"
         ],
-        "bends": 25
+        "bends": 15
       },
       {
         "ref": "X.108",
@@ -3373,7 +3319,7 @@
         "by": [
           "X.41"
         ],
-        "bends": 48
+        "bends": 34
       },
       {
         "ref": "X.42",
@@ -3637,7 +3583,7 @@
         "by": [
           "X.70"
         ],
-        "bends": 24
+        "bends": 17
       },
       {
         "ref": "X.71",
@@ -3725,7 +3671,7 @@
         "by": [
           "X.78"
         ],
-        "bends": 48
+        "bends": 46
       },
       {
         "ref": "X.79",
@@ -4144,6 +4090,142 @@
         "bends": 48
       },
       {
+        "ref": "XI.24",
+        "text": "and the opposite faces are equal to one another",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.24",
+        "text": "the opposite sides of each face are parallel, so each is a parallelogram",
+        "by": [
+          "XI.16"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.24",
+        "text": "the solid is contained by planes parallel two and two",
+        "by": [
+          "XI.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.25",
+        "text": "as the base is to the base, so is the solid to the solid",
+        "by": [
+          "XI.25"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.25",
+        "text": "the cutting plane is parallel to the two opposite planes",
+        "by": [
+          "XI.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.26",
+        "text": "and it is a solid angle, its arms not in one plane",
+        "by": [
+          "XI.23"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XI.26",
+        "text": "the angle constructed is contained by plane angles equal to the given ones",
+        "by": [
+          "XI.26"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XI.26",
+        "text": "the first arm is set up along the given straight line, at the given point on it",
+        "by": [
+          "XI.Def.11"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XI.27",
+        "text": "and the solid angles at the answering corners are equal, so it is similarly situated",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.27",
+        "text": "its edges are to the edges of the given solid in one ratio",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.27",
+        "text": "the solid is described on the given straight line",
+        "by": [
+          "XI.26"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.28",
+        "text": "so the solid is bisected by the plane",
+        "by": [
+          "XI.28"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.28",
+        "text": "the plane is carried through the diagonals of the opposite faces",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.28",
+        "text": "the two prisms it makes are equal to one another",
+        "by": [
+          "I.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.29",
+        "text": "and the solids are equal to one another",
+        "by": [
+          "XI.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.29",
+        "text": "the two solids stand on the same base",
+        "by": [
+          "XI.24"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.29",
+        "text": "their tops are in one plane, so they are of the same height",
+        "by": [
+          "XI.14"
+        ],
+        "bends": 48
+      },
+      {
         "ref": "XI.3",
         "text": "and every point of it lies in both planes",
         "by": [
@@ -4164,6 +4246,238 @@
         "text": "the two points the planes share lie on it",
         "by": [
           "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.30",
+        "text": "and the solids are equal to one another",
+        "by": [
+          "XI.30"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.30",
+        "text": "the tops do not lie in the same straight lines",
+        "by": [
+          "XI.Def.10"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.30",
+        "text": "the two solids stand on the same base and reach the same plane",
+        "by": [
+          "XI.29"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.31",
+        "text": "and the solids are equal to one another",
+        "by": [
+          "XI.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.31",
+        "text": "the bases are in one plane and the tops in one plane, so the heights are the same",
+        "by": [
+          "XI.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.31",
+        "text": "the two bases are equal, and are not the same figure",
+        "by": [
+          "I.35"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.32",
+        "text": "as the base is to the base, so is the solid to the solid",
+        "by": [
+          "XI.32"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.32",
+        "text": "the two solids are of the same height",
+        "by": [
+          "XI.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.33",
+        "text": "as the solid is to the solid, so is the cube on the side to the cube on the answering side",
+        "by": [
+          "XI.33"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.33",
+        "text": "the solids are similar, their edges in one ratio and their solid angles equal",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.34",
+        "text": "and solids whose bases are reciprocally proportional to their heights are equal",
+        "by": [
+          "XI.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.34",
+        "text": "so as the base is to the base, so is the height to the height reciprocally",
+        "by": [
+          "XI.34"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.34",
+        "text": "the two solids are equal",
+        "by": [
+          "XI.31"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.35",
+        "text": "and the elevated lines contain equal angles with their sides",
+        "by": [
+          "XI.26"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "XI.35",
+        "text": "the two plane angles are equal",
+        "by": [
+          "I.Def.8"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "XI.35",
+        "text": "therefore the elevated lines contain equal angles with the joins",
+        "by": [
+          "XI.35"
+        ],
+        "bends": 6
+      },
+      {
+        "ref": "XI.36",
+        "text": "and it is equiangular with the first",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "XI.36",
+        "text": "the second solid is equilateral",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "XI.36",
+        "text": "therefore the two solids are equal",
+        "by": [
+          "XI.36"
+        ],
+        "bends": 10
+      },
+      {
+        "ref": "XI.37",
+        "text": "and a solid on any other line breaks the proportion, so solids proportional give lines proportional",
+        "by": [
+          "XI.37"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XI.37",
+        "text": "as the first solid is to the second, so is the third to the fourth",
+        "by": [
+          "XI.37"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XI.37",
+        "text": "the four solids are similar and similarly described",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XI.38",
+        "text": "and the two bisect one another",
+        "by": [
+          "XI.38"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.38",
+        "text": "it meets the diameter",
+        "by": [
+          "XI.Def.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.38",
+        "text": "the common section of the two planes is a straight line",
+        "by": [
+          "XI.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.39",
+        "text": "both prisms stand on that plane, the one on a parallelogram in it and the other on a triangle",
+        "by": [
+          "XI.Def.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.39",
+        "text": "the parallelogram is double of the triangle, being cut by the diagonal into it and its equal",
+        "by": [
+          "I.41"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.39",
+        "text": "therefore the prisms are equal to one another",
+        "by": [
+          "XI.39"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XI.39",
+        "text": "they are of the same height, the edge the first rises to and the face the second is carried to standing off the plane alike",
+        "by": [
+          "XI.Def.13"
         ],
         "bends": 48
       },
@@ -4224,13 +4538,221 @@
         "bends": 48
       },
       {
+        "ref": "XII.1",
+        "text": "as the polygon is to the polygon, so is the square on the diameter to the square on the diameter",
+        "by": [
+          "XII.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.1",
+        "text": "the polygons are similar, their sides in one ratio",
+        "by": [
+          "VI.Def.1"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.16",
+        "text": "and no side of it touches the lesser circle",
+        "by": [
+          "XII.16"
+        ],
+        "bends": 2
+      },
+      {
+        "ref": "XII.16",
+        "text": "it is equilateral, and inscribed in the greater circle",
+        "by": [
+          "IV.6"
+        ],
+        "bends": 2
+      },
+      {
+        "ref": "XII.16",
+        "text": "the polygon has an even number of sides",
+        "by": [
+          "XII.16"
+        ],
+        "bends": 2
+      },
+      {
+        "ref": "XII.18",
+        "text": "and what is left over falls short of half itself at each stage",
+        "by": [
+          "X.1"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "XII.18",
+        "text": "the polyhedra inscribed in the two spheres are similar, so at every stage the enclosure holds the triplicate ratio of the diameters",
+        "by": [
+          "XII.17"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "XII.18",
+        "text": "therefore the spheres are to one another in the triplicate ratio of their diameters",
+        "by": [
+          "XII.18"
+        ],
+        "bends": 1
+      },
+      {
+        "ref": "XII.3",
+        "text": "and the two prisms together are greater than the half of the whole pyramid",
+        "by": [
+          "XII.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.3",
+        "text": "the pieces together make the whole pyramid",
+        "by": [
+          "XII.3"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.3",
+        "text": "the two prisms are equal to one another",
+        "by": [
+          "XI.39"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.3",
+        "text": "the two pyramids are equal to one another and similar to the whole, every edge of each being half the edge it answers to",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.4",
+        "text": "as the base is to the base, so are all the prisms in the one to all the prisms in the other",
+        "by": [
+          "XII.4"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.4",
+        "text": "the two pyramids are of the same height",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.5",
+        "text": "as the base is to the base, so is the pyramid to the pyramid",
+        "by": [
+          "XII.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.5",
+        "text": "the two pyramids are of the same height",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.6",
+        "text": "as the base is to the base, so is the pyramid to the pyramid",
+        "by": [
+          "XII.6"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.6",
+        "text": "the pyramid on the polygon is the pyramids on the triangles it divides into",
+        "by": [
+          "XII.5"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.7",
+        "text": "and together they are the prism",
+        "by": [
+          "XII.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.7",
+        "text": "the three pyramids have triangular bases",
+        "by": [
+          "XI.Def.12"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.7",
+        "text": "they are equal to one another",
+        "by": [
+          "XII.7"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.8",
+        "text": "as the pyramid is to the pyramid, so is the cube on the side to the cube on the answering side",
+        "by": [
+          "XII.8"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.8",
+        "text": "the pyramids are similar, their edges in one ratio",
+        "by": [
+          "XI.Def.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.9",
+        "text": "and pyramids whose bases are reciprocally proportional to their heights are equal",
+        "by": [
+          "XII.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.9",
+        "text": "so as the base is to the base, so is the height to the height reciprocally",
+        "by": [
+          "XII.9"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XII.9",
+        "text": "the two pyramids are equal",
+        "by": [
+          "XII.5"
+        ],
+        "bends": 48
+      },
+      {
         "ref": "XIII.1",
         "text": "D lies on BA produced, with AD half of AB",
         "by": [
           "Post.2",
           "I.10"
         ],
-        "bends": 25
+        "bends": 9
       },
       {
         "ref": "XIII.1",
@@ -4238,7 +4760,7 @@
         "by": [
           "II.6"
         ],
-        "bends": 25
+        "bends": 9
       },
       {
         "ref": "XIII.12",
@@ -4246,7 +4768,7 @@
         "by": [
           "IV.15"
         ],
-        "bends": 19
+        "bends": 9
       },
       {
         "ref": "XIII.12",
@@ -4254,7 +4776,175 @@
         "by": [
           "I.47"
         ],
-        "bends": 19
+        "bends": 9
+      },
+      {
+        "ref": "XIII.13",
+        "text": "and the square on the diameter of the sphere is one and a half times the square on the side of the pyramid",
+        "by": [
+          "XIII.13"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.13",
+        "text": "every vertex of the pyramid is on the sphere, so it is comprehended in it",
+        "by": [
+          "XI.Def.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.13",
+        "text": "it is contained by four equal and equilateral triangles, three edges meeting at each corner",
+        "by": [
+          "XI.Def.25"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.14",
+        "text": "and the square on the diameter of the sphere is double the square on the side of the octahedron",
+        "by": [
+          "XIII.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.14",
+        "text": "every vertex of the octahedron is on the sphere",
+        "by": [
+          "XI.Def.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.14",
+        "text": "it is contained by eight equal and equilateral triangles, four edges meeting at each corner",
+        "by": [
+          "XI.Def.26"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.15",
+        "text": "and the square on the diameter of the sphere is triple the square on the side of the cube",
+        "by": [
+          "XIII.15"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.15",
+        "text": "every vertex of the cube is on the sphere",
+        "by": [
+          "XI.Def.14"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.15",
+        "text": "it is contained by six equal squares, three edges meeting at each corner",
+        "by": [
+          "XI.Def.25"
+        ],
+        "bends": 48
+      },
+      {
+        "ref": "XIII.16",
+        "text": "and the side of the icosahedron is the irrational straight line called minor",
+        "by": [
+          "X.76"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XIII.16",
+        "text": "every vertex of the icosahedron is on the sphere",
+        "by": [
+          "XI.Def.14"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XIII.16",
+        "text": "it is contained by twenty equal and equilateral triangles, five edges meeting at each corner",
+        "by": [
+          "XI.Def.27"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XIII.16",
+        "text": "it is of the fourth degree over the rationals, so neither a rational line nor a medial one",
+        "by": [
+          "X.73"
+        ],
+        "bends": 13
+      },
+      {
+        "ref": "XIII.17",
+        "text": "and the side of the dodecahedron is the irrational straight line called apotome",
+        "by": [
+          "X.73"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "XIII.17",
+        "text": "every vertex of the dodecahedron is on the sphere",
+        "by": [
+          "XI.Def.14"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "XIII.17",
+        "text": "it is contained by twelve equal and equilateral pentagons, three edges meeting at each corner",
+        "by": [
+          "XI.Def.28"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "XIII.17",
+        "text": "its two terms are rational lines commensurable in square only",
+        "by": [
+          "X.73"
+        ],
+        "bends": 4
+      },
+      {
+        "ref": "XIII.18",
+        "text": "and there is no sixth figure",
+        "by": [
+          "XI.21"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XIII.18",
+        "text": "the first three have to the diameter a ratio a number can name, and the last two have not",
+        "by": [
+          "X.73"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XIII.18",
+        "text": "the side of the cube is greater than the side of the icosahedron, and that than the side of the dodecahedron",
+        "by": [
+          "XIII.17"
+        ],
+        "bends": 3
+      },
+      {
+        "ref": "XIII.18",
+        "text": "the side of the pyramid is greater than the side of the octahedron, and that than the side of the cube",
+        "by": [
+          "XIII.15"
+        ],
+        "bends": 3
       },
       {
         "ref": "XIII.2",
@@ -4262,7 +4952,7 @@
         "by": [
           "Post.2"
         ],
-        "bends": 16
+        "bends": 7
       },
       {
         "ref": "XIII.2",
@@ -4270,7 +4960,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 16
+        "bends": 7
       },
       {
         "ref": "XIII.3",
@@ -4278,7 +4968,7 @@
         "by": [
           "I.10"
         ],
-        "bends": 8
+        "bends": 3
       },
       {
         "ref": "XIII.3",
@@ -4286,7 +4976,7 @@
         "by": [
           "II.6"
         ],
-        "bends": 8
+        "bends": 3
       },
       {
         "ref": "XIII.4",
@@ -4294,7 +4984,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 43
+        "bends": 21
       },
       {
         "ref": "XIII.4",
@@ -4302,7 +4992,7 @@
         "by": [
           "II.7"
         ],
-        "bends": 43
+        "bends": 21
       },
       {
         "ref": "XIII.5",
@@ -4310,7 +5000,7 @@
         "by": [
           "Post.2"
         ],
-        "bends": 43
+        "bends": 22
       },
       {
         "ref": "XIII.5",
@@ -4318,7 +5008,7 @@
         "by": [
           "VI.30"
         ],
-        "bends": 43
+        "bends": 22
       },
       {
         "ref": "XIII.5",
@@ -4326,31 +5016,7 @@
         "by": [
           "Def.3"
         ],
-        "bends": 43
-      },
-      {
-        "ref": "XIII.8",
-        "text": "AC is cut at H in extreme and mean ratio",
-        "by": [
-          "VI.30"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "XIII.8",
-        "text": "and its greater segment equals the side of the pentagon",
-        "by": [
-          "Def.3"
-        ],
-        "bends": 1
-      },
-      {
-        "ref": "XIII.8",
-        "text": "the diagonals meet within the pentagon",
-        "by": [
-          "Post.1"
-        ],
-        "bends": 1
+        "bends": 22
       }
     ]
   },
@@ -4657,13 +5323,20 @@
         "XI.18",
         "XI.19",
         "XI.2",
+        "XI.24",
+        "XI.28",
+        "XI.29",
         "XI.3",
+        "XI.30",
+        "XI.38",
         "XI.4",
         "XI.5",
         "XI.6",
         "XI.7",
         "XI.8",
-        "XI.9"
+        "XI.9",
+        "XII.1",
+        "XII.3"
       ],
       "measuring_only": [
         "I.13",
@@ -4681,7 +5354,18 @@
         "IV.3",
         "VI.33",
         "VI.7",
-        "XI.10"
+        "XI.10",
+        "XI.25",
+        "XI.32",
+        "XI.33",
+        "XI.34",
+        "XI.36",
+        "XI.37",
+        "XII.5",
+        "XII.6",
+        "XII.7",
+        "XII.8",
+        "XII.9"
       ],
       "discharged_luckily": [
         "I.22",
@@ -4803,9 +5487,27 @@
         "XI.20",
         "XI.22",
         "XI.23",
+        "XI.26",
+        "XI.27",
+        "XII.10",
+        "XII.11",
+        "XII.12",
+        "XII.13",
+        "XII.14",
+        "XII.15",
+        "XII.16",
+        "XII.17",
+        "XII.18",
+        "XII.2",
         "XIII.1",
         "XIII.10",
         "XIII.11",
+        "XIII.13",
+        "XIII.14",
+        "XIII.15",
+        "XIII.16",
+        "XIII.17",
+        "XIII.18",
         "XIII.3",
         "XIII.4",
         "XIII.5",
@@ -4838,7 +5540,11 @@
         "VII.30",
         "VII.31",
         "VII.8",
-        "XI.21"
+        "XI.21",
+        "XI.31",
+        "XI.35",
+        "XI.39",
+        "XII.4"
       ],
       "untestable": [
         "X.100",
@@ -4925,12 +5631,12 @@
       ]
     },
     "counts": {
-      "rational": 179,
-      "measuring_only": 16,
+      "rational": 186,
+      "measuring_only": 27,
       "discharged_luckily": 17,
       "needs_continuity": 66,
-      "needs_magnitude": 41,
-      "configuration_dependent": 25,
+      "needs_magnitude": 59,
+      "configuration_dependent": 29,
       "untestable": 81
     },
     "witnesses": [

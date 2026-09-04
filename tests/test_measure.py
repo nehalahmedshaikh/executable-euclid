@@ -10,6 +10,8 @@ at once is thrown away, that the recorded file matches the code that wrote it.
 from __future__ import annotations
 
 import json
+import signal
+import time
 from fractions import Fraction
 
 import pytest
@@ -37,17 +39,14 @@ from euclid.measure import (
 )
 from euclid.measure.necessity import NEEDED, SURVIVED, WELL_DEFINED
 
-
 # --------------------------------------------------------------------------
 # relaxed_hypotheses: the mechanism everything else rests on
 # --------------------------------------------------------------------------
-
 
 def test_a_broken_hypothesis_normally_stops_the_proposition():
     with Context("test:strict"):
         with pytest.raises(registry.BadConfiguration):
             hypothesis("this is not so", False)
-
 
 def test_relaxing_records_the_violation_instead_of_raising():
     with Context("test:relaxed"):
@@ -56,14 +55,12 @@ def test_relaxing_records_the_violation_instead_of_raising():
             assert hypothesis("this is so", True) is True
     assert [text for _ref, text, _guard in violations] == ["this is not so"]
 
-
 def test_relaxation_does_not_leak_out_of_its_block():
     with Context("test:leak"):
         with relaxed_hypotheses():
             hypothesis("recorded", False)
         with pytest.raises(registry.BadConfiguration):
             hypothesis("must raise again", False)
-
 
 # --------------------------------------------------------------------------
 # depth
@@ -79,22 +76,18 @@ def profile():
     """
     return depth_profile()
 
-
-
 def test_the_equilateral_triangle_needs_a_square_root():
     """I.1 puts its apex at an irrational height. Degree 1 would be a bug."""
     assert algebraic_depth(get("I.1")).degree == 2
 
-
-def test_book_x_is_not_reported_as_rational():
+def test_book_x_is_not_reported_as_rational(profile):
     """Book X returns magnitudes rather than points.
 
     A walk that only looks at coordinates reports the whole book as degree 1,
     which is how this was wrong the first time.
     """
-    profile = depth_profile([e for e in all_propositions() if e.ref.startswith("X.")])
-    assert max(item.degree for item in profile.values()) > 2
-
+    book_x = [item for ref, item in profile.items() if ref.startswith("X.")]
+    assert max(item.degree for item in book_x) > 2
 
 def test_arithmetic_books_never_leave_the_rationals(profile):
     """Books VII to IX are about numbers; a square root there would be a bug."""
@@ -102,12 +95,10 @@ def test_arithmetic_books_never_leave_the_rationals(profile):
     for book in ("VII", "VIII", "IX"):
         assert tops[book] == 1, f"Book {book} should stay rational, got {tops[book]}"
 
-
 def test_every_degree_is_a_power_of_two(profile):
     """Constructible means a tower of quadratic extensions. Nothing else fits."""
     for item in profile.values():
         assert item.degree & (item.degree - 1) == 0, f"{item.ref} has degree {item.degree}"
-
 
 def test_each_book_has_a_ceiling_and_each_degree_a_first_appearance(profile):
     tops = ceilings(profile)
@@ -115,11 +106,9 @@ def test_each_book_has_a_ceiling_and_each_degree_a_first_appearance(profile):
     for degree, ref in first_appearances(profile).items():
         assert profile[ref].degree == degree
 
-
 # --------------------------------------------------------------------------
 # gaps
 # --------------------------------------------------------------------------
-
 
 def test_book_x_misses_a_constructible_number():
     gap = simplest_gap()
@@ -127,7 +116,6 @@ def test_book_x_misses_a_constructible_number():
     assert gap.degree in (2, 4, 8)
     assert gap.minimal_polynomial.endswith("= 0")
     assert gap.reason
-
 
 def test_the_witness_is_really_outside_the_thirteen_species():
     """Re-derive the finding by hand rather than trusting the search."""
@@ -137,7 +125,6 @@ def test_the_witness_is_really_outside_the_thirteen_species():
 
     with Context("test:gap"):
         assert classify(1 + sqrt(2) + sqrt(3)).name == UNNAMED
-
 
 def test_something_is_still_nameable():
     """A classifier that named nothing would make this finding vacuous."""
@@ -149,11 +136,9 @@ def test_something_is_still_nameable():
         assert classify(1 + sqrt(2)).name != UNNAMED
         assert classify(1 + sqrt(2)).species is not None
 
-
 # --------------------------------------------------------------------------
 # necessity: the method, not the numbers
 # --------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize(
     "ref, doing_the_work",
@@ -168,7 +153,6 @@ def test_a_hypothesis_that_matters_comes_out_needed(ref, doing_the_work):
     results = hypothesis_necessity(get(ref), trials=16)
     verdicts = {item.text: item.verdict for item in results}
     assert verdicts.get(doing_the_work) == NEEDED, verdicts
-
 
 def test_side_angle_side_can_now_be_taken_apart():
     """I.4 was the honest limit of the method, and is no longer.
@@ -187,7 +171,6 @@ def test_side_angle_side_can_now_be_taken_apart():
     assert len(verdicts) == 3, verdicts
     assert all(v == NEEDED for v in verdicts.values()), verdicts
 
-
 def test_a_perturbation_keeps_the_configuration_exact():
     """The rotation is the rational parametrisation of the circle, so a moved
     point is still a point of the field the sampler built in."""
@@ -202,7 +185,6 @@ def test_a_perturbation_keeps_the_configuration_exact():
     stretched = _stretched(point, anchor, F(2))
     assert (stretched.x, stretched.y) == (6, 8)             # direction preserved
 
-
 def test_a_candidate_is_reported_as_a_candidate():
     """II.9 and II.10 are the same identity; both should survive breaking.
 
@@ -212,12 +194,10 @@ def test_a_candidate_is_reported_as_a_candidate():
         results = hypothesis_necessity(get(ref), trials=16)
         assert any(item.verdict == SURVIVED for item in results), ref
 
-
 def test_the_verdicts_are_the_only_three():
     report = necessity_report(entries=[get("I.4"), get("I.5"), get("II.9")], trials=8)
     for item in report.tested:
         assert item.verdict in (NEEDED, SURVIVED, WELL_DEFINED)
-
 
 def test_coverage_is_stated_and_honest():
     """A report that hid its coverage would read as far stronger than it is."""
@@ -227,7 +207,6 @@ def test_coverage_is_stated_and_honest():
     assert "coverage" in report.summary()
     assert "candidates, not results" in report.summary()
 
-
 def test_a_run_breaking_two_hypotheses_is_discarded():
     """The attribution rule. Without it every verdict is unattributable."""
     results = hypothesis_necessity(get("I.4"), trials=12)
@@ -236,11 +215,22 @@ def test_a_run_breaking_two_hypotheses_is_discarded():
     for item in results:
         assert item.broken == item.needed + item.well_defined + item.survived
 
+@pytest.mark.skipif(not hasattr(signal, "setitimer"),
+                    reason="hard sweep deadlines require POSIX interval timers")
+def test_one_run_cannot_overrun_the_whole_sweep_budget():
+    """A bent XII.16 used to spend hours building thousands of exact vertices."""
+    from euclid.measure.sweep import BUDGET, ran_every_trial
+
+    started = time.monotonic()
+    hypothesis_necessity(get("XII.16"), trials=1)
+    elapsed = time.monotonic() - started
+
+    assert elapsed < BUDGET + 1
+    assert not ran_every_trial("XII.16")
 
 # --------------------------------------------------------------------------
 # the recorded file
 # --------------------------------------------------------------------------
-
 
 def test_the_recorded_findings_match_this_corpus():
     """A stale findings.json would put wrong numbers on the site."""
@@ -248,12 +238,10 @@ def test_the_recorded_findings_match_this_corpus():
     assert measured is not None, "run: euclid measure --write"
     assert measured["corpus"] == len(all_propositions())
 
-
 def test_the_recorded_findings_agree_with_recomputing_them(profile):
     """The exact parts are recomputed; the sampled parts cannot be."""
     measured = load_findings()
     assert measured["depth"]["ceilings"] == ceilings(profile)
-
 
 def test_the_recorded_findings_state_their_method():
     measured = load_findings()
@@ -266,7 +254,6 @@ def test_the_recorded_findings_state_their_method():
     assert (need["needed"] + need["well_defined"] + len(need["candidates"])
             + need["surviving_guards"] + need["implied"]) == need["judged"]
     assert need["separated"] + need["implied"] == need["judged"]
-
 
 def test_the_recorded_findings_were_computed_at_full_strength():
     """The same file could be written at two strengths, and was.
@@ -284,7 +271,6 @@ def test_the_recorded_findings_were_computed_at_full_strength():
         "findings.json was recorded at a different strength: "
         "run `euclid measure --write`")
 
-
 def test_the_command_that_regenerates_records_at_full_strength():
     """The documented regeneration must not quietly weaken the file."""
     from euclid.cli import build_parser
@@ -294,6 +280,11 @@ def test_the_command_that_regenerates_records_at_full_strength():
     strength = args.trials if args.trials is not None else RECORDED_TRIALS
     assert strength == RECORDED_TRIALS
 
+def test_findings_reject_an_invalid_worker_count():
+    from euclid.measure import write_findings
+
+    with pytest.raises(ValueError, match="jobs"):
+        write_findings(jobs=0)
 
 def test_the_findings_page_reports_only_measured_things():
     """The whole point of the rewrite: no finding derived from citations.
@@ -311,7 +302,6 @@ def test_the_findings_page_reports_only_measured_things():
     for forbidden in ("load_bearing", "tree_shake", "uses_parallel_postulate"):
         assert forbidden not in body, f"{forbidden} is a citation-derived finding"
 
-
 def test_the_graph_page_no_longer_claims_there_is_no_index():
     """It said 'No list of cross-references is kept anywhere in this project'.
 
@@ -324,49 +314,6 @@ def test_the_graph_page_no_longer_claims_there_is_no_index():
     source = inspect.getsource(pages._graph_page)
     assert "No list of cross-references is kept" not in source
     assert "executed" in source and "cited" in source.lower()
-
-
-def test_the_readme_quotes_only_numbers_it_still_carries():
-    """The README states very few numbers now, and these are they.
-
-    It used to reproduce the whole findings section -- seven write-ups, three
-    tables -- which meant every measurement existed in two places and the copy
-    kept by hand was the one that went stale. The findings live on the generated
-    site, where nothing is typed. What is left here is what a reader needs before
-    deciding to look further.
-
-    Matched against whitespace-normalised text: the previous version embedded the
-    line breaks of one particular wrapping, so it tested paragraph shape rather
-    than the number inside it and broke on any reflow.
-    """
-    from pathlib import Path
-
-    readme = " ".join(
-        (Path(__file__).resolve().parent.parent / "README.md")
-        .read_text(encoding="utf-8").split()
-    )
-    measured = load_findings()
-
-    coverage = f"{100 * measured['necessity']['coverage']:.0f}%"
-    assert f"Coverage is {coverage}" in readme
-    # The coverage figure is 100% by construction -- every hypothesis is given a
-    # verdict -- so it says nothing unless the share actually separated stands
-    # beside it. Quoting the first without the second is the failure this guards.
-    separated = f"{100 * measured['necessity']['separated_share']:.0f}%"
-    assert f"was found for {separated}" in readme
-    assert str(measured["necessity"]["implied"]) + " implied" in readme
-    assert str(measured["necessity"]["hypotheses"]) + " hypotheses" in readme
-
-    graph = build_graph()
-    executed, cited = graph.provenance()
-    assert f"{executed} edges are **executed**" in readme
-    assert f"{cited} are **cited**" in readme
-    assert f"{round(100 * executed / (executed + cited))}% of the graph" in readme
-
-    rests_on = sum(1 for ref in graph.nodes
-                   if ref != "I.1" and "I.1" in graph.ancestors(ref))
-    assert f'"{rests_on} propositions depend on I.1"' in readme
-
 
 def test_only_an_exactly_enumerated_row_is_called_a_theorem():
     """"Fewest possible" belongs to a row every shorter figure was ruled out for.
@@ -392,7 +339,6 @@ def test_only_an_exactly_enumerated_row_is_called_a_theorem():
     assert deep["beat_float"], "this row is the one the float search got wrong"
     assert _strength(deep) == "fewest possible"
 
-
 def test_exact_enumeration_is_authoritative_over_the_float_search():
     """When the two disagree the exact answer wins, and says that it did.
 
@@ -406,7 +352,6 @@ def test_exact_enumeration_is_authoritative_over_the_float_search():
         PROBLEMS["midpoint"], "compass-only", 6, budget=200_000)
     assert certified and not exhaustion.found, "five circles should be ruled out"
 
-
 def test_the_graph_knows_which_edges_it_executed():
     graph = build_graph()
     executed, cited = graph.provenance()
@@ -416,11 +361,9 @@ def test_the_graph_knows_which_edges_it_executed():
         for ref in graph.nodes
     )
 
-
 # --------------------------------------------------------------------------
 # the soundness of the numbers themselves
 # --------------------------------------------------------------------------
-
 
 def test_depth_is_a_maximum_over_configurations_not_the_first_one():
     """``algebraic_depth`` used to return inside its retry loop.
@@ -430,7 +373,6 @@ def test_depth_is_a_maximum_over_configurations_not_the_first_one():
     """
     depth = algebraic_depth(get("I.1"))
     assert depth.configurations > 1, "only one configuration was examined"
-
 
 def test_a_deep_tower_no_longer_hides_a_degree():
     """I.45 builds ten levels; the old depth bound refused all 514 magnitudes.
@@ -442,7 +384,6 @@ def test_a_deep_tower_no_longer_hides_a_degree():
     depth = algebraic_depth(get("I.45"))
     assert depth.tower_height > 8, "I.45 no longer exercises the deep-tower case"
     assert depth.unmeasured == 0, f"{depth.unmeasured} magnitudes still unmeasured"
-
 
 def test_the_support_bound_is_closed_under_radicands():
     """Bounding by the levels an element uses *directly* is wrong.
@@ -467,7 +408,6 @@ def test_restricting_the_field_changes_nothing_by_default():
         assert ctx.tower.policy is None
         assert field_sqrt(2) is not None
 
-
 def test_the_rational_plane_refuses_a_new_root_but_keeps_the_old_ones():
     """Q has sqrt(4). It does not have sqrt(2). The gate fires only on growth."""
     from euclid.kernel.field import Rational, RootNotInField, sqrt as field_sqrt
@@ -476,7 +416,6 @@ def test_the_rational_plane_refuses_a_new_root_but_keeps_the_old_ones():
         assert field_sqrt(4) == 2
         with pytest.raises(RootNotInField):
             field_sqrt(2)
-
 
 def test_the_pythagorean_field_wants_a_witness():
     """sqrt(a^2 + b^2) is a hypotenuse; anything else is refused.
@@ -493,7 +432,6 @@ def test_the_pythagorean_field_wants_a_witness():
             field_sqrt(2)
         assert field_sqrt(2, witness=(1, 1)) is not None
 
-
 def test_a_missing_root_is_not_filed_as_an_arithmetic_error():
     """``necessity`` catches ArithmeticError and calls it well-definedness.
 
@@ -504,7 +442,6 @@ def test_a_missing_root_is_not_filed_as_an_arithmetic_error():
 
     assert not issubclass(RootNotInField, ArithmeticError)
     assert not issubclass(RootNotInField, ValueError)
-
 
 def test_an_irrational_sampler_is_untestable_and_never_blamed():
     """Book X's samplers build irrational magnitudes because that is the subject.
@@ -520,7 +457,6 @@ def test_an_irrational_sampler_is_untestable_and_never_blamed():
     assert verdict.verdict == UNTESTABLE
     assert verdict.configurations == 0
     assert verdict.needs_root == 0
-
 
 def test_the_ladder_separates_measuring_from_intersecting():
     """The finding, on the two cases that show what it is for.
@@ -539,7 +475,6 @@ def test_the_ladder_separates_measuring_from_intersecting():
     measured = field_verdict(get("I.34"), Rational(), trials=6)
     assert measured.verdict == NEVER and measured.cause == MEASUREMENT
     assert field_verdict(get("I.34"), Pythagorean(), trials=6).verdict == ALWAYS
-
 
 def test_carrying_out_a_citation_moves_a_proposition_down_the_ladder():
     """I.20 was the measuring-only witness until its citations were carried out.
@@ -568,7 +503,6 @@ def test_carrying_out_a_citation_moves_a_proposition_down_the_ladder():
     with Context("chain"):
         run_sampled("I.5", random.Random(0))
     assert "I.3" in get("I.5").calls
-
 
 def test_a_lucky_intersection_is_not_reported_as_pythagorean():
     """I.23's sampler hands it a rational triangle, so its circles meet where

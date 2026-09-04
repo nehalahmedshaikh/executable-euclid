@@ -2,6 +2,3 @@
 * text=auto eol=lf
 *.png binary
 *.pdf binary
-
-# The site is generated; collapse it in diffs and reviews.
-docs/** linguist-generated=true

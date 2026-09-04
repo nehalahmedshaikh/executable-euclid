@@ -125,7 +125,7 @@ def _blame(error: RootNotInField) -> tuple[str, str]:
         # Measuring a length is one act and crossing two circles is another,
         # and the whole of this analysis is telling them apart. Space has its
         # own pair of modules doing the same two jobs.
-        if where.endswith(("plane/angles.py", "solid/angles.py")):
+        if where.endswith(("plane/angles.py", "solid/angles.py", "solid/exhaust.py", "solid/solids.py")):
             return MEASUREMENT, site
         if where.endswith(("plane/construct.py", "solid/construct.py")):
             return CONTINUITY, site

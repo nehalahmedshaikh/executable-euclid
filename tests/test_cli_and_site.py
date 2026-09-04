@@ -1,8 +1,8 @@
 """The command line and the generated site."""
 
-import collections
 import html
 import inspect
+import os
 import random
 import re
 from pathlib import Path
@@ -26,16 +26,13 @@ from euclid.render.site import _legibility, _sample_trace
 from euclid.render.svg import _collect, _the_propositions_own, render_trace
 from euclid.verify.ledger import audit
 
-
 def test_classify_from_the_command_line(capsys):
     assert main(["classify", "sqrt(3)+sqrt(5)"]) == 0
     assert "sixth binomial" in capsys.readouterr().out
 
-
 def test_classify_rejects_inexact_input(capsys):
     assert main(["classify", "1.414"]) == 1
     assert "exact" in capsys.readouterr().err
-
 
 def test_ngon(capsys):
     assert main(["ngon", "17"]) == 0
@@ -44,13 +41,11 @@ def test_ngon(capsys):
     output = capsys.readouterr().out
     assert "impossible" in output and "Fermat" in output
 
-
 def test_impossible(capsys):
     assert main(["impossible"]) == 0
     output = capsys.readouterr().out
     assert output.count("impossible") == 3
     assert "degree 3" in output
-
 
 def test_run_and_why(capsys):
     assert main(["run", "I.47"]) == 0
@@ -59,57 +54,55 @@ def test_run_and_why(capsys):
     output = capsys.readouterr().out
     assert "parallel postulate: required" in output
 
-
 def test_minimal(capsys):
     assert main(["minimal", "I.47"]) == 0
     output = capsys.readouterr().out
     assert "minimal Elements for I.47" in output
     assert "I.1" in output
 
-
 def test_unknown_proposition_is_an_error(capsys):
     assert main(["why", "I.99"]) == 1
 
+def test_verify_command_delegates_to_the_certifier(monkeypatch, capsys):
+    """Exercise CLI wiring without certifying the corpus a second time."""
+    import euclid.verify
+
+    calls = []
+
+    class Report:
+        failures = ()
+
+        def line(self):
+            return "certified"
+
+    def fake_certify(ref, trials):
+        calls.append((ref, trials))
+        return Report()
+
+    monkeypatch.setattr(euclid.verify, "certify", fake_certify)
+    assert main(["verify", "V", "--trials", "1"]) == 0
+    assert calls and all(ref.startswith("V.") and trials == 1
+                         for ref, trials in calls)
+    assert "0 failures" in capsys.readouterr().out
 
 @pytest.fixture(scope="session")
 def site(tmp_path_factory):
     """The generated site, built once and shared by every test that reads it.
 
-    Building it costs about as much as the whole of the rest of the suite, and
-    the cost grows with every proposition added, so it is not done nine times
-    over. The one test that changes what the site would contain builds its own.
+    CI builds the deployable artifact first and points this fixture at it, so
+    the pages being audited are exactly the pages it uploads. A local test run
+    still builds its own copy, once.
     """
+    supplied = os.environ.get("EUCLID_SITE_DIR")
+    if supplied:
+        out = Path(supplied)
+        assert out.is_dir(), f"EUCLID_SITE_DIR is not a directory: {out}"
+        return out
     out = tmp_path_factory.mktemp("site")
-    assert main(["site", "--out", str(out), "--no-search"]) == 0
-    return out
-
-
-@pytest.fixture(scope="session")
-def published(tmp_path_factory):
-    """The site as ``euclid site --out docs`` builds it, search rows included."""
-    out = tmp_path_factory.mktemp("published")
     assert main(["site", "--out", str(out)]) == 0
     return out
 
-
-def test_the_committed_site_is_the_current_build(published):
-    """``docs/`` is what GitHub Pages serves, so a stale copy is a wrong site.
-
-    The build is reproducible -- every sampler it uses is seeded -- so the only
-    way this differs is that the corpus moved and nobody rebuilt.
-    """
-    committed = Path(__file__).resolve().parent.parent / "docs"
-    fresh = {path.name: path.read_bytes()
-             for path in published.iterdir() if path.is_file()}
-    have = {path.name: path.read_bytes()
-            for path in committed.iterdir() if path.is_file()}
-    rebuild = "rebuild with `euclid site --out docs`"
-    assert set(have) - set(fresh) == set(), f"{rebuild}: extra pages"
-    assert set(fresh) - set(have) == set(), f"{rebuild}: missing pages"
-    stale = sorted(name for name in fresh if fresh[name] != have[name])
-    assert not stale, f"{rebuild}: {len(stale)} pages differ, e.g. {stale[:4]}"
-
-
+@pytest.mark.site
 def test_site_builds_without_broken_links(site):
     pages = sorted(site.glob("*.html"))
     assert len(pages) > 70
@@ -122,13 +115,12 @@ def test_site_builds_without_broken_links(site):
                 broken.add((page.name, href))
     assert not broken, f"broken links: {sorted(broken)[:5]}"
 
-
+@pytest.mark.site
 def test_every_geometric_proposition_gets_a_diagram(site):
     for ref in ("I-1", "I-47", "IV-11", "II-11"):
         page = (site / f"{ref}.html").read_text(encoding="utf-8")
         assert "<svg" in page, f"{ref} has no figure"
         assert 'class="figure"' in page
-
 
 @pytest.fixture(scope="session")
 def drawn_figures():
@@ -147,7 +139,6 @@ def drawn_figures():
             continue  # Books V and VII-IX argue about magnitudes, not figures
         figures.append((entry, trace, points, lines, circles))
     return figures
-
 
 def test_no_point_is_drawn_with_nothing_joined_to_it(drawn_figures):
     """A point floating free means the figure is missing something.
@@ -174,13 +165,11 @@ def test_no_point_is_drawn_with_nothing_joined_to_it(drawn_figures):
         ]
         assert not adrift, f"{entry.ref} draws {adrift} joined to nothing"
 
-
 def test_every_geometric_proposition_draws_more_than_a_dot(drawn_figures):
     """A figure has to be a figure."""
     for entry, trace, points, lines, circles in drawn_figures:
         assert len(lines) + len(circles) >= 2, f"{entry.ref} draws too little to read"
         assert len(points) >= 2, entry.ref
-
 
 def test_the_chosen_figures_are_legible(drawn_figures):
     """The one shown on the page is picked for clarity from many valid ones.
@@ -190,7 +179,6 @@ def test_the_chosen_figures_are_legible(drawn_figures):
     """
     for entry, trace, points, lines, circles in drawn_figures:
         assert _legibility(trace) > 0.35, f"{entry.ref} is drawn too cramped to read"
-
 
 def test_no_figure_letters_a_point_twice(drawn_figures):
     """One letter, one point.
@@ -204,7 +192,6 @@ def test_no_figure_letters_a_point_twice(drawn_figures):
         figure = render_trace(trace, entry.ref)
         letters = re.findall(r'class="letter">(\w+)</text>', figure)
         assert len(letters) == len(set(letters)), f"{entry.ref} letters a point twice: {letters}"
-
 
 def test_a_figure_separates_its_own_work_from_its_helpers(drawn_figures):
     """The subject is drawn firm, the apparatus that found it is drawn back.
@@ -229,7 +216,6 @@ def test_a_figure_separates_its_own_work_from_its_helpers(drawn_figures):
     nested = render_trace(_sample_trace(get("I.3")), "I.3")
     assert nested.count('class="ray aside"') > nested.count('class="ray"/')
 
-
 def test_marking_a_result_overrides_ownership():
     """The one case ownership cannot get right.
 
@@ -247,7 +233,7 @@ def test_marking_a_result_overrides_ownership():
         answer = [item for item in trace.results if not isinstance(item, Point)]
         assert answer, ref
 
-
+@pytest.mark.site
 def test_the_index_reports_real_numbers(site):
     index = (site / "index.html").read_text(encoding="utf-8")
     stats = dict(
@@ -258,33 +244,7 @@ def test_the_index_reports_real_numbers(site):
     assert stats["steps checked"] > 500
     assert stats["unproved assumptions"] > 0
 
-
-def test_the_readme_numbers_are_current():
-    """The README quotes counts that go stale every time a book grows.
-
-    They have gone stale twice and been corrected by hand both times, which is
-    what a test is for. Every number below is read straight out of the registry.
-    """
-    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(encoding="utf-8")
-    entries = all_propositions()
-
-    headline = re.search(r"\*\*(\d+) propositions\*\*, [\d,]+ checked steps", readme)
-    assert headline, "the README no longer states a proposition count"
-    assert int(headline.group(1)) == len(entries)
-
-    assert f"**{len(HEATH)} enunciations**" in readme, "the enunciation count is stale"
-
-    # The measured figures the README quotes are checked in test_measure.py,
-    # beside the file they are read from.
-
-    # The coverage table: one row per book, "encoded / total".
-    counted = collections.Counter(entry.book for entry in entries)
-    rows = re.findall(r"^\| \*{0,2}([IVX]+)\*{0,2} \| \*{0,2}(\d+) / (\d+)", readme, re.M)
-    assert len(rows) == 13, f"expected a row per book, found {len(rows)}"
-    for book, encoded, total in rows:
-        assert int(encoded) == counted[book], f"Book {book}: README says {encoded}"
-
-
+@pytest.mark.site
 def test_every_statement_is_heath_word_for_word(site):
     """No page may show anything but the parsed text, verbatim."""
     for entry in all_propositions():
@@ -292,7 +252,6 @@ def test_every_statement_is_heath_word_for_word(site):
         assert "Heath, 1908" in page, entry.ref
         assert entry.statement == HEATH[entry.ref]
         assert html.escape(entry.statement, quote=False) in page, entry.ref
-
 
 def test_a_proposition_cannot_carry_its_own_wording():
     """Hard rule: statements are parsed, never written.
@@ -310,7 +269,7 @@ def test_a_proposition_cannot_carry_its_own_wording():
     with pytest.raises(KeyError, match="not a proposition of the Elements"):
         proposition("XIV.1")(lambda: None)
 
-
+@pytest.mark.site
 def test_the_errata_are_published_in_full(site):
     """Every departure from the scan is listed where a reader can check it."""
     page = (site / "text.html").read_text(encoding="utf-8")
@@ -326,7 +285,7 @@ def test_the_errata_are_published_in_full(site):
             # full stop) leaves the original reading as a prefix of the fix
             assert item["source_reads"] not in HEATH[item["ref"]]
 
-
+@pytest.mark.site
 def test_the_findings_page_reports_the_real_results(site):
     """Every finding is measured, labelled by strength, and reproducible.
 
@@ -338,7 +297,7 @@ def test_the_findings_page_reports_the_real_results(site):
     findings = (site / "findings.html").read_text(encoding="utf-8")
 
     for banished in ("parallel postulate", "Postulate 5", "depend on I.1",
-                     "holds up the whole book", "a quarter of what has been written"):
+                     "holds up the whole book", "a quarter of what has been written", "Still open", "390 functions"):
         assert banished not in findings, f"{banished!r} is derived from citations"
 
     # What is left, and the kind of claim each one is.
@@ -355,7 +314,7 @@ def test_the_findings_page_reports_the_real_results(site):
     # Nothing may sit here without the command that reproduces it.
     assert findings.count("<pre>euclid ") >= findings.count('<div class="finding">') - 1
 
-
+@pytest.mark.site
 def test_the_pages_agree_with_each_other(site):
     """The same quantity must not be computed twice and reported differently.
 
@@ -377,7 +336,7 @@ def test_the_pages_agree_with_each_other(site):
         numbers["findings.html/prose"] = int(found.group(1))
     assert len(set(numbers.values())) == 1, numbers
 
-
+@pytest.mark.site
 def test_no_page_claims_every_proof_is_case_independent(site):
     """Four propositions do vary by figure, and every page must say so.
 
@@ -386,7 +345,7 @@ def test_no_page_claims_every_proof_is_case_independent(site):
     were generated from the same build.
     """
     # Read the refs off the page, then re-derive the verdict for those and for
-    # controls. Auditing all 390 again here cost five and a half minutes and
+    # controls. Auditing the full corpus again here cost five and a half minutes and
     # duplicated exactly what the build that made this site had just done.
     ledger_page = (site / "ledger.html").read_text(encoding="utf-8")
     section = ledger_page.split("Steps that vary by figure")[1].split("</p>")[0]
@@ -412,7 +371,7 @@ def test_no_page_claims_every_proof_is_case_independent(site):
     )
     assert "There are none" not in readme
 
-
+@pytest.mark.site
 def test_the_site_uses_exactly_three_colours(site):
     """Black, white, and one grey exactly halfway between. Nothing else."""
     found = set()
@@ -420,14 +379,14 @@ def test_the_site_uses_exactly_three_colours(site):
         found |= set(re.findall(r"#([0-9a-fA-F]{6})", page.read_text(encoding="utf-8")))
     assert {value.lower() for value in found} == {"000000", "808080", "ffffff"}
 
-
+@pytest.mark.site
 def test_the_site_never_fakes_a_fourth_shade(site):
     """Opacity or alpha would manufacture greys outside the palette."""
     style = (site / "style.css").read_text(encoding="utf-8")
     assert "opacity" not in style
     assert "rgba" not in style
 
-
+@pytest.mark.site
 def test_the_stylesheet_is_shared_rather_than_inlined(site):
     """It used to be inlined into all 398 pages: 61% of everything shipped.
 
@@ -441,7 +400,7 @@ def test_the_stylesheet_is_shared_rather_than_inlined(site):
         assert '<link rel="stylesheet" href="style.css">' in text, page.name
         assert "<style>" not in text, f"{page.name} still inlines CSS"
 
-
+@pytest.mark.site
 def test_the_stylesheet_parses(site):
     """Braces and comments balance, and no rule is stranded outside a block.
 
@@ -466,14 +425,14 @@ def test_the_stylesheet_parses(site):
             f"this looks like prose, not a selector: {selector[:70]!r}"
         )
 
-
+@pytest.mark.site
 def test_theorems_draw_the_figures_they_argue_about(site):
     """A proposition handed a triangle should still show you the triangle."""
     for ref in ("I-41", "I-4", "I-37", "I-20", "VI-4"):
         page = (site / f"{ref}.html").read_text(encoding="utf-8")
         assert page.count("<line ") >= 3, f"{ref} renders as bare dots"
 
-
+@pytest.mark.site
 def test_numbers_written_into_prose_match_their_source(site):
     """A figure typed into a sentence goes stale silently.
 

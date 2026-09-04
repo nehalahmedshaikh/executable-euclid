@@ -28,19 +28,9 @@ from euclid.elements.book10 import (
 from euclid.kernel import Context, sqrt
 from euclid.kernel.field import to_float
 from euclid.plane import Point, eq_len, len2, right_angle
-from euclid.verify import certify
 
 PLANE_XIII = [entry for entry in all_propositions()
               if entry.book == "XIII" and entry.number <= 12]
-
-EVERY = list(all_propositions())
-
-
-@pytest.mark.parametrize("entry", EVERY, ids=lambda entry: entry.ref)
-def test_proposition_is_certified(entry):
-    report = certify(entry.ref, trials=6)
-    assert not report.failures, report.failures[0].message
-    assert report.verified > 0, f"{entry.ref}: no valid configuration was sampled"
 
 
 # ---------------------------------------------------------------------------
