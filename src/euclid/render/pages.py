@@ -132,10 +132,9 @@ def _proposition_page(entry: Proposition, graph, trace: Optional[Trace],
 
 
 def _index_page(graph, stats) -> str:
-    top_ref, top_count = graph.load_bearing()[0]
     body = [
-        '<p class="kicker">Euclid\'s Elements, as software</p>',
-        "<h1>Executable Euclid</h1>",
+        '<p class="kicker">Euclid\'s Elements as software</p>',
+        "<h1>Overview</h1>",
         '<p class="lede">Every proposition is a small program. It draws its own figure '
         "with a straightedge and compass, checks its own conclusion, and says what it "
         "depended on. Nothing is measured or approximated.</p>",
@@ -149,70 +148,30 @@ def _index_page(graph, stats) -> str:
         "<p>A straightedge and compass can only produce certain numbers: the ones you "
         "reach from whole numbers by adding, subtracting, multiplying, dividing, and "
         "taking square roots. This project stores those numbers exactly, as square roots "
-        "piled on square roots, never as decimals.</p>",
-        "<p>That sounds like a small choice, but it changes what the machine can say. "
-        "Two lengths are either equal or they are not; there is no rounding, no tolerance "
-        "to set, and no near-miss that might be mistaken for a theorem. Everything else "
-        "on this site follows from that.</p>",
-        "<h2>What it found</h2>",
-        "<ul>",
-        '<li><a href="findings.html">The book measured by algebraic depth.</a> Every '
-        "magnitude a construction produces has an exact degree over the rationals, so "
-        "each book has a ceiling. I.1 already needs a square root; Books VII to IX never "
-        "leave the rationals; X.115 reaches degree 32.</li>",
-        '<li><a href="findings.html">Hypotheses broken on purpose.</a> Move a given until '
-        "one of Euclid's stated conditions fails, then run without enforcing it, and see "
-        "whether the conclusion held anyway. II.9 and II.10 turn out to be the same "
-        "identity written twice.</li>",
-        '<li><a href="findings.html">A constructible number Book X cannot name.</a> The '
-        "thirteen species do not cover everything a straightedge and compass produce, and "
-        "the classifier finds the boundary.</li>",
-        '<li><a href="ledger.html">The gaps Euclid never mentions.</a> His rules let you '
-        "draw circles, but never say that two circles meet. He uses that fact anyway, "
-        "starting on page one.</li>",
-        '<li><a href="optimizer.html">The shortest possible constructions.</a> Where the '
-        "table says <em>fewest possible</em>, every shorter figure was ruled out in exact "
-        "arithmetic. With no straightedge at all a midpoint costs six circles.</li>",
-        '<li><a href="graph.html">What depends on what.</a> Two kinds of edge, and the '
-        f"page says which is which: {top_ref} carries {top_count} of the others, but most "
-        "of that is Euclid's own cross-references.</li>",
-        "</ul>",
-        '<p><a href="findings.html"><strong>All the findings in one place &rarr;</strong>'
-        "</a></p>",
+        "piled on square roots, never as decimals. Two lengths are either equal or they "
+        "are not; there is no rounding, no tolerance to set, and no near-miss that might "
+        "be mistaken for a theorem. Everything else on this site follows from that. See "
+        "the <a href='findings.html'>findings page</a> for the measurements and the "
+        "commands that reproduce them.</p>",
         "<h2>The propositions</h2>",
     ]
 
     by_book: dict[str, list[Proposition]] = {}
     for entry in all_propositions():
         by_book.setdefault(entry.book, []).append(entry)
-    # "(complete)" used to be hardcoded to Book I and stayed there while nine
-    # more books were finished. It is counted against the text instead.
     in_heath: dict[str, int] = {}
     for ref in HEATH:
         in_heath[ref.split(".")[0]] = in_heath.get(ref.split(".")[0], 0) + 1
     for book, entries in by_book.items():
         title = BOOK_TITLES.get(book, "")
         total = in_heath.get(book, 0)
-        note = " &mdash; complete" if total and len(entries) == total else (
-            f" &mdash; {len(entries)} of {total}" if total else ""
-        )
+        note = f" &mdash; {len(entries)} of {total}" if total and len(entries) != total else ""
         body.append(f"<h3>Book {book}: {_esc(title)}{note}</h3>")
         body.append('<div class="grid">')
         for entry in entries:
             body.append(f'<a href="{_slug(entry.ref)}.html">{entry.ref}</a>')
         body.append("</div>")
 
-    body.append(
-        "<h2>What &ldquo;checked&rdquo; means here</h2>"
-        "<p>Each proposition is run on many different figures that fit its assumptions, "
-        "and every step is tested exactly against the figure that was built. That is a "
-        "strong test, but it is a test of the pictures, not a proof in Euclid's own "
-        "logic. It confirms the conclusions are true of the constructions; it does not "
-        "confirm they follow by his rules of reasoning.</p>"
-        "<p>The references each step cites are recorded, but the test does not rely on "
-        "them. So a step with the wrong reference attached still cannot slip a false "
-        "statement past.</p>"
-    )
     return _page("Executable Euclid", "".join(body), here="index.html")
 
 
@@ -233,12 +192,16 @@ def _findings_page(graph, stats, search_rows) -> str:
 
     if measured:
         depth = measured["depth"]
-        ceiling_rows = "".join(
-            f"<tr><td>{book}</td><td>{top}</td></tr>"
-            for book, top in sorted(
-                depth["ceilings"].items(),
-                key=lambda kv: BOOK_ORDER.index(kv[0]) if kv[0] in BOOK_ORDER else 99,
-            )
+        ceiling = sorted(
+            depth["ceilings"].items(),
+            key=lambda kv: BOOK_ORDER.index(kv[0]) if kv[0] in BOOK_ORDER else 99,
+        )
+        ceiling_rows = (
+            "<tr><th>Book</th>"
+            + "".join(f"<td>{book}</td>" for book, _ in ceiling)
+            + "</tr><tr><th>Highest degree</th>"
+            + "".join(f"<td>{top}</td>" for _, top in ceiling)
+            + "</tr>"
         )
         first = depth["first_appearances"]
         deepest = depth["deepest"][0]
@@ -248,16 +211,15 @@ def _findings_page(graph, stats, search_rows) -> str:
             "tower of quadratic extensions of the rationals, so it has a degree, and the "
             f"kernel can state it. Running all {measured['corpus']} propositions gives a "
             "map of the work by algebraic depth. The text cannot tell you this; it is a "
-            "property of what the constructions <em>do</em>.</p>"
-            "<p>The equilateral triangle of <strong>I.1</strong> already needs "
+            "property of what the constructions <em>do</em>. The equilateral triangle of <strong>I.1</strong> already needs "
             f"&radic;3, and <strong>{_esc(first.get('4', 'I.2'))}</strong> already needs "
             "a second square root standing on the first. Yet Books III and VI &mdash; all "
             "those circles, all that similarity &mdash; never exceed degree 2, and Books "
             "VII to IX never leave the rationals at all, which is what arithmetic ought "
             "to look like. The deepest point in the whole work is "
             f"<strong>{_esc(deepest['ref'])}</strong>, at degree {deepest['degree']}.</p>"
-            '<div class="scroll"><table><tr><th>Book</th><th>Highest degree reached</th>'
-            f"</tr>{ceiling_rows}</table></div>"
+            '<div class="scroll"><table>'
+            f"{ceiling_rows}</table></div>"
             "<pre>euclid measure --depth</pre>",
         ))
 
@@ -318,8 +280,7 @@ def _findings_page(graph, stats, search_rows) -> str:
             "exclude, so those are normally thrown away, and one question goes unasked: "
             "<em>would the conclusion have held anyway?</em> Lifting the exclusion makes "
             "it askable. Move one given until a hypothesis breaks, then run without "
-            "enforcing it.</p>"
-            f"<p>Across the corpus {need['hypotheses']} hypotheses are stated. "
+            f"enforcing it. Across the corpus {need['hypotheses']} hypotheses are stated. "
             f"{need['judged']} could be broken cleanly enough to judge "
             f"({100 * need['coverage']:.0f}% coverage &mdash; a run that breaks two at "
             "once says nothing about either and is discarded). Of those, "
@@ -340,8 +301,7 @@ def _findings_page(graph, stats, search_rows) -> str:
         "<p>His postulates let you draw a circle. None of them says that two circles ever "
         "cross. He needs them to cross in I.1, on the very first page, to get the top "
         "corner of his triangle &mdash; and simply takes it. The gap was not stated "
-        "properly until the nineteenth century.</p>"
-        "<p>Every step that uses an intersection the postulates do not license is counted "
+        "properly until the nineteenth century. Every step that uses an intersection the postulates do not license is counted "
         f"as it happens: <strong>{stats['continuity']} places</strong> across Books I to "
         'X. <a href="ledger.html">The full ledger &rarr;</a></p>'
         "<pre>euclid ledger</pre>",
@@ -448,8 +408,7 @@ def _findings_page(graph, stats, search_rows) -> str:
             f"<p>For {certified} of these problems every shorter figure was enumerated in "
             "exact arithmetic and none reached the goal, so <em>fewest possible</em> is a "
             "theorem. The two circles of I.1 are the shortest way to an equilateral "
-            "triangle, and nothing of one move comes close.</p>"
-            "<p>Mohr in 1672 and Mascheroni in 1797 proved the compass alone finds "
+            "triangle, and nothing of one move comes close. Mohr in 1672 and Mascheroni in 1797 proved the compass alone finds "
             "anything the pair can, and the search puts a price on it: a midpoint costs "
             "<strong>six circles</strong>, and every five-circle figure was enumerated "
             "exactly to prove it cannot be done in five.</p>"
@@ -473,23 +432,24 @@ def _findings_page(graph, stats, search_rows) -> str:
         "<h1>Findings</h1>",
         '<p class="lede">Every number on this page was produced by running the corpus, '
         "and each finding carries the command that reproduces it.</p>",
-        '<p class="note"><b>Exhaustive</b>: every possibility was enumerated, so a '
-        "negative answer is a theorem. <b>Measured</b>: computed exactly from the "
-        "constructions as they run. <b>Empirical</b>: sampled over configurations, so it "
-        "is evidence, and it says how much. Nothing here is read off the citations "
-        'written beside each step. <a href="graph.html">Which edges are which.</a></p>',
-        '<p class="note">All of it is measured over <em>this encoding</em> of the '
-        "<em>Elements</em>, and the encoding is written by hand. Heath's "
-        "words are parsed and never retyped; turning them into hypotheses and claims is "
-        "authored, and that is the part to doubt. Exact arithmetic catches a claim that "
-        "is <em>false</em> the moment it runs. A hypothesis that is merely <em>narrower</em> "
-        "than Euclid's makes the proposition weaker and still passes forever, so the "
-        "necessity analysis below is also the test for it: a condition doing no work "
-        "survives being broken. That is how VIII.8, VIII.10 and VIII.13 were caught "
-        "requiring a ratio in least terms, which Euclid nowhere asks for.</p>",
     ]
+    definitions = {
+        "Exhaustive": "Every possibility was enumerated, so a negative answer is a theorem.",
+        "Measured": "Computed exactly from the constructions as they run.",
+        "Empirical": "Sampled over configurations, so it is evidence, and it says how much.",
+    }
+    grouped = {category: [] for category in definitions}
     for heading, text in findings:
-        body.append(f'<div class="finding"><h3>{heading}</h3>{text}</div>')
+        category, title = heading.split(" &mdash; ", 1)
+        grouped.setdefault(category, []).append((title, text))
+    for category in ("Exhaustive", "Measured", "Empirical"):
+        body.append(
+            f'<h2>{category}<span class="section-definition"> &mdash; '
+            f'{definitions[category]}</span></h2>'
+        )
+        for title, text in grouped[category]:
+            title = title[:1].upper() + title[1:]
+            body.append(f'<div class="finding"><h3>{title}</h3>{text}</div>')
     return _page("Findings — Executable Euclid", "".join(body), here="findings.html")
 
 
@@ -507,14 +467,15 @@ def _graph_page(graph) -> str:
         key=lambda ref: graph.nodes[ref].sort_key(),
     )
     body = [
-        '<p class="kicker">Two kinds of edge, and they are not the same</p>',
-        "<h1>What depends on what</h1>",
-        '<p class="lede">This graph has two sorts of line in it, and the difference '
-        "matters more than the picture does.</p>",
+        '<p class="kicker">The two kinds of edges</p>',
+        "<h1>Dependencies</h1>",
+        '<p class="lede">Propositions sit on the row matching how many steps of argument '
+        "stand between them and the starting rules. Lines run upward from a proposition "
+        "to the ones built on it.</p>",
         '<div class="stat">',
-        f"<div><b>{executed}</b><span>edges executed</span></div>",
-        f"<div><b>{cited}</b><span>edges cited</span></div>",
-        f"<div><b>{100 * executed // total if total else 0}%</b><span>executed</span></div>",
+        f"<div><b>{executed}</b><span>executed edges</span></div>",
+        f"<div><b>{cited}</b><span>cited edges</span></div>",
+        f"<div><b>{total}</b><span>total edges</span></div>",
         "</div>",
         "<p><strong>Executed.</strong> One proposition calls another as a function, and "
         "the call is recorded as it happens. That edge is a fact about the running code: "
@@ -526,25 +487,13 @@ def _graph_page(graph) -> str:
         "discovery. A finding read off cited edges is a finding about our typing, so "
         'nothing on the <a href="findings.html">findings page</a> is derived from '
         "them.</p>",
-        "<h2>What actually ran</h2>",
-        f"<p>The {executed} executed edges on their own, over the "
-        f"{len(executed_refs)} propositions that have one. Small enough to read, and "
-        "every line in it is a call that happened.</p>",
+        "<h2>Executed edges</h2>",
         f'<div class="plot">{graph_svg(graph, executed_refs, only_executed=True)}</div>',
-        "<h2>Everything, both kinds together</h2>",
-        f"<p>All {len(graph.nodes)} propositions. This is about ten thousand pixels "
-        "wide, so it scrolls at full size: shrunk to a page the labels come out a pixel "
-        "tall. Drag it sideways.</p>",
+        "<h2>Total edges</h2>",
         f'<div class="plot">{graph_svg(graph)}</div>',
         '<p class="legend">'
         "<span><i></i>executed &mdash; a recorded call</span>"
         '<span><i class="dash"></i>cited &mdash; written beside the step</span></p>',
-        '<p class="note">Propositions sit on the row matching how many steps of argument '
-        "stand between them and the starting rules. Lines run upward from a proposition to "
-        "the ones built on it.</p>",
-        "<h2>Carrying the most weight</h2>",
-        "<p>How many other propositions would fall if this one did &mdash; counting both "
-        "kinds of edge, so mostly a summary of Euclid's own cross-references.</p>",
         '<div class="scroll"><table><tr><th>Proposition</th><th>Dependents</th>'
         f"<th>Depth</th><th>Statement</th></tr>{rows}</table></div>",
     ]
@@ -556,36 +505,15 @@ def _minimal_page(graph, target: str = "I.47") -> str:
     if target not in graph.nodes:
         return _page("Minimal Elements", "<h1>Nothing to show</h1>")
     minimal = graph.tree_shake(target)
-    dropped = sorted(set(graph.nodes) - set(minimal), key=lambda r: graph.nodes[r].sort_key())
-    rows = "".join(
-        f'<tr><td><a href="{_slug(ref)}.html">{ref}</a></td>'
-        f"<td>{_esc(graph.nodes[ref].statement)}</td></tr>"
-        for ref in minimal
-    )
     body = [
-        '<p class="kicker">Everything Pythagoras needs, and nothing else</p>',
-        f"<h1>The shortest route to {target}</h1>",
-        f'<p class="lede">Of the {len(graph.nodes)} propositions written out here, '
-        f"{len(minimal)} are needed to reach {target}. Below they are in order, each one "
-        "resting only on those above it.</p>",
-        '<p class="note">This is computed over both kinds of dependency edge, and most of '
-        "them are citations written by hand from Heath's margins. So read this as a "
-        "tidy presentation of Euclid's own cross-references. "
-        '<a href="graph.html">The split is on the graph page.</a></p>',
-        f"<p>{target} is the one shown here because it is the traditional end of Book I "
-        "and the obvious thing to aim at. Nothing about the calculation is special to "
-        "it &mdash; any proposition can be tree-shaken the same way, and the command "
-        "takes whichever you like:</p>",
-        "<pre>euclid minimal III.35\neuclid minimal X.115</pre>",
+        '<p class="kicker">Everything Pythagoras needs</p>',
+        "<h1>Minimal Elements</h1>",
+        f'<p class="lede">The calculation is not special to {target} &mdash; any '
+        "proposition can be tree-shaken the same way.</p>",
         f'<div class="plot">{graph_svg(graph, minimal, highlight=target)}</div>',
         f'<p class="legend"><span><i></i>executed</span>'
         '<span><i class="dash"></i>cited</span></p>',
-        '<div class="scroll"><table><tr><th>Proposition</th><th>Statement</th></tr>'
-        f"{rows}</table></div>",
-        f"<h2>Left out ({len(dropped)})</h2>",
-        '<p class="note">'
-        + " ".join(f'<a href="{_slug(ref)}.html">{ref}</a>' for ref in dropped)
-        + "</p>",
+        "<pre>euclid minimal III.35\neuclid minimal X.115</pre>",
     ]
     return _page(f"Shortest route to {target}", "".join(body), here="minimal.html")
 
@@ -600,7 +528,6 @@ def _ledger_page(ledgers) -> str:
     # was four-fifths empty cells and read as broken rather than sparse. Only the
     # rows with something in them are drawn, and the count of the rest is stated.
     owing = [item for item in ledgers if not item.is_clean]
-    clean = len(ledgers) - len(owing)
     rows = "".join(
         f'<tr><td><a href="{_slug(item.ref)}.html">{item.ref}</a></td>'
         f"<td class=\"tally\">{item.continuity_debt or '&mdash;'}</td>"
@@ -610,17 +537,15 @@ def _ledger_page(ledgers) -> str:
         for item in owing
     )
     body = [
-        '<p class="kicker">Found by running the proofs, not by reading them</p>',
-        "<h1>What Euclid takes on trust</h1>",
+        '<p class="kicker">Found by running the proofs</p>',
+        "<h1>What Euclid assumes</h1>",
         '<p class="lede">His rules let you draw a straight line and a circle. None of them '
-        "says two circles ever cross. He uses that anyway, on the first page, and many "
-        "times after.</p>",
+        "says two circles ever cross.</p>",
         '<div class="stat">',
         f"<div><b>{totals[0]}</b><span>points assumed to exist</span></div>",
         f"<div><b>{totals[1]}</b><span>facts read off the picture</span></div>",
         f"<div><b>{totals[2]}</b><span>steps that vary by figure</span></div>",
         "</div>",
-        "<h2>What each column counts</h2>",
         "<p><strong>Points assumed to exist.</strong> Every time the construction uses a "
         "point where a line meets a circle, or two circles meet. Euclid's rules never "
         "promise those points are there. This is read straight off the record of what was "
@@ -640,10 +565,7 @@ def _ledger_page(ledgers) -> str:
         "diagram; III.32 has a step about two points lying on the same side of a line "
         "that is simply true in some figures and false in others. These are the places "
         "where a case analysis is doing work that the argument does not set out.</p>",
-        f"<h2>The {len(owing)} that assume something</h2>",
-        f'<p class="note">The other {clean} assume nothing at all &mdash; no '
-        "intersection drawn, nothing read off the picture. The last column shows the "
-        "first assumption of each; the rest are on the proposition's own page.</p>",
+        f"<h2>The {len(owing)} propositions that assume something</h2>",
         '<div class="scroll"><table><tr><th>Proposition</th>'
         '<th class="tally">Points assumed</th><th class="tally">Read off</th>'
         '<th class="tally">Varies</th><th>The first of them</th></tr>'
@@ -686,8 +608,8 @@ def _optimizer_page(rows) -> str:
             f"<td>{'yes' if row['verified'] else '&mdash;'}</td></tr>"
         )
     body = [
-        '<p class="kicker">Try everything, then check it exactly</p>',
-        "<h1>The shortest constructions</h1>",
+        '<p class="kicker">Try and check everything exactly</p>',
+        "<h1>Shortest constructions</h1>",
         '<p class="lede">The machine tries every legal move, in order of length, until it '
         "reaches the goal. The winner is then rebuilt in exact arithmetic, where it either "
         "works or does not.</p>",
@@ -700,10 +622,11 @@ def _optimizer_page(rows) -> str:
         "<strong>His moves</strong> counts every line and circle drawn once the earlier "
         "propositions he leans on are expanded &mdash; his I.10 reaches through three other "
         "results, so fifteen things get drawn. <strong>Fewest</strong> stops as soon as the "
-        "goal exists and draws nothing to tidy up.</p>"
-        "<p>More to the point, Euclid was building constructions that could be "
-        "<em>proved</em> from what came before. Reusing an earlier result costs moves but "
-        "buys certainty. Counting moves was a nineteenth-century preoccupation, not his.</p>",
+        "goal exists and draws nothing to tidy up. More to the point, Euclid was building "
+        "constructions that could be <em>proved</em> from what came before. Reusing an "
+        "earlier result costs moves but "
+        "buys certainty. Counting moves was a nineteenth-century preoccupation, not his."
+        "</p>",
         "<h2>Working with fewer tools</h2>",
         "<p>A construction is a program, and these are different machines to run it on: "
         "compass and straightedge, compass alone, straightedge alone with one circle "
@@ -722,8 +645,8 @@ def _optimizer_page(rows) -> str:
         "sharing a rounded fingerprint would each hide a construction and turn a longer "
         "answer into a false minimum. Certifying these depths exactly is out of reach.</p>"
         "<p><strong>Upper bound.</strong> The search hit its node budget. Only the "
-        "construction shown is meaningful.</p>"
-        "<p>The float search is what makes the problem tractable at all, and it carries "
+        "construction shown is meaningful. The float search is what makes the problem "
+        "tractable at all, and it carries "
         "two further limits: points straying far outside the figure are ignored, and a "
         "figure of more than twenty points is abandoned. Neither touches a "
         "<em>fewest possible</em> row.</p>",
@@ -747,11 +670,6 @@ def _text_page() -> str:
         "<h1>Text and figures</h1>",
         f'<p class="lede">Every proposition statement on this site is '
         f"{HEATH_CREDIT}</p>",
-        f"<p>All <strong>{len(HEATH)} propositions</strong> of all thirteen books are "
-        "parsed from one source and shipped as data. There is no second kind of "
-        "statement: a proposition whose enunciation is missing raises. "
-        f"Of the {len(HEATH)}, <strong>{len(encoded)}</strong> have been written out as "
-        "programs so far; the rest are text waiting for code.</p>",
         "<h2>Errata</h2>",
         "<p>The source is a scan, and scans misread. Every correction made to it is "
         "listed here in full &mdash; what the scan says, what it was corrected to, and "
@@ -760,10 +678,8 @@ def _text_page() -> str:
         '<div class="scroll"><table><tr><th>Proposition</th><th>The scan reads</th>'
         f"<th>Corrected to</th><th>Why</th></tr>{rows}</table></div>",
         "<h2>The figures are not Euclid's</h2>",
-        "<p>The words are his exactly. <strong>The diagrams are not, and are not "
-        "meant to be.</strong> If you hold a printed Euclid next to these pages, most "
-        "figures will not match.</p>",
-        "<p>A figure in a book is <em>composed</em>. The author picks a configuration "
+        "<p>If you hold a printed Euclid next to these pages, most figures will not "
+        "match. A figure in a book is <em>composed</em>. The author picks a configuration "
         "that shows the case well, draws the construction lines the argument needs and "
         "no others, and letters the points to suit the proof. Every figure here is a "
         "<em>trace</em>: the record of a construction that actually ran, on coordinates "
@@ -789,8 +705,8 @@ def _text_page() -> str:
         "<p>Two of the three above substitute a single letter and still spell a real "
         "word &mdash; <span class=\"mono\">acutc</span>, <span class=\"mono\">cach</span> "
         "&mdash; so no spell check or length check would catch them. What catches them "
-        "is that Euclid's vocabulary is tiny and endlessly repetitive: about four "
-        "hundred distinct words across all four hundred and sixty-five enunciations. "
+        "is that Euclid's vocabulary is tiny and endlessly repetitive: about 400 "
+        "distinct words across all 465 enunciations. "
         "The parser lists every word used <em>exactly once</em>, and a misprint has "
         "nowhere to hide in a list that short. Everything else in it is a genuine term "
         "of art.</p>",
@@ -799,7 +715,7 @@ def _text_page() -> str:
 
 
 def _book_x_page() -> str:
-    from ..elements.book10 import classify
+    from ..elements.book10 import SPECIES, classify
 
     rows = []
     with Context("book-x-site"):
@@ -822,7 +738,7 @@ def _book_x_page() -> str:
             sqrt(18) + sqrt(2),
             sqrt(4 + sqrt(7)),
         ]
-        # The last six species are the ones whose two terms are the roots of a
+        # The six apotome species are the ones whose two terms are the roots of a
         # single quadratic, so a sum like this is the only way to write them
         # down: give the sum of the squares and the rectangle, and the pair
         # follows. X.39-41 and their duals in X.76-78.
@@ -836,19 +752,35 @@ def _book_x_page() -> str:
         # And one the thirteen do not reach, so the table shows its own edge
         # rather than only the inside of it. See euclid.measure.gaps.
         specimens.append(1 + sqrt(2) + sqrt(3))
+        representatives = {}
         for value in specimens:
             named = classify(value)
+            if named.family == "medial":
+                species = "medial"
+            elif named.family == "binomial":
+                species = "binomial"
+            elif named.family == "apotome" and "medial line" not in named.name:
+                species = "apotome"
+            elif named.name in SPECIES:
+                species = named.name
+            else:
+                continue
+            representatives.setdefault(species, named)
+        for species in SPECIES:
+            named = representatives.get(species)
+            if named is None:
+                continue
             rows.append(
-                f'<tr><td class="mono">{_esc(fmt(value))}</td>'
-                f'<td class="mono">{to_float(value):.9f}</td>'
-                f"<td>{_esc(named.name)}</td><td>{named.algebraic_degree}</td></tr>"
+                f'<tr><td class="mono">{_esc(fmt(named.value))}</td>'
+                f'<td class="mono">{to_float(named.value):.9f}</td>'
+                f"<td>{_esc(species)}</td><td>{named.algebraic_degree}</td></tr>"
             )
     body = [
         '<p class="kicker">The book everyone skips</p>',
-        "<h1>Book X, running</h1>",
-        '<p class="lede">One hundred and fifteen propositions sorting irrational lengths '
-        "into named kinds. It reads as impenetrable because it is written about things "
-        "nobody could calculate with. This project can.</p>",
+        "<h1>Book X</h1>",
+        '<p class="lede">115 propositions sorting irrational lengths '
+        "into named kinds. It seems impenetrable because it is written about things "
+        "nobody could calculate with.</p>",
         "<p>Some lengths a straightedge and compass produce are whole numbers or "
         "fractions. Most are not. Euclid gives thirteen names to the ones that are not "
         "&mdash; <em>medial</em>, <em>binomial</em>, <em>apotome</em>, and so on &mdash; "
@@ -857,24 +789,17 @@ def _book_x_page() -> str:
         "whole classification becomes a single function.</p>",
         '<div class="scroll"><table><tr><th>Length</th><th>Value</th>'
         f"<th>Euclid's name for it</th><th>Degree</th></tr>{''.join(rows)}</table></div>",
-        "<p>All thirteen names are above. The last six are the awkward ones: their two "
+        "<p>The six apotome species are the awkward ones: their two "
         "terms are the roots of a single quadratic, so neither can be written without "
         "the other and the sum shows no seam to split it at. Squaring puts the seam "
         "back &mdash; the square is the sum of the squares plus twice the rectangle, and "
         "<em>those</em> come apart &mdash; after which the recovered pair is checked by "
         "adding it up again.</p>",
-        '<p class="note">'
-        '<span class="mono">sqrt(18) + sqrt(2)</span> is not a binomial: the two parts are '
-        'multiples of each other, so it collapses to <span class="mono">4&middot;sqrt(2)</span>, '
-        'and the classifier says so. <span class="mono">sqrt(4 + sqrt 7)</span> untangles '
-        "itself before being named. And the second bimedial turns on its rectangle being "
-        "a medial <em>area</em> rather than a medial <em>line</em> &mdash; one square "
-        "shallower, and a distinction easy to lose.</p>",
         "<h2>Where the thirteen run out</h2>",
-        "<p>The last row. "
-        '<span class="mono">1 + sqrt(2) + sqrt(3)</span> is constructible with a '
-        "straightedge and compass like everything above it, and Euclid has no name for "
-        "it. His classification comes out of applying areas, which produces sums and "
+        "<p>The simplest example outside the thirteen is "
+        '<span class="mono">1 + sqrt(2) + sqrt(3)</span>. It is constructible with a '
+        "straightedge and compass, but Euclid has no name for it. His classification "
+        "comes out of applying areas, which produces sums and "
         "differences of <em>two</em> terms; this one resolves into three, and falls "
         "outside. It is the simplest such number the search finds. "
         '<a href="findings.html">The finding &rarr;</a></p>',

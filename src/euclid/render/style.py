@@ -41,6 +41,7 @@ h1 { font-size: 1.95rem; line-height: 1.22; margin: 0 0 .5rem; font-weight: norm
      letter-spacing: -.01em; }
 h2 { font-size: 1.22rem; font-weight: normal; margin: 2.8rem 0 .8rem;
      border-bottom: 1px solid var(--grey); padding-bottom: .35rem; }
+h2 .section-definition { font-size: inherit; color: var(--ink); letter-spacing: 0; }
 h3 { font-size: 1rem; margin: 1.9rem 0 .5rem; font-weight: 700; }
 .kicker { font: 700 .68rem/1 ui-sans-serif, system-ui, sans-serif;
   letter-spacing: .16em; text-transform: uppercase; color: var(--grey);
@@ -119,7 +120,7 @@ blockquote .src { display: block; font: .7rem ui-sans-serif, system-ui, sans-ser
                   color: var(--grey); margin-top: .55rem; letter-spacing: .04em;
                   text-transform: uppercase; }
 .note { color: var(--grey); font-size: .95rem; }
-.finding { border-top: 1px solid var(--grey); padding-top: 1.1rem; margin-top: 1.8rem; }
+.finding { padding-top: 1.1rem; margin-top: 1.8rem; }
 .finding h3 { margin-top: 0; }
 .legend { font: .78rem/1.6 ui-sans-serif, system-ui, sans-serif; color: var(--grey);
           display: flex; flex-wrap: wrap; gap: .3rem 1.6rem; margin: .7rem 0 0; }

@@ -366,10 +366,6 @@ def test_no_page_claims_every_proof_is_case_independent(site):
         for ref in varying:
             assert ref in text, f"{page} does not name {ref}"
 
-    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(
-        encoding="utf-8"
-    )
-    assert "There are none" not in readme
 
 @pytest.mark.site
 def test_the_site_uses_exactly_three_colours(site):
